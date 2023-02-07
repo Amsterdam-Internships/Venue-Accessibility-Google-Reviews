@@ -1,7 +1,6 @@
 # env / packaging
 myenv/
 wheels/
-
 # bytecode stuffs
 __pycache__/
 *.py[cod]
@@ -13,3 +12,7 @@ __pycache__/
 # other
 .idea/*
 .gitignore
+
+# Data
+GoogleReviews/
+EuansGuideData.xlsx
