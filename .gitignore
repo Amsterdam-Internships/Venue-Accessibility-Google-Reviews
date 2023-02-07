@@ -1,5 +1,5 @@
 # env / packaging
-env/
+myenv/
 wheels/
 
 # bytecode stuffs
@@ -12,3 +12,7 @@ __pycache__/
 
 # other
 .idea/*
+
+# Data
+GoogleReviews/
+EuansGuideData.xlsx
