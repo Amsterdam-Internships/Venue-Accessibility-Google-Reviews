@@ -8,6 +8,7 @@ __pycache__/
 # jupyter
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
+pipeline_google_reviews.ipynb
 
 # other
 .idea/*
@@ -15,4 +16,6 @@ __pycache__/
 
 # Data
 GoogleReviews/
-EuansGuideData.xlsx
+Euan's Guide Data.xlsx
+src/data
+.gitignore
