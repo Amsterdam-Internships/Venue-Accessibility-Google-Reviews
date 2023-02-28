@@ -8,11 +8,13 @@ __pycache__/
 # jupyter
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
-pipeline_google_reviews.ipynb
+/pipeline_google_reviews.ipynb
+/Venue-Accessibility-Google-Reviews.code-workspace
 
 # other
 .idea/*
 .gitignore
+
 
 # Data
 GoogleReviews/
