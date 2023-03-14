@@ -19,7 +19,7 @@ def clean_train_df(df):
     return  rating_to_sent(selected_aspects)
 
 def clean_sentiment(df):
-    to_remove = [" stars", " tar"]
+    to_remove = [" stars", " star"]
     df["Sentiment"] = df["Sentiment"].map(lambda x: re.sub("|".join(to_remove), "", x))
     return df
 
