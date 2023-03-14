@@ -26,7 +26,6 @@ def clean_sentiment(df):
 def clean_test_df(df):
     wanted_columns = drop_test(df)
     tokenised_data = tokenize_text(df)
-    return tokenised_data
     clean_sent = clean_sentiment(tokenised_data)
     return  rating_to_sent(clean_sent)
   
