@@ -20,5 +20,7 @@ __pycache__/
 GoogleReviews/
 Euan's Guide Data.xlsx
 src/data
+data/
+datasets/
 
 pipeline_google_reviews.ipynb
