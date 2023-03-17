@@ -35,7 +35,7 @@ def clean_and_select(df, columns):
     if 'Aspect' in df:
         df_selected = rename_columns(df[columns], ["Review"],  ["Text"])
         df_cleaned = remove_empty_vals(df_selected)
-        target_aspects = ['Toilets', 'Transport & Parking']
+        target_aspects = ['Toilets', 'Transport & Parking', 'Wheelchair']
         selected_aspects = filter_aspects(df_cleaned, target_aspects)
         selected_aspects["Venue"] = selected_aspects["Venue"].apply(lambda x: get_venue_name(x))
         return convert_rating(selected_aspects)
@@ -43,7 +43,7 @@ def clean_and_select(df, columns):
         df_selected = rename_columns(df[columns], ["Review Text", "Review Rate"],["Text","Sentiment"])
         cleaned_df = remove_empty_vals(df_selected)
         cleaned_sentiments = clean_sentiment(cleaned_df)
-        return  convert_rating(cleaned_df)
+        return  convert_rating(cleaned_sentiments)
     
 
 def replace_substrings(s):

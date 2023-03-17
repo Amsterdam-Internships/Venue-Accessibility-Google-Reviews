@@ -18,7 +18,8 @@ __pycache__/
 
 # Data
 datasets/GoogleReviews/
-datasets/Euan's Guide Data.xlsx
+/datasets/EuansGuideData.xlsx
+/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/datasets/
 src/data
 data/
 datasets/
