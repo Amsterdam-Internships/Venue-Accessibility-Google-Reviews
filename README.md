@@ -1,11 +1,11 @@
-# Amsterdam Internships - Example README
+# Venue Accessibility with Googlie Reviews 
 
-Explain in short what this repository is. Mind the target audience.
-No need to go into too much technical details if you expect some people would just use it as end-users 
-and don't care about the internals (so focus on what the code really *does*), not how.
-The *_How it works_* section below would contain more technical details for curious people.
+This project aims to highlight the perspective of people with Reduced Mobility (RM) living in Amsterdam via analysis of public venue reviews. This is done using Natural Language Processing (NLP) techniques such as Aspect Based Sentiment Analysis and Opinion Summarisation. 
 
-If applicable, you can also show an example of the final output.
+It is an extension of the work carried out by L. Da Rocha Bazilio, to understand how different models are able to extract aspects in reference to accessibility with data that is noisy e.g. data with implicit aspects. 
+
+In addition, understanding the impact of Opinion Summarisation on the reviews about accessibility. Also, how this can make activity and journey planning for those with RM easier. 
+
 
 ![](media/examples/emojis.png)
 
@@ -18,29 +18,14 @@ Explain briefly what's where so people can find their way around. For example:
 
 There are the following folders in the structure:
 
+1) [`datasets`](./datasets): This is where you should place your data for training and testing.
+1) [`media`](./media): This is where results of each step of the pipeline are stored as images.
+1) [`notebooks`](./notebooks): This contains the notebooks of th pipeline.
 1) [`resources`](./resources): Random nice resources, e.g. [`useful links`](./resources/README.md)
+1) [`results`](./results): Here you will find the txt form of the results.
 1) [`src`](./src): Folder for all source files specific to this project
 1) [`scripts`](./scripts): Folder with example scripts for performing different tasks (could serve as usage documentation)
-1) [`tests`](./tests) Test example
-1) [`media`](./media): Folder containing media files (icons, video)
-1) ...
-
-OR
-
-Or use something like `tree` to include the overall structure with preferred level of detail (`-L 2` or `-d` or `-a`...)
-```buildoutcfg
-├── media --> you can still add comments and descriptions in this tree
-│   └── examples
-├── resources --> a lot of useful links here
-├── scripts
-├── src --
-└── tests
-```
-
-
-
-If you are lacking ideas on how to structure your code at the first place, take a look at [`CookieCutter`](https://drivendata.github.io/cookiecutter-data-science/)
-
+1) [`tests`](./tests) Here I store all of the tests for project
 ---
 
 
@@ -53,17 +38,12 @@ A person should be able to clone this repo, follow your instructions blindly, an
 
 1) Clone this repository:
     ```bash
-    git clone https://github.com/Amsterdam-Internships/InternshipAmsterdamGeneral
+    git clone git@github.com:Amsterdam-Internships/Venue-Accessibility-Google-Reviews.git
     ```
 
-1) If you are using submodules don't forget to include `--recurse-submodules` to the step above or mention that people can still do it afterwards:
-   ```bash
-   git submodule update --init --recursive
-   ```
-
-1) Install all dependencies:
+2) Install all dependencies:
     ```bash
-    pip install -r requirements.txt
+    conda install environment.yaml
     ```
 ---
 
@@ -107,8 +87,4 @@ You can explain roughly how the code works, what the main components are, how ce
 ## Acknowledgements
 
 
-Don't forget to acknowledge any work by others that you have used for your project. Add links and check whether the authors have explicitly stated citation preference for using the DOI or citing a paper or so. 
-For example:
-
-Our code uses [YOLOv5](https://github.com/ultralytics/yolov5) [![DOI](https://zenodo.org/badge/264818686.svg)](https://zenodo.org/badge/latestdoi/264818686)
-
+This work and code is based off of the priort work of @Lizzydrb .
