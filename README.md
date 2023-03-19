@@ -7,14 +7,14 @@ It is an extension of the work carried out by L. Da Rocha Bazilio, to understand
 In addition, understanding the impact of Opinion Summarisation on the reviews about accessibility. Also, how this can make activity and journey planning for those with RM easier. 
 
 
-![](media/examples/emojis.png)
+![](media/examples/journey map.png)
+
+![](media/examples/journey map.png)
 
 ---
 
 
 ## Project Folder Structure
-
-Explain briefly what's where so people can find their way around. For example:
 
 There are the following folders in the structure:
 
@@ -31,10 +31,6 @@ There are the following folders in the structure:
 
 ## Installation
 
-Explain how to set up everything. 
-Let people know if there are weird dependencies - if so feel free to add links to guides and tutorials.
-
-A person should be able to clone this repo, follow your instructions blindly, and still end up with something *fully working*!
 
 1) Clone this repository:
     ```bash
