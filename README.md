@@ -7,9 +7,8 @@ It is an extension of the work carried out by L. Da Rocha Bazilio, to understand
 In addition, understanding the impact of Opinion Summarisation on the reviews about accessibility. Also, how this can make activity and journey planning for those with RM easier. 
 
 
-![](media/examples/journey map.png)
+![](media/examples/venue-accessibility-example-profile-cropped.png)
 
-![](media/examples/journey map.png)
 
 ---
 
