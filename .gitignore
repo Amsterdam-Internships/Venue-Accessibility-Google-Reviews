@@ -17,11 +17,4 @@ __pycache__/
 
 
 # Data
-datasets/GoogleReviews/
-datasets/
-/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/datasets/
-src/data
-data/
-datasets/
-
-pipeline_google_reviews.ipynb
+/datasets/
