@@ -7,6 +7,7 @@ It is an extension of the work carried out by L. Da Rocha Bazilio, to understand
 In addition, understanding the impact of Opinion Summarisation on the reviews about accessibility. Also, how this can make activity and journey planning for those with RM easier. 
 
 
+This is an example of the UI of the application that pipeline will be connected to:
 ![](media/examples/venue-accessibility-example-profile-cropped.png)
 
 
