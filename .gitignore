@@ -17,4 +17,5 @@ __pycache__/
 
 
 # Data
-/datasets/
+datasets/EuansGuideData.xlsx
+datasets/GoogleReviews
