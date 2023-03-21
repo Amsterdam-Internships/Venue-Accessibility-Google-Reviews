@@ -1,8 +1,8 @@
-# Venue Accessibility with Googlie Reviews 
+# Venue Accessibility with Google Reviews 
 
 This project aims to highlight the perspective of people with Reduced Mobility (RM) living in Amsterdam via analysis of public venue reviews. This is done using Natural Language Processing (NLP) techniques such as Aspect Based Sentiment Analysis and Opinion Summarisation. 
 
-It is an extension of the work carried out by L. Da Rocha Bazilio, to understand how different models are able to extract aspects in reference to accessibility with data that is noisy e.g. data with implicit aspects. 
+It is an extension of the work carried out by [L. Da Rocha Bazilio] (https://github.com/Amsterdam-Internships/Venue-Accessibility-NLP), to understand how different models are able to extract aspects in reference to accessibility with data that is noisy e.g with explicit aspects to classify. 
 
 In addition, understanding the impact of Opinion Summarisation on the reviews about accessibility. Also, how this can make activity and journey planning for those with RM easier. 
 
@@ -21,7 +21,6 @@ There are the following folders in the structure:
 1) [`datasets`](./datasets): This is where you should place your data for training and testing.
 1) [`media`](./media): This is where results of each step of the pipeline are stored as images.
 1) [`notebooks`](./notebooks): This contains the notebooks of th pipeline.
-1) [`resources`](./resources): Random nice resources, e.g. [`useful links`](./resources/README.md)
 1) [`results`](./results): Here you will find the txt form of the results.
 1) [`src`](./src): Folder for all source files specific to this project
 1) [`scripts`](./scripts): Folder with example scripts for performing different tasks (could serve as usage documentation)
