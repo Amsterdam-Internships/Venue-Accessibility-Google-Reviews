@@ -1,0 +1,8 @@
+                     precision    recall  f1-score   support
+
+            Toilets       0.45      0.59      0.51      1218
+Transport & Parking       0.56      0.43      0.49      1508
+
+           accuracy                           0.50      2726
+          macro avg       0.51      0.51      0.50      2726
+       weighted avg       0.51      0.50      0.50      2726

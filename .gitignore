@@ -13,9 +13,11 @@ __pycache__/
 
 # other
 .idea/*
-.gitignore
+
 
 
 # Data
 datasets/EuansGuideData.xlsx
 datasets/GoogleReviews
+/datasets/google_reviews.csv
+/datasets/euans_reviews.csv

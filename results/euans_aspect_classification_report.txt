@@ -1,6 +1,6 @@
                      precision    recall  f1-score   support
 
-            Toilets       0.99      0.98      0.99      1218
+            Toilets       0.99      0.99      0.99      1218
 Transport & Parking       0.99      0.99      0.99      1508
 
            accuracy                           0.99      2726

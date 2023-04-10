@@ -2,7 +2,19 @@ import pandas as pd
 import re
 import numpy as np
 import nltk
+import gensim
+from gensim.utils import simple_preprocess
+from gensim.parsing.preprocessing import STOPWORDS
+from nltk.stem import WordNetLemmatizer, SnowballStemmer
+from nltk.stem.porter import *
+lemmatizer = WordNetLemmatizer()
 
+def gensim_formatting(df):
+    formatted = {}
+    df['Venues', 'Aspect', 'Sentiment']
+    
+def stem_and_lemmatize(sentence):
+    return lemmatizer.lemmatize(sentence)
 
 def count_sentences(text):
     sentences = nltk.sent_tokenize(text)
@@ -45,7 +57,6 @@ def clean_and_select(df, columns):
         cleaned_sentiments = clean_sentiment(cleaned_df)
         return  convert_rating(cleaned_sentiments)
     
-
 def replace_substrings(s):
     # Define a dictionary of substring replacements
     replacements = {' stars': '', ' star':'', ' stars ':''}
@@ -54,7 +65,6 @@ def replace_substrings(s):
         s = re.sub(old, new, s)
     return s
     
-
 def clean_sentiment(df):
     df['Sentiment'] = df['Sentiment'].apply(lambda x: replace_substrings(x))
     df["Sentiment"] = df["Sentiment"].apply(lambda x: int(x))
