@@ -8,10 +8,6 @@ from gensim.parsing.preprocessing import STOPWORDS
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.stem.porter import *
 lemmatizer = WordNetLemmatizer()
-
-def gensim_formatting(df):
-    formatted = {}
-    df['Venues', 'Aspect', 'Sentiment']
     
 def stem_and_lemmatize(sentence):
     return lemmatizer.lemmatize(sentence)
@@ -103,4 +99,12 @@ def tokenize_text(df):
     df["Text"] = df["Text"].apply(lambda x: nltk.regexp_tokenize(x, rule))
     return df
 
+def lemmatize_stemming(text):
+    return lemmatizer.lemmatize(text)
 
+def preprocess(text):
+    result = []
+    for token in gensim.utils.simple_preprocess(text):
+        if token not in gensim.parsing.preprocessing.STOPWORDS and len(token) > 3:
+            result.append(lemmatize_stemming(token))
+    return result

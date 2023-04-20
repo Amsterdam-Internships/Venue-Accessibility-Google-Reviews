@@ -5,4 +5,5 @@ export TRAINING_MODE='simple'
 echo "Starting training..."
 
 # Do something (somewhat) useful
-python src/train.py 
+python src/train.py
+python src/train.py
