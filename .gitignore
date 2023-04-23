@@ -21,3 +21,8 @@ datasets/EuansGuideData.xlsx
 datasets/GoogleReviews
 /datasets/google_reviews.csv
 /datasets/euans_reviews.csv
+datasets/labelling data
+datasets/test data
+datasets/training data
+data/raw/test/GoogleReviews
+data/raw/train/EuansGuideData.xlsx
