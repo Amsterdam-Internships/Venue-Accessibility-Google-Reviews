@@ -1,47 +1,43 @@
 '''
-This is a script to download or generate data.
+This is a script to load, clean and save data.
+
 '''
 
 import pandas as pd 
 import os
-import pathlib
-import glob
-import sys
-import nltk
-import re
-import string 
-from src import data_cleaning as dc
+from data_cleaning import cleaning_selector
+from dotenv import load_dotenv
 
-# Get current directory
-current_dir = os.getcwd()
-# Get parent directory
-parent_dir = os.path.join(current_dir, '..')
-# Append parent directory to sys.path
-sys.path.append(parent_dir)
+# Load environment variables from .env file
+load_dotenv()
 
 
-cwd = pathlib.Path.cwd().parent
-training_file_path = cwd.joinpath("datasets/EuansGuideData.xlsx")
-test_file_path = cwd.joinpath("datasets/GoogleReviews")
-
-
-all_file_names = glob.glob(str(test_file_path) + "/*.csv")
-google_df = [pd.read_csv(file_name, index_col=None, header=0) for file_name in all_file_names]
-test_data = pd.concat(google_df, axis=0, ignore_index=True)
-
-training_data = pd.read_excel(training_file_path)
-clean_train_df = dc.cleaning_selector(training_data, ["Aspect", "Rating", "Review", "Venue"])
-clean_test_df = dc.cleaning_selector(test_data, ["Name","Review Rate", "Review Text"])
-
-clean_train_df.to_csv('datasets/processed data/clean_euans.csv')
-clean_test_df.to_csv('datasets/processed data/clean_google.csv')
-
+def make_trainset():
+    training_data = pd.read_excel(training_file_path)
+    clean_train_df = cleaning_selector(training_data, ["Aspect", "Rating", "Review", "Venue"])
+    clean_train_df.to_csv(processed_train_path)
+    
+def make_testset():
+    test_data = load_data()
+    clean_test_df = cleaning_selector(test_data, ["Name","Review Rate", "Review Text"])
+    clean_test_df.to_csv(processed_test_path)
 
 def load_data():
-    pass
+    df_list = []
+    for filename in os.listdir(test_file_path):
+        if filename.endswith('.csv'):
+            df = pd.read_csv(os.path.join(test_file_path, filename))
+            df_list.append(df)
+    google_data = pd.concat(df_list, axis=0, ignore_index=True)
+    return google_data
 
-def clean_data():
-    pass
 
-def save_data():
-    pass
+# Call main function
+if __name__ == '__main__':
+    training_file_path = os.environ.get('RAW_TRAIN_DATA_PATH')
+    test_file_path = os.environ.get('RAW_TEST_DATA_PATH')
+    processed_test_path = os.environ.get('PROCESSED_TEST_DATA')
+    processed_train_path = os.environ.get('PROCESSED_TRAIN_DATA')
+    make_trainset()
+    make_testset()
+    print('Done !')

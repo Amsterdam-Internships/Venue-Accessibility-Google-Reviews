@@ -26,3 +26,4 @@ datasets/test data
 datasets/training data
 data/raw/test/GoogleReviews
 data/raw/train/EuansGuideData.xlsx
+.env

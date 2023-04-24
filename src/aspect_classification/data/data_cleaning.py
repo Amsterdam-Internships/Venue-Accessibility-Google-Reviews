@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 import re
 import numpy as np
@@ -41,13 +42,19 @@ def removing_nans(df):
 def select_aspects(aspects, df):
     selected_aspects = filter_aspects(df, aspects)
     selected_aspects["Venue"] = selected_aspects["Venue"].apply(get_venue_name)
-    return select_aspects
+    return selected_aspects
+
+def remove_translate_tags(df):
+    pattern = r'\(Translated by Google\)|\(Original\)'  # Define the regular expression pattern
+    df['Text'] = df['Text'].str.replace(pattern, '', regex=True)
+    return df
 
 def cleaning_selector(df, columns):
     if 'Aspect' in df:
         df_selected = rename_columns(df[columns], ["Review"],  ["Text"])
         df_cleaned = removing_nans(df_selected)
-        target_aspects = ['Toilets', 'Transport & Parking', 'Wheelchair']
+        target_aspects = ['Toilets', 'Transport & Parking',
+                          'Wheelchair', 'Staff', 'Overview', 'Access']
         df_aspects = select_aspects(target_aspects, df_cleaned)
         return convert_rating(df_aspects)
     else:
@@ -55,7 +62,9 @@ def cleaning_selector(df, columns):
         new_columns = ["Text","Sentiment"]
         df_selected = rename_columns(df[columns], old_columns,new_columns)
         cleaned_df = removing_nans(df_selected)
-        cleaned_sentiments = clean_sentiment(cleaned_df)
+        removed_tags = remove_translate_tags(cleaned_df)
+        cleaned_sentiments = clean_sentiment(removed_tags)
+        
         return  convert_rating(cleaned_sentiments)
     
 def replace_substrings(s):

@@ -1,5 +1,22 @@
 from setuptools import setup, find_packages
 
+import os
+import sys
+import pathlib
+# Get current directory
+current_dir = os.getcwd()
+# Get parent directory
+parent_dir = os.path.join(current_dir, '..')
+# Append parent directory to sys.path
+sys.path.append(parent_dir)
+cwd = pathlib.Path.cwd().parent
+
+os.environ['RAW_TRAIN_DATA_PATH'] = cwd.joinpath('data/raw/train/EuansGuideData.xlsx')
+
+os.environ['RAW_TEST_DATA_PATH'] = cwd.joinpath('data/raw/test/GoogleReviews')
+
+os.environ['PROCESSED_DATA'] = cwd.joinpath('data/processed/aspect classification data')
+
 with open('requirements.txt', 'r') as f:
     requirements = f.read().splitlines()
 
