@@ -126,7 +126,7 @@ def tokenize_text(df):
 def lemmatize_stemming(text):
     return lemmatizer.lemmatize(text)
 
-def preprocess(text):
+def gensim_processing(text):
     result = []
     for token in gensim.utils.simple_preprocess(text):
         if token not in gensim.parsing.preprocessing.STOPWORDS and len(token) > 3:
