@@ -2,7 +2,7 @@
 
 This project aims to highlight the perspective of people with Reduced Mobility (RM) living in Amsterdam via analysis of public venue reviews. This is done using Natural Language Processing (NLP) techniques such as Aspect Based Sentiment Analysis and Opinion Summarisation. 
 
-It is an extension of the work carried out by [L. Da Rocha Bazilio](https://github.com/Amsterdam-Internships/Venue-Accessibility-NLP), to understand how different models are able to extract aspects in reference to accessibility with data that is noisy e.g with explicit aspects to classify. 
+It is an extension of the work carried out by [L. Da Rocha Bazilio](https://github.com/Amsterdam-Internships/Venue-Accessibility-NLP), to understand how different models are able to extract aspects in reference to accessibility with data that is noisy e.g. a mixture of topics, instead of accessibility focused only.
 
 In addition, understanding the impact of Opinion Summarisation on the reviews about accessibility. Also, how this can make activity and journey planning for those with RM easier. 
 
@@ -19,16 +19,16 @@ This is an example of the UI of the application that pipeline will be connected 
 There are the following folders in the structure:
 
 1) [`data`](./data): This folder includes data for the following purposes:
-    2) [`external'](./data/external/): This includes data from third party sources
-    2) [`interim`](./data/interim/): Intermediate data that has been transformed
-    2) ['processed'](./data/processed/): Finalised datasets for modelling
-    2) ['raw'](./data/raw/): The original immutable data
+    1) [`external'](./data/external/): This includes data from third party sources
+    1) [`interim`](./data/interim/): Intermediate data that has been transformed
+    1) ['processed'](./data/processed/): Finalised datasets for modelling
+    1) ['raw'](./data/raw/): The original immutable data
 1) [`datasets`](./datasets): This is where you should place your data for training and testing.
 1) [`media`](./media): This is where results of each step of the pipeline are stored as images.
 1) [`models`](./models/):Trained and serialized models, model predictions, or model summaries
 1) [`notebooks`](./notebooks): This contains the notebooks of th pipeline.
 1) [`reports`](./reports/): Generated analysis as HTML, PDF, LaTeX, etc.
-    2) ['figures'](./reports/figures/): Generated graphics and figures to be used in reporting.
+    1) ['figures'](./reports/figures/): Generated graphics and figures to be used in reporting.
 1) [`results`](./results): Here you will find the txt form of the results.
 1) [`src`](./src): Folder for all source files specific to this project
 1) [`scripts`](./scripts): Folder with example scripts for performing different tasks (could serve as usage documentation)
@@ -46,7 +46,7 @@ There are the following folders in the structure:
 
 2) Install all dependencies:
     ```bash
-    conda install environment.yaml
+    conda install environment.yml
     ```
 ---
 
@@ -62,7 +62,6 @@ To train...
 $ python train.py --some-importang-argument
 ```
 
-If there are too many command line arguments, you can add a nice table with explanation (thanks, [Diana Epureano](https://www.linkedin.com/in/diana-epureanu-235104153/)!)
 
 |Argument | Type or Action | Description | Default |
 |---|:---:|:---:|:---:|
@@ -76,8 +75,6 @@ If there are too many command line arguments, you can add a nice table with expl
 |`--train_ratio`|  float| `Percentage of the training set.`| 0.7|
 |...|...|...|...|
 
-
-Alternatively, as a way of documenting the intended usage, you could add a `scripts` folder with a number of scripts for setting up the environment, performing training in different modes or different tasks, evaluation, etc (thanks, [Tom Lotze](https://www.linkedin.com/in/tom-lotze/)!)
 
 ---
 
