@@ -2,7 +2,12 @@ import gensim
 from gensim import models
 import os
 import sys
-import pathlib
+# Get current directory
+current_dir = os.getcwd()
+# Get parent directory
+parent_dir = os.path.join(current_dir, '..')
+# Append parent directory to sys.path
+sys.path.append(parent_dir)
 import pandas as pd
 from data.data_cleaning import gensim_processing
 from dotenv import load_dotenv
@@ -23,13 +28,13 @@ def train_model(corpus, dictionary):
     # Train an LDA model on the corpus
     tfidf_lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus_tfidf,
                                                 id2word=dictionary,
-                                                num_topics=10,
+                                                num_topics=8,
                                                 random_state=42,
                                                 passes=10)
     return tfidf_lda_model
     
 
-def save_model(model, model_path='/aspect_classification/eda/lda_tfidf.lda'):
+def save_model(model, model_path='/lda_tfidf.lda'):
     model_path = saved_model_path + model_path
     model.save(model_path)
     
