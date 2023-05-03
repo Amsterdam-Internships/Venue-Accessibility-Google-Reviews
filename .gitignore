@@ -27,3 +27,10 @@ datasets/training data
 data/raw/test/GoogleReviews
 data/raw/train/EuansGuideData.xlsx
 .env
+data/processed/summarisation_data/BART_google_summaries.csv
+data/processed/summarisation_data/euans_reviews.csv
+data/processed/summarisation_data/textrank_euans_summaries.csv
+data/processed/summarisation_data/textrank_google_summaries.csv
+data/processed/summarisation_data/trial labels.csv
+data/processed/aspect_classification_data/euans_reviews.csv
+data/processed/aspect_classification_data/google_reviews.csv
