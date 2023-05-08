@@ -26,9 +26,9 @@ There are the following folders in the structure:
 1) [`datasets`](./datasets): This is where you should place your data for training and testing.
 1) [`media`](./media): This is where results of each step of the pipeline are stored as images.
 1) [`models`](./models/):Trained and serialized models, model predictions, or model summaries
-1) [`notebooks`](./notebooks): This contains the notebooks of th pipeline.
+1) [`notebooks`](./notebooks): This contains the notebooks of the pipeline.
 1) [`reports`](./reports/): Generated analysis as HTML, PDF, LaTeX, etc.
-    1) ['figures'](./reports/figures/): Generated graphics and figures to be used in reporting.
+    1) [`figures`](./reports/figures/): Generated graphics and figures to be used in reporting.
 1) [`results`](./results): Here you will find the txt form of the results.
 1) [`src`](./src): Folder for all source files specific to this project
 1) [`scripts`](./scripts): Folder with example scripts for performing different tasks (could serve as usage documentation)

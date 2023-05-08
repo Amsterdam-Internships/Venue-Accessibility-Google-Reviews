@@ -29,4 +29,8 @@ data/interim/*
 data/processed/aspect_classification_data/*
 data/processed/summarisation_data/*
 
+# Media
+reports/figures/*
+media/*
+
 
