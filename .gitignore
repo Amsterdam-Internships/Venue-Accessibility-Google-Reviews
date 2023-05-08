@@ -1,11 +1,15 @@
 # env / packaging
 myenv/
 wheels/
+.env
 # bytecode stuffs
 __pycache__/
 *.py[cod]
 
 # jupyter
+notebooks/cache_dir
+notebooks/outputs
+notebooks/runs
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 /pipeline_google_reviews.ipynb
@@ -16,32 +20,12 @@ notebooks/Pipeline.ipynb
 .idea/*
 
 
-
 # Data
-datasets/EuansGuideData.xlsx
-datasets/GoogleReviews
-/datasets/google_reviews.csv
-/datasets/euans_reviews.csv
-datasets/labelling data
-datasets/test data
-datasets/training data
-data/raw/test/GoogleReviews
-data/raw/train/EuansGuideData.xlsx
-.env
-data/processed/summarisation_data/BART_google_summaries.csv
-data/processed/summarisation_data/euans_reviews.csv
-data/processed/summarisation_data/textrank_euans_summaries.csv
-data/processed/summarisation_data/textrank_google_summaries.csv
-data/processed/summarisation_data/trial labels.csv
-data/processed/aspect_classification_data/euans_reviews.csv
-data/processed/aspect_classification_data/google_reviews.csv
 models/*
+data/raw/test/*
+data/raw/train/*
 data/external/*
 data/interim/*
 data/processed/*
-notebooks/cache_dir
-notebooks/outputs
-notebooks/runs
-data/processed/summarisation_data/train_file.csv
-data/processed/summarisation_data/eval_file.csv
-data/processed/summarisation_data/train_file.csv
+
+
