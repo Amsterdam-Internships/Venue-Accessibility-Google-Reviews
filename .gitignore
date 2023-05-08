@@ -22,10 +22,11 @@ notebooks/Pipeline.ipynb
 
 # Data
 models/*
-data/raw/test/*
-data/raw/train/*
+data/raw/test/GoogleReviews/
+data/raw/train/EuansGuideData.xlsx
 data/external/*
 data/interim/*
-data/processed/*
+data/processed/aspect_classification_data/*
+data/processed/summarisation_data/*
 
 
