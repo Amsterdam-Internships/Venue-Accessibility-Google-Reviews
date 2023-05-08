@@ -87,4 +87,4 @@ You can explain roughly how the code works, what the main components are, how ce
 ## Acknowledgements
 
 
-This work and code is based off of the priort work of @Lizzydrb .
+This repository was created in collaboration with [Amsterdam Intelligence](https://amsterdamintelligence.com/) for the [City of Amsterdam](https://www.amsterdam.nl/). It is based on [the prior work](https://github.com/Amsterdam-Internships/Venue-Accessibility-NLP) of [Lizzy Da Rocha Bazilio](https://www.linkedin.com/in/lizzy-da-rocha-bazilio/).

@@ -35,14 +35,13 @@ data/processed/summarisation_data/textrank_google_summaries.csv
 data/processed/summarisation_data/trial labels.csv
 data/processed/aspect_classification_data/euans_reviews.csv
 data/processed/aspect_classification_data/google_reviews.csv
-models/aspect_classification/eda/lda_tfidf.lda
-models/aspect_classification/eda/lda_tfidf.lda.expElogbeta.npy
-models/aspect_classification/eda/lda_tfidf.lda.id2word
-models/aspect_classification/eda/lda_tfidf.lda.state
+models/*
+data/external/*
+data/interim/*
+data/processed/*
 notebooks/cache_dir
 notebooks/outputs
 notebooks/runs
 data/processed/summarisation_data/train_file.csv
 data/processed/summarisation_data/eval_file.csv
 data/processed/summarisation_data/train_file.csv
-models/opinion_summarisation\gridsearch.joblib
