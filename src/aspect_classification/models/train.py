@@ -44,7 +44,7 @@ def pick_hyperparameters():
     
 
 def train_model(load_path, save_path):
-    grid_search = GridSearchCV(estimator=pipeline, param_grid=parameters, cv=5, n_jobs=5, verbose=1)
+    grid_search = GridSearchCV(estimator=pipeline, param_grid=parameters, cv=5, n_jobs=5, verbose=3)
     euans_data = pd.read_csv(load_path)
     X_train, y_train = split_data(euans_data)
     X_train = X_train[:32019]
@@ -60,6 +60,7 @@ def train_model(load_path, save_path):
         
 
 if __name__ == '__main__':
-    saved_model_path = os.environ.get('SAVED_TRAINED_MODEL_PATH')
-    loaded_data_path = os.environ.get('PROCESSED_TRAIN_DATA') 
+    saved_model_path = os.environ.get('LOCAL_ENV') + 'models/opinion_summarisation'
+    loaded_data_path = os.environ.get('LOCAL_ENV') + 'data/processed/aspect_classification_data/euans_reviews.csv'
     train_model(loaded_data_path, saved_model_path)
+# data/processed/aspect_classification_data/euans_reviews.csv
