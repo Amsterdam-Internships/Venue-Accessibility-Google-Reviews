@@ -19,10 +19,10 @@ This is an example of the UI of the application that pipeline will be connected 
 There are the following folders in the structure:
 
 1) [`data`](./data): This folder includes data for the following purposes:
-    1) [`external'](./data/external/): This includes data from third party sources
-    1) [`interim`](./data/interim/): Intermediate data that has been transformed
-    1) ['processed'](./data/processed/): Finalised datasets for modelling
-    1) ['raw'](./data/raw/): The original immutable data
+    1) [`external`](./data/external/): This includes data from third party sources.
+    1) [`interim`](./data/interim/): Intermediate data that has been transformed.
+    1) [`processed`](./data/processed/): Finalised datasets for modelling.
+    1) [`raw`](./data/raw/): The original immutable data.
 1) [`datasets`](./datasets): This is where you should place your data for training and testing.
 1) [`media`](./media): This is where results of each step of the pipeline are stored as images.
 1) [`models`](./models/):Trained and serialized models, model predictions, or model summaries
