@@ -12,6 +12,6 @@ bert_params:
     batch_size: [16, 32, 64]
     learning_rate: [2e-5, 3e-5, 5e-5]
 pipeline_type: 'bert pipeline'
-model_name: 'distilbert-base-uncased'
+model_name: 'absa/bert-absa-english-multilingual-0.2'
 
 

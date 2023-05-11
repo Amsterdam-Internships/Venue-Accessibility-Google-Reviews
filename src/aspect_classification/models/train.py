@@ -25,7 +25,7 @@ def train_classic_models():
     cv=5, n_jobs=3, verbose=3, scoring='accuracy')
     euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
-    trained_model = grid_search.fit(X_train[:10000], y_train[:10000])
+    trained_model = grid_search.fit(X_train[:801], y_train[:801])
     print('training of classic models has finished !')
     save_path = saved_model_path + '/gridsearch.joblib'
     joblib.dump(trained_model, save_path)

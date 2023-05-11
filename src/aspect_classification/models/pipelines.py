@@ -1,4 +1,4 @@
-from transformers import BertTokenizer, BertForSequenceClassification, AdamW
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, AdamW
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import VotingClassifier
@@ -33,11 +33,11 @@ class MyPipeline:
             self.bert_pipeline = None
         else:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            self.tokenizer = BertTokenizer.from_pretrained(bert_model)
-            self.model = BertForSequenceClassification.from_pretrained(bert_model)
+            self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
+            self.model = AutoModelForSequenceClassification.from_pretrained(bert_model)
             bert_classifier = Pipeline([
                 ('tokenizer', self.tokenizer),
-                ('bert', self.model)
+                (bert_model, self.model)
             ])
             self.sk_pipeline = None
             self.bert_pipeline = bert_classifier
@@ -95,6 +95,8 @@ class MyPipeline:
             input_ids = encoded_texts['input_ids'].to(self.device)
             attention_mask = encoded_texts['attention_mask'].to(self.device)
             outputs = self.model(input_ids, attention_mask=attention_mask)
-            return outputs
+            _, y_pred = torch.max(outputs[0], dim=1)
+            y_pred = y_pred.cpu().numpy()
+            return y_pred
         else:
             raise ValueError('Both pipelines are None. Please provide a valid pipeline type.')
