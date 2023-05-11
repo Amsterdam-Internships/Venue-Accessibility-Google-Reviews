@@ -132,3 +132,24 @@ def gensim_processing(text):
         if token not in gensim.parsing.preprocessing.STOPWORDS and len(token) > 3:
             result.append(lemmatize_stemming(token))
     return result
+
+def bert_processing(dataframe):
+    reviews = dataframe['Text'].values.tolist()
+    for i, review in enumerate(reviews[:]):
+        # remove punctuation, special characters, and numbers from the text data
+        tokenizer = nltk.RegexpTokenizer(r'\w+')
+        tokens = tokenizer.tokenize(review)
+        
+        # remove stop words from the text data.
+        stop_words = set(nltk.corpus.stopwords.words('english'))
+        tokens = [token for token in tokens if token.lower() not in stop_words]
+        
+        # convert all text to lowercase.
+        tokens = [token.lower() for token in tokens]
+        
+        # tokenize the text data into individual words or subwords.
+        tokens = nltk.word_tokenize(' '.join(tokens))
+        
+        reviews[i] = tokens
+    return reviews
+    

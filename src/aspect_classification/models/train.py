@@ -1,66 +1,50 @@
-'''
-This is a script to train the models.
-'''
-import os
-import pandas as pd
-from sklearn.pipeline import Pipeline
-from sklearn.feature_extraction.text import TfidfVectorizer
+from pipelines import MyPipeline
 from sklearn.model_selection import GridSearchCV
-from sklearn.naive_bayes import MultinomialNB
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import VotingClassifier
 from dotenv import load_dotenv
 import joblib
+import pandas as pd
+import os
+import yaml
 
 # Load environment variables from .env file
 load_dotenv()
-
-
-pipeline = Pipeline([
-    ('vectorizer', TfidfVectorizer()),
-    ('clf', VotingClassifier([
-        ('nb', MultinomialNB()),
-        ('lr', LogisticRegression())
-        ]))
-    ])
-
-parameters = {
-    'vectorizer__max_df': (0.5, 0.75, 1.0),
-    'vectorizer__ngram_range': ((1, 1), (1, 2)),
-    'clf__voting': ('soft', 'hard'),
-    'clf__nb__alpha': (0.5, 1),
-    'clf__lr__C': (0.1, 1, 10),
-}
+with open('src/aspect_classification/models/config.yml', 'r') as f:
+    params = yaml.load(f, Loader=yaml.FullLoader)
+    
+    
+my_pipeline = MyPipeline(pipeline_type=params['pipeline_type'], bert_model=params['model_name'])
 
 def split_data(euans_data):
     euans_reviews = euans_data.Text.values.tolist()
     euans_labels = euans_data.Aspect.values.tolist()
-    print(len(euans_reviews))
     return euans_reviews, euans_labels
 
-def pick_hyperparameters():
-    pass
-    
-
-def train_model(load_path, save_path):
-    grid_search = GridSearchCV(estimator=pipeline, param_grid=parameters, cv=5, n_jobs=5, verbose=3)
-    euans_data = pd.read_csv(load_path)
+def train_classic_models():
+    grid_search = GridSearchCV(estimator=my_pipeline.get_sk_pipeline(),
+    param_grid=my_pipeline.get_params(),
+    cv=5, n_jobs=3, verbose=3, scoring='accuracy')
+    euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
-    X_train = X_train[:32019]
-    y_train = y_train[:32019]
-    # there is probably something wrong with your pre-processing
-    trained_model = grid_search.fit(X_train, y_train)
-    print('training has finished !')
-    save_path = save_path + '\gridsearch.joblib'
+    trained_model = grid_search.fit(X_train[:10000], y_train[:10000])
+    print('training of classic models has finished !')
+    save_path = saved_model_path + '/gridsearch.joblib'
+    joblib.dump(trained_model, save_path)
+
+def train_bert_models():
+    euans_data = pd.read_csv(loaded_data_path)
+    X_train, y_train = split_data(euans_data)
+    X_train = X_train[:10000]
+    y_train = y_train[:10000]
+    trained_model = my_pipeline.fit(X_train, y_train)
+    print('training of BERT models has finished !')
+    save_path = saved_model_path + '/bert.joblib'
     print(save_path)
     joblib.dump(trained_model, save_path)
-    
-    
-        
 
 if __name__ == '__main__':
-    saved_model_path = os.environ.get('LOCAL_ENV') + 'models/opinion_summarisation'
-    loaded_data_path = os.environ.get('LOCAL_ENV') + 'data/processed/aspect_classification_data/euans_reviews.csv'
-    train_model(loaded_data_path, saved_model_path)
-# data/processed/aspect_classification_data/euans_reviews.csv
+    # Get the file paths from environment variables
+    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/euans_reviews.csv'
+    saved_model_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification'
+    
+    train_classic_models()
+    train_bert_models()
