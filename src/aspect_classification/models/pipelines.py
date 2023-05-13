@@ -81,7 +81,7 @@ class MyPipeline:
             labels_encoded = torch.tensor(y_encoded)
             dataset = TensorDataset(input_ids, attention_mask, labels_encoded)
             dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0])
-            optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[0], eps=1e-8)
+            optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[2])
             start_time = time.time()
             print('Started ...')
             for epoch in range(self.bert_epochs[0]):
@@ -94,8 +94,8 @@ class MyPipeline:
                     loss = outputs[0]
                     loss.backward()
                     optimizer.step()
-            end_time = time.time()
-            epoch_time = end_time - start_time
+                end_time = time.time()
+                epoch_time = end_time - start_time
             print("Time for all epochs:", epoch_time*self.bert_epochs[0])
         return self
 

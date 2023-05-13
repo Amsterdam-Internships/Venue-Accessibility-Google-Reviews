@@ -138,7 +138,7 @@ def bert_processing(reviews):
     for review in reviews:
         # remove punctuation, special characters, and numbers from the text data
         tokenizer = nltk.RegexpTokenizer(r'\w+')
-        tokens = tokenizer.tokenize(review)
+        tokens = tokenizer.tokenize(str(review))
         
         # remove stop words from the text data.
         stop_words = set(nltk.corpus.stopwords.words('english'))

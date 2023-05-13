@@ -2,7 +2,9 @@
 This is a script to use trained models to make predictions.
 '''
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-from src.aspect_classification.data.data_cleaning import bert_processing
+import sys
+sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
+from aspect_classification.data.data_cleaning import bert_processing
 from pipelines import MyPipeline
 from dotenv import load_dotenv
 import pandas as pd
@@ -31,9 +33,12 @@ def evaluate(y_true, y_pred):
 
 def generate_results():
     test_data = pd.read_csv(test_data_path)
-    processed_data = bert_processing(test_data)
-    y_pred = my_pipeline.predict(processed_data)
-    eval_report = evaluate(test_data['Aspect Label'], y_pred)
+    test_data = test_data.dropna(subset=['Aspect Label'])
+    google_reviews = test_data['Aspect Label'].values.tolist()
+    processed_data = bert_processing(google_reviews)
+    y_pred = my_pipeline.predict(processed_data[:842])
+    print(google_reviews)
+    eval_report = evaluate(google_reviews, y_pred)
     df = pd.DataFrame(eval_report)
     df.to_csv(results_path, index=False)
     
@@ -41,7 +46,7 @@ def generate_results():
 
 if __name__ == '__main__':
     # Get the file paths from environment variables
-    test_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/google_reviews.csv'
-    loaded_model_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification/' 
+    test_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/trial labels.csv'
+    loaded_model_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification/transformer_models/bert.joblib' 
     results_path = os.getenv('LOCAL_ENV') + 'results/aspect_classification/' + params['model_name'] + '.csv'
     generate_results()
