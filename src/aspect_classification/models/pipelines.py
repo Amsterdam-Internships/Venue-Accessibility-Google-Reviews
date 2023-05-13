@@ -7,6 +7,7 @@ from sklearn.model_selection import ParameterGrid
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
 import torch
+import time
 import numpy as np
 from torch.utils.data import TensorDataset, DataLoader
 import yaml
@@ -78,11 +79,11 @@ class MyPipeline:
             encoder = LabelEncoder()
             y_encoded = encoder.fit_transform(y)
             labels_encoded = torch.tensor(y_encoded)
-            num_classes = len(torch.unique(labels_encoded))
-            print(num_classes)
             dataset = TensorDataset(input_ids, attention_mask, labels_encoded)
             dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0])
             optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[0], eps=1e-8)
+            start_time = time.time()
+            print('Started ...')
             for epoch in range(self.bert_epochs[0]):
                 for batch in dataloader:
                     input_ids = batch[0].to(self.device)
@@ -93,6 +94,9 @@ class MyPipeline:
                     loss = outputs[0]
                     loss.backward()
                     optimizer.step()
+            end_time = time.time()
+            epoch_time = end_time - start_time
+            print("Time for all epochs:", epoch_time*self.bert_epochs[0])
         return self
 
     def predict(self, X):
