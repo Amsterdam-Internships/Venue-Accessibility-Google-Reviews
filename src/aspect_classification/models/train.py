@@ -1,6 +1,9 @@
 from pipelines import MyPipeline
 from sklearn.model_selection import GridSearchCV
 from dotenv import load_dotenv
+import sys    
+sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
+from aspect_classification.data.data_cleaning import bert_processing
 import joblib
 import pandas as pd
 import os
@@ -33,8 +36,7 @@ def train_classic_models():
 def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
-    X_train = X_train[:10000]
-    y_train = y_train[:10000]
+    X_train = bert_processing(X_train[:40024])
     trained_model = my_pipeline.fit(X_train, y_train)
     print('training of BERT models has finished !')
     save_path = saved_model_path + '/bert.joblib'
@@ -45,6 +47,7 @@ if __name__ == '__main__':
     # Get the file paths from environment variables
     loaded_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/euans_reviews.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification'
-    
-    train_classic_models()
-    train_bert_models()
+    if params['pipeline_type'] == 'default':
+        train_classic_models()
+    else:
+        train_bert_models()

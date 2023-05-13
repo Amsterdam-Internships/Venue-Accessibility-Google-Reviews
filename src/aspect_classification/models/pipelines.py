@@ -1,11 +1,13 @@
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, AdamW
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import VotingClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import ParameterGrid
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import LabelEncoder
 import torch
+import numpy as np
 from torch.utils.data import TensorDataset, DataLoader
 import yaml
 
@@ -34,7 +36,8 @@ class MyPipeline:
         else:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
-            self.model = AutoModelForSequenceClassification.from_pretrained(bert_model)
+            self.num_labels = self.bert_params['num_of_labels']
+            self.model = AutoModelForSequenceClassification.from_pretrained(bert_model, num_labels=self.num_labels)
             bert_classifier = Pipeline([
                 ('tokenizer', self.tokenizer),
                 (bert_model, self.model)
@@ -45,11 +48,12 @@ class MyPipeline:
             # Load BERT parameters from config file
             self.bert_epochs = self.bert_params['epochs']
             self.bert_batch_size = self.bert_params['batch_size']
-            self.bert_learning_rate = self.bert_params['learning_rate']
-            
+            self.bert_learning_rate = self.format_params(self.bert_params['learning_rate'])
+    def format_params(self, params):
+        return [float(lr) for lr in params]
+    
     def convert_to_tuple(self, subkey, subval):
         if subkey == 'ngram_range':
-            print(subval)
             return tuple([tuple(x) for x in subval])
         else:
             return subval
@@ -71,11 +75,15 @@ class MyPipeline:
             encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
             input_ids = encoded_texts['input_ids']
             attention_mask = encoded_texts['attention_mask']
-            labels = torch.tensor(y)
-            dataset = TensorDataset(input_ids, attention_mask, labels)
-            dataloader = DataLoader(dataset, batch_size=self.bert_batch_size)
-            optimizer = AdamW(self.model.parameters(), lr=self.bert_learning_rate, eps=1e-8)
-            for epoch in range(self.bert_epochs):
+            encoder = LabelEncoder()
+            y_encoded = encoder.fit_transform(y)
+            labels_encoded = torch.tensor(y_encoded)
+            num_classes = len(torch.unique(labels_encoded))
+            print(num_classes)
+            dataset = TensorDataset(input_ids, attention_mask, labels_encoded)
+            dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0])
+            optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[0], eps=1e-8)
+            for epoch in range(self.bert_epochs[0]):
                 for batch in dataloader:
                     input_ids = batch[0].to(self.device)
                     attention_mask = batch[1].to(self.device)

@@ -133,9 +133,9 @@ def gensim_processing(text):
             result.append(lemmatize_stemming(token))
     return result
 
-def bert_processing(dataframe):
-    reviews = dataframe['Text'].values.tolist()
-    for i, review in enumerate(reviews[:]):
+def bert_processing(reviews):
+    preprocessed_reviews = []
+    for review in reviews:
         # remove punctuation, special characters, and numbers from the text data
         tokenizer = nltk.RegexpTokenizer(r'\w+')
         tokens = tokenizer.tokenize(review)
@@ -147,9 +147,8 @@ def bert_processing(dataframe):
         # convert all text to lowercase.
         tokens = [token.lower() for token in tokens]
         
-        # tokenize the text data into individual words or subwords.
-        tokens = nltk.word_tokenize(' '.join(tokens))
-        
-        reviews[i] = tokens
-    return reviews
+        # join the tokens for each review into a single string
+        preprocessed_review = ' '.join(tokens)
+        preprocessed_reviews.append(preprocessed_review)
+    return preprocessed_reviews
     

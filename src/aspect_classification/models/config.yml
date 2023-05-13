@@ -11,7 +11,8 @@ bert_params:
     epochs: [5, 10, 15]
     batch_size: [16, 32, 64]
     learning_rate: [2e-5, 3e-5, 5e-5]
+    num_of_labels: 5
 pipeline_type: 'bert pipeline'
-model_name: 'absa/bert-absa-english-multilingual-0.2'
+model_name: 'bert-base-uncased'
 
 
