@@ -22,6 +22,7 @@ notebooks/Pipeline.ipynb
 
 # Data
 models/*
+results/aspect_classification/TinyBERT_General_4L_312D.csv
 data/raw/test/GoogleReviews/
 data/raw/train/EuansGuideData.xlsx
 data/external/*
