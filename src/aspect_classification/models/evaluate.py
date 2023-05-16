@@ -64,10 +64,10 @@ def generate_results():
     eval_metrics, confusion_graph = evaluate(y_true, y_pred, labels)
     
     # Convert y_pred to a pandas DataFrame
-    predicted_labels_df = pd.DataFrame({'Predicted Labels': y_pred})
+    predicted_labels_df = pd.DataFrame({'Predicted Aspect Labels': y_pred})
 
     # Save the predicted labels as a CSV file
-    predicted_labels_path = interim_path + "/predicted_labels.csv"
+    predicted_labels_path = interim_path + "/predicted_aspect_labels.csv"
     predicted_labels_df.to_csv(predicted_labels_path, index=False)
     
     # # Save the classification report as a text file

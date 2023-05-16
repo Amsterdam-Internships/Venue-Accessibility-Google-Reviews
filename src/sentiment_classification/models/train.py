@@ -19,7 +19,7 @@ my_pipeline = MyPipeline(pipeline_type=params['pipeline_type'], bert_model=param
 
 def split_data(euans_data):
     euans_reviews = euans_data.Text.values.tolist()
-    euans_labels = euans_data.Aspect.values.tolist()
+    euans_labels = euans_data.Sentiment.values.tolist()
     return euans_reviews, euans_labels
 
 def train_classic_models():
@@ -45,8 +45,8 @@ def train_bert_models():
 
 if __name__ == '__main__':
     # Get the file paths from environment variables
-    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/euans_reviews.csv'
-    saved_model_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification'
+    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/predicted_labels.csv'
+    saved_model_path = os.getenv('LOCAL_ENV') + 'models/sentiment_analysis'
     if params['pipeline_type'] == 'default':
         train_classic_models()
     else:
