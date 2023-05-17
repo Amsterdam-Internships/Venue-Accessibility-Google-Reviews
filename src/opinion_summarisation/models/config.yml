@@ -1,0 +1,8 @@
+model_name: "huawei-noah/TinyBERT_General_4L_312D"
+tokenizer_name: "huawei-noah/TinyBERT_General_4L_312D"
+max_length: 512
+num_beams: 4
+max_summary_length: 150
+batch_size: 8
+learning_rate: 0.1
+num_epochs: 5
