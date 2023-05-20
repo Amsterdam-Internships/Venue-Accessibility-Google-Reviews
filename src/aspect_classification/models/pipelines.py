@@ -3,7 +3,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
@@ -21,22 +21,6 @@ config_path = os.getenv('LOCAL_ENV') + 'src/aspect_classification/models/config.
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
     
-class TransformersLabelEncoder:
-    def __init__(self, model_name):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        
-    def encode_labels(self, labels):
-        encoded_labels = self.tokenizer(labels, padding=True, truncation=True, return_tensors='pt')
-        return encoded_labels
-    
-    def decode_labels(self, encoded_labels):
-        decoded_labels = []
-        for label_ids in encoded_labels['input_ids']:
-            labels = self.tokenizer.decode(label_ids, skip_special_tokens=True)
-            decoded_labels.append(labels)
-        return decoded_labels
-
-
 
 class MyPipeline:
     def __init__(self, pipeline_type='default', bert_model=None):
@@ -66,7 +50,7 @@ class MyPipeline:
             ])
             self.sk_pipeline = None
             self.bert_pipeline = bert_classifier
-            self.label_encoder = LabelEncoder()
+            self.label_binarizer = MultiLabelBinarizer()
             # Load BERT parameters from config file
             self.bert_epochs = self.bert_params['epochs']
             self.bert_batch_size = self.bert_params['batch_size']
@@ -107,11 +91,7 @@ class MyPipeline:
             encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
             input_ids = encoded_texts['input_ids']
             attention_mask = encoded_texts['attention_mask']
-            y_encoded = self.label_encoder.fit_transform(y)
-
-            # Store the unique classes encountered during fitting
-            self.classes_ = np.unique(y)
-
+            y_encoded = self.label_binarizer.fit_transform(y)  # Use MultiLabelBinarizer
             labels_encoded = torch.tensor(y_encoded)
             dataset = TensorDataset(input_ids, attention_mask, labels_encoded)
             dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0])
@@ -133,8 +113,6 @@ class MyPipeline:
             print("Time for all epochs:", epoch_time*self.bert_epochs[0])
         return self
 
-
-
     def predict(self, X):
         if self.sk_pipeline is not None:
             return self.sk_pipeline.predict(X)
@@ -146,15 +124,22 @@ class MyPipeline:
             _, y_pred = torch.max(outputs.logits, dim=1)  # Use logits for prediction
             y_pred = y_pred.cpu().numpy()  # Convert tensor to numpy array
 
-            # Filter out unseen labels
-            filtered_labels = [label for label in y_pred if label in np.unique(y_pred)]
+            # Reshape y_pred as a 2D array with a single column
+            y_pred = y_pred.reshape(-1, 1)
 
-            # Add unseen labels to the fitted labels of the LabelEncoder
-            self.label_encoder.classes_ = np.unique([-1] + filtered_labels)
+            # Fit the MultiLabelBinarizer on the predicted labels
+            self.label_binarizer.fit(y_pred)
 
-            # Inverse transform the predicted labels and handle unseen labels
-            labels = self.label_encoder.inverse_transform([-1 if label not in filtered_labels else label for label in y_pred])
-            return labels
+            # Transform the predicted labels using MultiLabelBinarizer
+            encoded_labels = self.label_binarizer.transform(y_pred)
+
+            # Inverse transform the predicted labels using MultiLabelBinarizer
+            decoded_labels = self.label_binarizer.inverse_transform(encoded_labels)
+
+            # Convert the decoded_labels to integer values
+            decoded_labels = [label[0] for label in decoded_labels]
+
+            return decoded_labels
         else:
             raise ValueError('Both pipelines are None. Please provide a valid pipeline type.')
 

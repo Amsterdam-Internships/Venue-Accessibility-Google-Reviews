@@ -40,6 +40,7 @@ def generate_results():
     google_reviews = selected_rows['Text'].values.tolist()
     # Select target labels
     y_true = selected_rows['Improved Aspect Label'].values.tolist()
+    print(y_true)
     # Process reviews
     processed_reviews = bert_processing(google_reviews)
     y_pred = my_pipeline.predict(processed_reviews)
@@ -51,7 +52,7 @@ def generate_results():
 
 def save_results(eval_metrics, y_pred):
     # Convert y_pred to a pandas DataFrame
-    predicted_labels_df = pd.DataFrame({'Predicted Aspect Labels': y_pred})
+    predicted_labels_df = pd.DataFrame({'Predicted Aspect Labels': y_pred}, index=range(len(y_pred)))
 
     # Save the predicted labels as a CSV file
     predicted_labels_path = interim_path + "/predicted_aspect_labels.csv"
