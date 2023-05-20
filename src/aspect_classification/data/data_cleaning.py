@@ -52,6 +52,7 @@ def remove_translate_tags(df):
 def cleaning_selector(df, columns):
     if 'Aspect' in df:
         df_selected = rename_columns(df[columns], ["Review"],  ["Text"])
+        print(df_selected.head())
         df_cleaned = removing_nans(df_selected)
         target_aspects = ['Toilets', 'Transport & Parking',
                           'Wheelchair', 'Staff', 'Overview', 'Access']

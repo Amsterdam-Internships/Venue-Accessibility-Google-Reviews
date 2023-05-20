@@ -11,7 +11,9 @@ import yaml
 
 # Load environment variables from .env file
 load_dotenv()
-with open('src/aspect_classification/models/config.yml', 'r') as f:
+config_path = os.getenv('LOCAL_ENV') + 'src/aspect_classification/models/config.yml'
+
+with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
     
     
@@ -45,7 +47,7 @@ def train_bert_models():
 
 if __name__ == '__main__':
     # Get the file paths from environment variables
-    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/euans_reviews.csv'
+    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/processed_euans_reviews.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification'
     if params['pipeline_type'] == 'default':
         train_classic_models()

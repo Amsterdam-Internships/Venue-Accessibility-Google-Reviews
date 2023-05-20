@@ -34,10 +34,10 @@ def load_data():
 
 # Call main function
 if __name__ == '__main__':
-    training_file_path = os.environ.get('RAW_TRAIN_DATA_PATH')
-    test_file_path = os.environ.get('RAW_TEST_DATA_PATH')
-    processed_test_path = os.environ.get('PROCESSED_TEST_DATA')
-    processed_train_path = os.environ.get('PROCESSED_TRAIN_DATA')
+    training_file_path = os.environ.get('LOCAL_ENV') + 'data/raw/train/EuansGuideData.xlsx'
+    test_file_path = os.environ.get('LOCAL_ENV') + 'data/raw/test/GoogleReviews'
+    processed_train_path = os.environ.get('LOCAL_ENV') + 'data/processed/aspect_classification_data/processed_euans_reviews.csv'
+    processed_test_path = os.environ.get('LOCAL_ENV') + 'data/processed/aspect_classification_data/processed_google_reviews.csv'
     make_trainset()
     make_testset()
     print('Done !')
