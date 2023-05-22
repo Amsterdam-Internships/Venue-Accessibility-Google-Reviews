@@ -4,12 +4,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
-from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
+from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
 from dotenv import load_dotenv
-from datasets import load_metric
 import numpy as np
 import torch
 import json
@@ -83,24 +82,25 @@ class MyPipeline:
         evaluation_metrics['f1_score'] = f1_score(y_true, y_pred, average='samples')
         return evaluation_metrics
     
-
-            
-        
-    
     def fit(self, X, y):
         if self.sk_pipeline is not None:
             self.sk_pipeline.set_params(**self.params['default'])
             self.sk_pipeline.fit(X, y)
         if self.bert_pipeline is not None:
-            encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
+            encoded_texts = self.tokenizer(X, padding='max_length', truncation=True, return_tensors='pt', max_length=19)
             input_ids = encoded_texts['input_ids']
             attention_mask = encoded_texts['attention_mask']
             y_encoded = self.label_binarizer.fit_transform(y)  # Use MultiLabelBinarizer
-            labels_encoded = torch.tensor(y_encoded)
+
+            # Adjust label encoding
+            labels_encoded = torch.tensor(y_encoded, dtype=torch.float)  # Convert to torch.float type
+
             dataset = TensorDataset(input_ids, attention_mask, labels_encoded)
-            dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0])
+            dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0], shuffle=True)  # Add shuffle for better training
+
             optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[2])
             start_time = time.time()
+
             print('Started ...')
             for epoch in range(self.bert_epochs[0]):
                 for batch in dataloader:
