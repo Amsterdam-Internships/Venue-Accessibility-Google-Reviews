@@ -39,7 +39,7 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
     X_train = bert_processing(X_train)
-    trained_model = my_pipeline.fit(X_train[:1000], y_train[:1000])
+    trained_model = my_pipeline.fit(X_train, y_train)
     print('training of BERT models has finished !')
     save_path = saved_model_path + '/bert.joblib'
     print(save_path)

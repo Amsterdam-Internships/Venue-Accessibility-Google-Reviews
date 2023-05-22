@@ -27,28 +27,24 @@ my_pipeline = MyPipeline(pipeline_type=params['pipeline_type'], bert_model=param
 
 def remove_rows(test_data):
     # Remove the redundant rows
-    test_data = test_data.dropna(subset=['Aspect Label'])
-    test_data = test_data[test_data['Aspect Label'] != 'Nonsense']
-    test_data['Aspect Label'] = test_data['Aspect Label'].str.split(' & ')
+    test_data = test_data.dropna(subset=['Improved Aspect Label'])
+    test_data['Aspect Label'] = test_data['Improved Aspect Label'].str.split(' & ')
     return test_data
 
 
 def generate_results():
     test_data = pd.read_csv(test_data_path)
-    selected_rows = remove_rows(test_data)
+    print(test_data.head())
+    #selected_rows = remove_rows(test_data)
     # Select the input features
-    google_reviews = selected_rows['Text'].values.tolist()
+    google_reviews = test_data['Review Text'].values.tolist()
     # Select target labels
-    y_true = selected_rows['Improved Aspect Label'].values.tolist()
-    print(y_true)
+    y_true = test_data['Aspect'].values.tolist()
     # Process reviews
     processed_reviews = bert_processing(google_reviews)
     y_pred = my_pipeline.predict(processed_reviews)
     eval_metrics = my_pipeline.evaluate(y_true, y_pred)
-    tokenizer = AutoTokenizer.from_pretrained(params['model_name'])
-    decoded_y_pred = tokenizer.decode(y_pred, skip_special_tokens=True)
-    print(decoded_y_pred)
-    save_results(eval_metrics, decoded_y_pred)
+    save_results(eval_metrics, y_pred)
 
 def save_results(eval_metrics, y_pred):
     # Convert y_pred to a pandas DataFrame
@@ -60,13 +56,14 @@ def save_results(eval_metrics, y_pred):
     
     # # Save the classification report as a text file
     report_path = results_path+"_classification_report.tex"
+    pd.DataFrame(eval_metrics).to_csv(results_path+'.csv')
     report_df = pd.DataFrame(eval_metrics).transpose()
     report_df.to_latex(report_path)
 
 
 if __name__ == '__main__':
     # Get the file paths from environment variables
-    test_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/sample_test_data.csv'
+    test_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/test_example.csv'
     loaded_model_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification/transformer_models/bert.joblib'
     # Define the directory path
     names = params['model_name'].split("/")

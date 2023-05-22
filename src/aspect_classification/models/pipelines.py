@@ -1,4 +1,5 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, EvalPrediction
+from sklearn.metrics import hamming_loss, jaccard_score, f1_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.linear_model import LogisticRegression
@@ -8,6 +9,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
 from dotenv import load_dotenv
+from datasets import load_metric
 import numpy as np
 import torch
 import json
@@ -74,11 +76,13 @@ class MyPipeline:
         return self.bert_pipeline
     
     def evaluate(self, y_true, y_pred):
-        if self.sk_pipeline is not None:
-            return classification_report(y_pred, y_true, output_dict=True)
-        else:
-            # Create an instance of EvalPrediction
-            return EvalPrediction(predictions=y_pred, label_ids=y_true).predictions
+        evaluation_metrics = {}
+        # Compute and store evaluation metrics
+        evaluation_metrics['hamming_loss'] = hamming_loss(y_true, y_pred)
+        evaluation_metrics['jaccard_score'] = jaccard_score(y_true, y_pred, average='samples')
+        evaluation_metrics['f1_score'] = f1_score(y_true, y_pred, average='samples')
+        return evaluation_metrics
+    
 
             
         
@@ -121,28 +125,25 @@ class MyPipeline:
             input_ids = encoded_texts['input_ids'].to(self.device)
             attention_mask = encoded_texts['attention_mask'].to(self.device)
             outputs = self.model(input_ids, attention_mask=attention_mask)
-            _, y_pred = torch.max(outputs.logits, dim=1)  # Use logits for prediction
-            y_pred = y_pred.cpu().numpy()  # Convert tensor to numpy array
+            logits = outputs.logits  # Get the predicted logits
 
-            # Reshape y_pred as a 2D array with a single column
-            y_pred = y_pred.reshape(-1, 1)
+            # Apply sigmoid activation function to obtain probabilities
+            probabilities = torch.sigmoid(logits)
+            # Set a threshold to determine the predicted labels
+            threshold = 0.5
+            predicted_labels = (probabilities > threshold).int()
+            # Define the aspect labels
+            aspect_labels = ["Toilets", "Transport & Parking", "Accessibility", "Staff", "Overview"]
 
-            # Fit the MultiLabelBinarizer on the predicted labels
-            self.label_binarizer.fit(y_pred)
+            # Convert the predicted labels to a list of aspects for each input sample
+            aspects = []
+            for labels in predicted_labels:
+                indices = np.where(labels == 1)[0]
+                aspects.append([aspect_labels[i] for i in indices])
 
-            # Transform the predicted labels using MultiLabelBinarizer
-            encoded_labels = self.label_binarizer.transform(y_pred)
-
-            # Inverse transform the predicted labels using MultiLabelBinarizer
-            decoded_labels = self.label_binarizer.inverse_transform(encoded_labels)
-
-            # Convert the decoded_labels to integer values
-            decoded_labels = [label[0] for label in decoded_labels]
-
-            return decoded_labels
+            return aspects
         else:
             raise ValueError('Both pipelines are None. Please provide a valid pipeline type.')
-
 
 
 
