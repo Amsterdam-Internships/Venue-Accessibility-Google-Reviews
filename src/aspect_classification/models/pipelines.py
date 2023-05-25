@@ -76,7 +76,8 @@ class MyPipeline:
     
     def evaluate(self, y_true, y_pred):
         evaluation_metrics = {}
-        # Compute and store evaluation metrics
+        # Compute and store evaluation metrics.
+        # This is just numpy arrays so just use the prediction scores.
         evaluation_metrics['hamming_loss'] = hamming_loss(y_true, y_pred)
         evaluation_metrics['jaccard_score'] = jaccard_score(y_true, y_pred, average='samples')
         evaluation_metrics['f1_score'] = f1_score(y_true, y_pred, average='samples')
