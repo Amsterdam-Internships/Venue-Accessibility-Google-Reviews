@@ -12,7 +12,7 @@ import numpy as np
 from torch.utils.data import TensorDataset, DataLoader
 import yaml
 
-with open('src/aspect_classification/models/config.yml', 'r') as f:
+with open('src/sentiment_classification/models/config.yml', 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
 
 

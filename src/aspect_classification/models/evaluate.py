@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
-import torch
+import ast
 import yaml
 import os
 
@@ -24,31 +24,33 @@ with open(config_path, 'r') as f:
      
 my_pipeline = MyPipeline(pipeline_type=params['pipeline_type'], bert_model=params['model_name'])
 
+def generate_results(test_data):
+    # Select annotated data
+    annotated_data = select_rows(test_data)
+    # Select the input features
+    google_reviews = annotated_data['Review Text'].values.tolist()
+    # Select target labels
+    gold_labels = annotated_data['Aspects'].values.tolist()
+    # Make predictions on reviews
+    processed_reviews = bert_processing(google_reviews)
+    predicted_labels = my_pipeline.predict(processed_reviews)
+    # get and save metrics
+    metrics = my_pipeline.evaluate(gold_labels, predicted_labels)
+    save_results(metrics, predicted_labels)
 
-def remove_rows(test_data):
+def select_rows(test_data):
     # Remove the redundant rows
-    test_data = test_data.dropna(subset=['Improved Aspect Label'])
+    # test_data = test_data.dropna(subset=['Improved Aspect Label']) will add this back when not using example file
     test_data['Aspect Label'] = test_data['Improved Aspect Label'].str.split(' & ')
     return test_data
 
 
-def generate_results():
-    test_data = pd.read_csv(test_data_path)
-    print(test_data.head())
-    #selected_rows = remove_rows(test_data)
-    # Select the input features
-    google_reviews = test_data['Review Text'].values.tolist()
-    # Select target labels
-    y_true = test_data['Aspect'].values.tolist()
-    # Process reviews
-    processed_reviews = bert_processing(google_reviews)
-    y_pred = my_pipeline.predict(processed_reviews)
-    eval_metrics = my_pipeline.evaluate(y_true, y_pred)
-    save_results(eval_metrics, y_pred)
 
 def save_results(eval_metrics, y_pred):
     # Convert y_pred to a pandas DataFrame
-    predicted_labels_df = pd.DataFrame({'Predicted Aspect Labels': y_pred}, index=range(len(y_pred)))
+    # Convert the string representation of predicted labels into a list
+    predicted_labels = [ast.literal_eval(label_str) for label_str in y_pred]
+    predicted_labels_df = pd.DataFrame({'Predicted Aspect Labels': predicted_labels}, index=range(len(predicted_labels)))
 
     # Save the predicted labels as a CSV file
     predicted_labels_path = interim_path + "/predicted_aspect_labels.csv"
@@ -71,4 +73,5 @@ if __name__ == '__main__':
     interim_path = os.getenv('LOCAL_ENV') + 'data/interim'
 
     # Call the function to generate results
-    generate_results()
+    test_data = pd.read_csv(test_data_path)
+    generate_results(test_data)

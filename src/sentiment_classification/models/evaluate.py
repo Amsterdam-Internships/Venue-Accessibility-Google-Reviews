@@ -18,7 +18,7 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-with open('src/aspect_classification/models/config.yml', 'r') as f:
+with open('src/sentiment_classification/models/config.yml', 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
     
 
@@ -34,12 +34,6 @@ def evaluate(y_true, y_pred, labels):
     confusion = confusion_matrix(y_true, y_pred, labels=labels)
     return report, confusion
 
-def remove_rows(test_data):
-    # Remove the redundant rows
-    test_data = test_data.dropna(subset=['Aspect Label'])
-    test_data = test_data[test_data['Aspect Label'] != 'Nonsense']
-    return test_data
-
 def encode_input(data):
     encoder = LabelEncoder()
     y_true = np.array(encoder.fit_transform(data))
@@ -47,21 +41,18 @@ def encode_input(data):
     
 def generate_results():
     test_data = pd.read_excel(test_data_path)
-    selected_rows = remove_rows(test_data)
+    predicted_data = pd.read_csv()
     # Select the input features
-    google_reviews = selected_rows['Text'].values.tolist()
+    google_reviews = test_data['Text'].values.tolist()
     # Select target labels
-    google_labels = selected_rows['Sentiment Label'].values.tolist()
+    gold_labels = test_data['Sentiment Label'].values.tolist()
     # Process reviews
     processed_reviews = bert_processing(google_reviews)
     y_pred = my_pipeline.predict(processed_reviews)
-    y_true = encode_input(google_labels)
+    y_true = encode_input(gold_labels)
 
-    # Convert y_true and y_pred to lists of strings
-    y_true = [str(label) for label in y_true]
-    y_pred = [str(label) for label in y_pred]
-    labels = ['Positive', 'Negative']
-    eval_metrics, confusion_graph = evaluate(y_true, y_pred, labels)
+
+    eval_metrics, confusion_graph = evaluate(y_true, y_pred)
     
     # Convert y_pred to a pandas DataFrame
     predicted_labels_df = pd.DataFrame({'Predicted Sentiment Labels': y_pred})

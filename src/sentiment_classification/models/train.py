@@ -11,7 +11,7 @@ import yaml
 
 # Load environment variables from .env file
 load_dotenv()
-with open('src/aspect_classification/models/config.yml', 'r') as f:
+with open('src/sentiment_classification/models/config.yml', 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
     
     
@@ -28,7 +28,7 @@ def train_classic_models():
     cv=5, n_jobs=3, verbose=3, scoring='accuracy')
     euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
-    trained_model = grid_search.fit(X_train[:801], y_train[:801])
+    trained_model = grid_search.fit(X_train, y_train)
     print('training of classic models has finished !')
     save_path = saved_model_path + '/gridsearch.joblib'
     joblib.dump(trained_model, save_path)
@@ -37,7 +37,7 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
     X_train = bert_processing(X_train)
-    trained_model = my_pipeline.fit(X_train[:1000], y_train[:1000])
+    trained_model = my_pipeline.fit(X_train, y_train)
     print('training of BERT models has finished !')
     save_path = saved_model_path + '/bert.joblib'
     print(save_path)
@@ -45,7 +45,7 @@ def train_bert_models():
 
 if __name__ == '__main__':
     # Get the file paths from environment variables
-    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/predicted_labels.csv'
+    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/processed_euans_reviews.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + 'models/sentiment_analysis'
     if params['pipeline_type'] == 'default':
         train_classic_models()
