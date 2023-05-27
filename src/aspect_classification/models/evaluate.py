@@ -1,7 +1,6 @@
 '''
 This is a script to use trained models to make predictions.
 '''
-from sklearn.metrics import classification_report, confusion_matrix
 import sys
 sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
 from aspect_classification.data.data_cleaning import bert_processing
@@ -33,34 +32,41 @@ def generate_results(test_data):
     gold_labels = annotated_data['Aspects'].values.tolist()
     # Make predictions on reviews
     processed_reviews = bert_processing(google_reviews)
+
     predicted_labels = my_pipeline.predict(processed_reviews)
+    # Assuming annotated_data is your DataFrame
+    annotated_data['Predicted Aspect Labels'] = pd.Series(predicted_labels)
     # get and save metrics
-    metrics = my_pipeline.evaluate(gold_labels, predicted_labels)
-    save_results(metrics, predicted_labels)
+    metrics = my_pipeline.evaluate(gold_labels, annotated_data['Predicted Aspect Labels'])
+    print(metrics)
+    save_results(metrics, annotated_data)
 
 def select_rows(test_data):
     # Remove the redundant rows
     # test_data = test_data.dropna(subset=['Improved Aspect Label']) will add this back when not using example file
-    test_data['Aspect Label'] = test_data['Improved Aspect Label'].str.split(' & ')
+    #test_data['Aspect Label'] = test_data['Improved Aspect Label'].str.split(' & ')
+    test_data['Aspects'] = test_data['Aspects'].str.split(' & ')
+    test_data['Aspects'] = test_data['Aspects'].astype(str).str.replace('`', '').str.replace("'", "")
     return test_data
 
 
 
-def save_results(eval_metrics, y_pred):
-    # Convert y_pred to a pandas DataFrame
-    # Convert the string representation of predicted labels into a list
-    predicted_labels = [ast.literal_eval(label_str) for label_str in y_pred]
-    predicted_labels_df = pd.DataFrame({'Predicted Aspect Labels': predicted_labels}, index=range(len(predicted_labels)))
-
+def save_results(eval_metrics, predicted_df):
     # Save the predicted labels as a CSV file
-    predicted_labels_path = interim_path + "/predicted_aspect_labels.csv"
-    predicted_labels_df.to_csv(predicted_labels_path, index=False)
-    
-    # # Save the classification report as a text file
-    report_path = results_path+"_classification_report.tex"
-    pd.DataFrame(eval_metrics).to_csv(results_path+'.csv')
-    report_df = pd.DataFrame(eval_metrics).transpose()
-    report_df.to_latex(report_path)
+    predicted_labels_path = interim_path + "/predicted_aspect_labels2.csv"
+    predicted_df.to_csv(predicted_labels_path)
+
+    # Save the evaluation metrics as a CSV file
+    results_path_csv = results_path + '.csv'
+    with open(results_path_csv, 'w') as f:
+        f.write(str(eval_metrics))
+
+    # Save the classification report as a text file
+    report_path = results_path + "_classification_report.tex"
+    eval_metrics_text = f"{eval_metrics}"
+    with open(report_path, 'w') as f:
+        f.write(eval_metrics_text)
+
 
 
 if __name__ == '__main__':

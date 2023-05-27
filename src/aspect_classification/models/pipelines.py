@@ -4,24 +4,25 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
-from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import classification_report
+from sklearn.metrics import  multilabel_confusion_matrix
 from dotenv import load_dotenv
 import numpy as np
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
 import json
 import time
 import yaml
 import os 
-
 # Load environment variables from .env file
 load_dotenv()
 config_path = os.getenv('LOCAL_ENV') + 'src/aspect_classification/models/config.yml'
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
-    
+
 
 class MyPipeline:
     def __init__(self, pipeline_type='default', bert_model=None):
@@ -51,7 +52,8 @@ class MyPipeline:
             ])
             self.sk_pipeline = None
             self.bert_pipeline = bert_classifier
-            self.label_binarizer = MultiLabelBinarizer()
+            self.multilabel_bin = MultiLabelBinarizer()
+            self.singlelabel_bin = LabelEncoder()
             # Load BERT parameters from config file
             self.bert_epochs = self.bert_params['epochs']
             self.bert_batch_size = self.bert_params['batch_size']
@@ -74,14 +76,44 @@ class MyPipeline:
     def get_bert_pipeline(self):
         return self.bert_pipeline
     
+
     def evaluate(self, y_true, y_pred):
-        evaluation_metrics = {}
-        # Compute and store evaluation metrics.
-        # This is just numpy arrays so just use the prediction scores.
-        evaluation_metrics['hamming_loss'] = hamming_loss(y_true, y_pred)
-        evaluation_metrics['jaccard_score'] = jaccard_score(y_true, y_pred, average='samples')
-        evaluation_metrics['f1_score'] = f1_score(y_true, y_pred, average='samples')
+        evaluation_metrics = {'average_precision': [],
+                            'average_recall': [],
+                            'average_f1_score': []}
+            # Fit and transform y_true and y_pred
+        y_pred_bin = self.multilabel_bin.transform(y_pred)
+        if isinstance(y_true[0], list):
+            y_true_labels = y_true
+        else:
+            # Convert string representations to lists of labels for y_true
+            y_true_labels = [label.strip("[]").split(", ") for label in y_true]
+            print(y_true_labels[0][0], y_pred[0][0])
+            
+        conf_matrix = multilabel_confusion_matrix(y_true_labels, y_pred_bin)
+
+        # Extract TP, FP, FN values from the confusion matrix
+        true_positives = conf_matrix[:, 1, 1]
+        false_positives = conf_matrix[:, 0, 1]
+        false_negatives = conf_matrix[:, 1, 0]
+
+        # Compute precision, recall, and F1-score for each label
+        precision = true_positives / (true_positives + false_positives)
+        recall = true_positives / (true_positives + false_negatives)
+        f1_score = 2 * (precision * recall) / (precision + recall)
+
+        # Average precision, recall, and F1-score across all labels
+        average_precision = precision.mean()
+        average_recall = recall.mean()
+        average_f1_score = f1_score.mean()
+
+        evaluation_metrics['average_precision'].append(average_precision)
+        evaluation_metrics['average_recall'].append(average_recall)
+        evaluation_metrics['average_f1_score'].append(average_f1_score)
+
         return evaluation_metrics
+
+
     
     def fit(self, X, y):
         if self.sk_pipeline is not None:
@@ -91,15 +123,18 @@ class MyPipeline:
             encoded_texts = self.tokenizer(X, padding='max_length', truncation=True, return_tensors='pt', max_length=19)
             input_ids = encoded_texts['input_ids']
             attention_mask = encoded_texts['attention_mask']
-            y_encoded = self.label_binarizer.fit_transform(y)  # Use MultiLabelBinarizer
+            y_encoded = self.singlelabel_bin.fit_transform(y)  
+        
+
 
             # Adjust label encoding
-            labels_encoded = torch.tensor(y_encoded, dtype=torch.float)  # Convert to torch.float type
+            labels_encoded = torch.tensor(y_encoded, dtype=torch.long)  # Convert to torch.long type
 
             dataset = TensorDataset(input_ids, attention_mask, labels_encoded)
             dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0], shuffle=True)  # Add shuffle for better training
 
             optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[2])
+            criterion = nn.CrossEntropyLoss()  # Use CrossEntropyLoss for multi-class labels
             start_time = time.time()
 
             print('Started ...')
@@ -109,13 +144,14 @@ class MyPipeline:
                     attention_mask = batch[1].to(self.device)
                     labels = batch[2].to(self.device)
                     optimizer.zero_grad()
-                    outputs = self.model(input_ids, attention_mask=attention_mask, labels=labels)
-                    loss = outputs[0]
+                    outputs = self.model(input_ids, attention_mask=attention_mask)
+                    logits = outputs.logits
+                    loss = criterion(logits, labels)
                     loss.backward()
                     optimizer.step()
                 end_time = time.time()
                 epoch_time = end_time - start_time
-            print("Time for all epochs:", epoch_time*self.bert_epochs[0])
+            print("Time for all epochs:", epoch_time * self.bert_epochs[0])
         return self
 
     def predict(self, X):
@@ -134,7 +170,13 @@ class MyPipeline:
             threshold = 0.5
             predicted_labels = (probabilities > threshold).int()
             # Define the aspect labels
-            aspect_labels = ["Toilets", "Transport & Parking", "Accessibility", "Staff", "Overview"]
+            aspect_labels = [
+                'Access',
+                'Overview',
+                'Staff',
+                'Toilets',
+                'Transport & Parking',
+            ]
 
             # Convert the predicted labels to a list of aspects for each input sample
             aspects = []
@@ -145,6 +187,7 @@ class MyPipeline:
             return aspects
         else:
             raise ValueError('Both pipelines are None. Please provide a valid pipeline type.')
+
 
 
 

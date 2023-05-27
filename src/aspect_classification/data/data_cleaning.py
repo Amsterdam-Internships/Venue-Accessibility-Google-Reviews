@@ -52,10 +52,8 @@ def remove_translate_tags(df):
 def cleaning_selector(df, columns):
     if 'Aspect' in df:
         df_selected = rename_columns(df[columns], ["Review"],  ["Text"])
-        print(df_selected.head())
         df_cleaned = removing_nans(df_selected)
-        target_aspects = ['Toilets', 'Transport & Parking',
-                          'Wheelchair', 'Staff', 'Overview', 'Access']
+        target_aspects = ['Toilets','Transport & Parking','Access','Overview','Staff']
         df_aspects = select_aspects(target_aspects, df_cleaned)
         return convert_rating(df_aspects)
     else:
@@ -80,8 +78,12 @@ def clean_sentiment(df):
     return df
     
 def filter_aspects(df, aspects):
-    filtered_data = df[df["Aspect"].isin(aspects)]
-    return filtered_data
+    cleaned_aspects = [aspect.strip() for aspect in aspects]
+    filtered_data = df[df["Aspect"].isin(cleaned_aspects)]
+    selected_aspects = filtered_data[filtered_data["Aspect"].isin(cleaned_aspects)]
+    return selected_aspects
+
+
 
 
 def convert_score(x):

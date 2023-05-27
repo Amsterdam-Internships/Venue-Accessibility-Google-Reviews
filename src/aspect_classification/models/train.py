@@ -1,3 +1,5 @@
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 from pipelines import MyPipeline
 from sklearn.model_selection import GridSearchCV
 from dotenv import load_dotenv
@@ -6,7 +8,6 @@ sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Revie
 from aspect_classification.data.data_cleaning import bert_processing
 import joblib
 import pandas as pd
-import os
 import yaml
 
 # Load environment variables from .env file
@@ -30,7 +31,7 @@ def train_classic_models():
     cv=5, n_jobs=3, verbose=3, scoring='accuracy')
     euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
-    trained_model = grid_search.fit(X_train[:801], y_train[:801])
+    trained_model = grid_search.fit(X_train, y_train)
     print('training of classic models has finished !')
     save_path = saved_model_path + '/gridsearch.joblib'
     joblib.dump(trained_model, save_path)
@@ -39,7 +40,7 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
     X_train = bert_processing(X_train)
-    trained_model = my_pipeline.fit(X_train, y_train)
+    trained_model = my_pipeline.fit(X_train[:800], y_train[:800])
     print('training of BERT models has finished !')
     save_path = saved_model_path + '/bert.joblib'
     print(save_path)
