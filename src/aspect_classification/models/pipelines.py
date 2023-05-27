@@ -1,13 +1,13 @@
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, EvalPrediction
-from sklearn.metrics import hamming_loss, jaccard_score, f1_score
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
-from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
+from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import  multilabel_confusion_matrix
+from sklearn.metrics import  confusion_matrix
 from dotenv import load_dotenv
 import numpy as np
 import torch
@@ -52,14 +52,15 @@ class MyPipeline:
             ])
             self.sk_pipeline = None
             self.bert_pipeline = bert_classifier
-            self.multilabel_bin = MultiLabelBinarizer()
-            self.singlelabel_bin = LabelEncoder()
+            self.label_encoder = LabelEncoder()
+            self.label_binarizer = LabelBinarizer()
             # Load BERT parameters from config file
             self.bert_epochs = self.bert_params['epochs']
             self.bert_batch_size = self.bert_params['batch_size']
             self.bert_learning_rate = self.format_params(self.bert_params['learning_rate'])
-    def format_params(self, params):
-        return [float(lr) for lr in params]
+    
+    def format_params(self, config):
+        return [float(lr) for lr in config]
     
     def convert_to_tuple(self, subkey, subval):
         if subkey == 'ngram_range':
@@ -76,42 +77,44 @@ class MyPipeline:
     def get_bert_pipeline(self):
         return self.bert_pipeline
     
-
-    def evaluate(self, y_true, y_pred):
-        evaluation_metrics = {'average_precision': [],
-                            'average_recall': [],
-                            'average_f1_score': []}
-            # Fit and transform y_true and y_pred
-        y_pred_bin = self.multilabel_bin.transform(y_pred)
-        if isinstance(y_true[0], list):
-            y_true_labels = y_true
-        else:
-            # Convert string representations to lists of labels for y_true
-            y_true_labels = [label.strip("[]").split(", ") for label in y_true]
-            print(y_true_labels[0][0], y_pred[0][0])
+    def format_metrics(self, y_true, y_pred):
+        formatted_values = []
+        for true_val, pred_row in zip(y_true, y_pred):
+            for pred_val in pred_row:
+                formatted_values.append((true_val, pred_val))
+        return formatted_values
+    
+    def split_metrics(self, formatted_values):
+        true_values =[]
+        predicted_values = []
+        for y_true, y_pred in formatted_values:
+            true_values.append(y_true)
+            predicted_values.append(y_pred)
+        return true_values, predicted_values
+    
+    
+    def calculate_metrics(self, formatted_values):
+        true_values, predicted_values = self.split_metrics(formatted_values)
+        accuracy = accuracy_score(true_values, predicted_values)
+        precision = precision_score(true_values, predicted_values, average='macro')
+        recall = recall_score(true_values, predicted_values, average='macro')
+        f1 = f1_score(true_values, predicted_values, average='macro')
+        return accuracy, precision, recall, f1
             
-        conf_matrix = multilabel_confusion_matrix(y_true_labels, y_pred_bin)
-
-        # Extract TP, FP, FN values from the confusion matrix
-        true_positives = conf_matrix[:, 1, 1]
-        false_positives = conf_matrix[:, 0, 1]
-        false_negatives = conf_matrix[:, 1, 0]
-
-        # Compute precision, recall, and F1-score for each label
-        precision = true_positives / (true_positives + false_positives)
-        recall = true_positives / (true_positives + false_negatives)
-        f1_score = 2 * (precision * recall) / (precision + recall)
-
-        # Average precision, recall, and F1-score across all labels
-        average_precision = precision.mean()
-        average_recall = recall.mean()
-        average_f1_score = f1_score.mean()
-
-        evaluation_metrics['average_precision'].append(average_precision)
-        evaluation_metrics['average_recall'].append(average_recall)
-        evaluation_metrics['average_f1_score'].append(average_f1_score)
-
+        
+    
+    def evaluate(self, y_true, y_pred):
+        # Calculate metrics
+        formatted_values = self.format_metrics(y_true, y_pred)
+        accuracy, precision, recall, f1 = self.calculate_metrics(formatted_values)
+        evaluation_metrics = {'Accuracy': accuracy,
+                            'Precision': precision,
+                            'Recall': recall,
+                            'F1-Score': f1}
+        
         return evaluation_metrics
+
+
 
 
     
@@ -123,7 +126,7 @@ class MyPipeline:
             encoded_texts = self.tokenizer(X, padding='max_length', truncation=True, return_tensors='pt', max_length=19)
             input_ids = encoded_texts['input_ids']
             attention_mask = encoded_texts['attention_mask']
-            y_encoded = self.singlelabel_bin.fit_transform(y)  
+            y_encoded = self.label_encoder.fit_transform(y)  
         
 
 
@@ -158,33 +161,33 @@ class MyPipeline:
         if self.sk_pipeline is not None:
             return self.sk_pipeline.predict(X)
         elif self.bert_pipeline is not None:
-            encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
-            input_ids = encoded_texts['input_ids'].to(self.device)
-            attention_mask = encoded_texts['attention_mask'].to(self.device)
-            outputs = self.model(input_ids, attention_mask=attention_mask)
-            logits = outputs.logits  # Get the predicted logits
+            try:
+                encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
+                input_ids = encoded_texts['input_ids'].to(self.device)
+                attention_mask = encoded_texts['attention_mask'].to(self.device)
+                outputs = self.model(input_ids, attention_mask=attention_mask)
+                logits = outputs.logits  # Get the predicted logits
 
-            # Apply sigmoid activation function to obtain probabilities
-            probabilities = torch.sigmoid(logits)
-            # Set a threshold to determine the predicted labels
-            threshold = 0.5
-            predicted_labels = (probabilities > threshold).int()
-            # Define the aspect labels
-            aspect_labels = [
-                'Access',
-                'Overview',
-                'Staff',
-                'Toilets',
-                'Transport & Parking',
-            ]
+                # Apply sigmoid activation function to obtain probabilities
+                probabilities = F.sigmoid(logits)
 
-            # Convert the predicted labels to a list of aspects for each input sample
-            aspects = []
-            for labels in predicted_labels:
-                indices = np.where(labels == 1)[0]
-                aspects.append([aspect_labels[i] for i in indices])
+                # Set a threshold to determine the predicted labels
+                threshold = 0.5
+                predicted_labels = (probabilities > threshold).int().tolist()
 
-            return aspects
+                # Define the aspect labels
+                aspect_labels = ['Access', 'Overview', 'Staff', 'Toilets', 'Transport & Parking']
+
+                # Convert the predicted labels to a list of aspects for each input sample
+                predictions = []
+                for labels in predicted_labels:
+                    prediction = [aspect_labels[i] for i, label in enumerate(labels) if label==1]
+                    predictions.append(prediction)
+                    
+                return predictions
+            except Exception as e:
+                # Handle specific exceptions or log the error
+                raise RuntimeError("Error occurred during BERT prediction: " + str(e))
         else:
             raise ValueError('Both pipelines are None. Please provide a valid pipeline type.')
 

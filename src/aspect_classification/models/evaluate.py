@@ -45,8 +45,8 @@ def select_rows(test_data):
     # Remove the redundant rows
     # test_data = test_data.dropna(subset=['Improved Aspect Label']) will add this back when not using example file
     #test_data['Aspect Label'] = test_data['Improved Aspect Label'].str.split(' & ')
-    test_data['Aspects'] = test_data['Aspects'].str.split(' & ')
-    test_data['Aspects'] = test_data['Aspects'].astype(str).str.replace('`', '').str.replace("'", "")
+    test_data['Aspects'] = test_data['Aspects'].apply(lambda x: x.split(' & ') if x != 'Transport & Parking' else [x])
+    test_data = test_data.explode('Aspects')
     return test_data
 
 
