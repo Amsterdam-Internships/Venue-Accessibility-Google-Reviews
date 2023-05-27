@@ -38,7 +38,6 @@ def generate_results(test_data):
     annotated_data['Predicted Aspect Labels'] = pd.Series(predicted_labels)
     # get and save metrics
     metrics = my_pipeline.evaluate(gold_labels, annotated_data['Predicted Aspect Labels'])
-    print(metrics)
     save_results(metrics, annotated_data)
 
 def select_rows(test_data):
@@ -53,19 +52,21 @@ def select_rows(test_data):
 
 def save_results(eval_metrics, predicted_df):
     # Save the predicted labels as a CSV file
-    predicted_labels_path = interim_path + "/predicted_aspect_labels2.csv"
+    predicted_labels_path = interim_path + "/predicted_aspect_labels.csv"
     predicted_df.to_csv(predicted_labels_path)
-
+    
+    # Create a DataFrame from the eval_metrics dictionary
+    eval_metrics_df = pd.DataFrame.from_dict(eval_metrics, orient='index').transpose()
+    
     # Save the evaluation metrics as a CSV file
     results_path_csv = results_path + '.csv'
-    with open(results_path_csv, 'w') as f:
-        f.write(str(eval_metrics))
-
+    eval_metrics_df.to_csv(results_path_csv)
+    
     # Save the classification report as a text file
     report_path = results_path + "_classification_report.tex"
-    eval_metrics_text = f"{eval_metrics}"
-    with open(report_path, 'w') as f:
-        f.write(eval_metrics_text)
+    eval_metrics_df.to_latex(report_path, index=True)
+
+
 
 
 

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import numpy as np
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -8,27 +9,32 @@ load_dotenv()
 
 def extract_metrics():
     eval_metrics = pd.read_csv(load_path)
-    # Extract the ROUGE metric names and corresponding scores
-    metrics = eval_metrics.columns
-    print(metrics)
-    precision_scores = eval_metrics['hamming loss']
-    recall_scores = eval_metrics['jaccard_score']
-    f1_scores = eval_metrics['f1']
-    plot_metric(metrics, precision_scores, 'hamming loss')
-    plot_metric(metrics, recall_scores, 'jaccard_score')
-    plot_metric(metrics, f1_scores, 'f1')
+    eval_metrics = eval_metrics.drop('Unnamed: 0', axis=1)
 
-def plot_metric(metrics, metric_type, metric_name):
-    # Create a bar plot for precision scores
+    # Get the metric scores for the single row
+    accuracy_score = eval_metrics['Accuracy'].values[0]
+    precision_score = eval_metrics['Precision'].values[0]
+    recall_score = eval_metrics['Recall'].values[0]
+    f1_score = eval_metrics['F1-Score'].values[0]
+
+    plot_metrics(accuracy_score, precision_score, recall_score, f1_score)
+
+def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
+    # Create a bar plot for all four metrics
     plt.figure(figsize=(8, 6))
-    plt.bar(metrics, metric_type)
-    plt.xlabel('ROUGE Metric')
-    plt.ylabel('{metric_name}'.format(metric_name))
-    plt.title('ROUGE {metric_name} Scores'.format(metric_name))
-    plt.savefig(save_path + '{metric_name}_scores.png'.format(metric_name))
+    metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
+    scores = [accuracy_score, precision_score, recall_score, f1_score]
+    plt.bar(metrics, scores)
+    plt.xlabel('Metric')
+    plt.ylabel('Score')
+    plt.title('Evaluation Metrics')
+    plt.savefig(save_path + 'evaluation_metrics.png')
     plt.close()
+
+
+
 
 if __name__ == '__main__':
     save_path = os.getenv('LOCAL_ENV') + 'results/aspect_classification/'
-    load_path = os.getenv('LOCAL_ENV') + 'data/interim/predicted_aspect_labels.csv'
+    load_path = os.getenv('LOCAL_ENV') + 'results/aspect_classification/TinyBERT_General_4L_312D.csv'
     extract_metrics()
