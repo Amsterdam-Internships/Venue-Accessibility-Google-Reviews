@@ -55,7 +55,10 @@ def cleaning_selector(df, columns):
         df_cleaned = removing_nans(df_selected)
         target_aspects = ['Toilets','Transport & Parking','Access','Overview','Staff']
         df_aspects = select_aspects(target_aspects, df_cleaned)
-        return convert_rating(df_aspects)
+        added_sentiments = convert_rating(df_aspects)
+        print(added_sentiments['Sentiment'])
+        cleaned_sentiments = clean_sentiment(added_sentiments)
+        return cleaned_sentiments
     else:
         old_columns = ["Review Text", "Review Rate"]
         new_columns = ["Text","Sentiment"]
@@ -74,8 +77,7 @@ def replace_substrings(s):
     
 def clean_sentiment(df):
     df['Sentiment'] = df['Sentiment'].apply(lambda x: replace_substrings(x))
-    df["Sentiment"] = df["Sentiment"].apply(lambda x: int(x))
-    return df
+    return remove_sentiment(df)
     
 def filter_aspects(df, aspects):
     cleaned_aspects = [aspect.strip() for aspect in aspects]
@@ -111,7 +113,7 @@ def asign_label(df):
     return df
 
 def remove_sentiment(df):
-    df = df[df['Sentiment'] != 'neutral']
+    df = df[df["Sentiment"] != 'neutral'].copy()
     return df
 
 def create_sentiment(df):

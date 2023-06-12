@@ -7,13 +7,10 @@ from sklearn.ensemble import VotingClassifier
 from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import  confusion_matrix
 from dotenv import load_dotenv
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import json
 import time
 import yaml
 import os 
@@ -127,9 +124,6 @@ class MyPipeline:
             input_ids = encoded_texts['input_ids']
             attention_mask = encoded_texts['attention_mask']
             y_encoded = self.label_encoder.fit_transform(y)  
-        
-
-
             # Adjust label encoding
             labels_encoded = torch.tensor(y_encoded, dtype=torch.long)  # Convert to torch.long type
 

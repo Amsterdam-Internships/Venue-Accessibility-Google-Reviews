@@ -1,23 +1,30 @@
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, AdamW
 from sklearn.pipeline import Pipeline
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import VotingClassifier
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.model_selection import ParameterGrid
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, LabelBinarizer
+from dotenv import load_dotenv
 import torch
+import torch.optim as optim
+import torch.nn as nn
+import torch.nn.functional as F
+import os
 import time
 import numpy as np
 from torch.utils.data import TensorDataset, DataLoader
 import yaml
-
-with open('src/sentiment_classification/models/config.yml', 'r') as f:
+# Load environment variables from .env file
+load_dotenv()
+config_path = os.getenv('LOCAL_ENV') + 'src/sentiment_classification/models/config.yml'
+with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
 
 
 
-class MyPipeline:
+class SentimentPipeline:
     def __init__(self, pipeline_type='default', bert_model=None):
         self.bert_params = params['bert_params']
         self.sk_params = params['sk_params']
@@ -35,6 +42,7 @@ class MyPipeline:
             self.sk_pipeline = None
             self.bert_pipeline = None
         else:
+            self.label_mapping = {0: 'Negative', 1: 'Positive'}
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
             self.num_labels = self.bert_params['num_of_labels']
@@ -45,6 +53,8 @@ class MyPipeline:
             ])
             self.sk_pipeline = None
             self.bert_pipeline = bert_classifier
+            self.label_encoder = LabelEncoder()
+            self.label_binarizer = LabelBinarizer()
 
             # Load BERT parameters from config file
             self.bert_epochs = self.bert_params['epochs']
@@ -52,6 +62,9 @@ class MyPipeline:
             self.bert_learning_rate = self.format_params(self.bert_params['learning_rate'])
     def format_params(self, params):
         return [float(lr) for lr in params]
+    
+    def update_label_mapping(self, label_encoder):
+        self.label_mapping = {i: label for i, label in enumerate(label_encoder.classes_)}
     
     def convert_to_tuple(self, subkey, subval):
         if subkey == 'ngram_range':
@@ -68,20 +81,42 @@ class MyPipeline:
     def get_bert_pipeline(self):
         return self.bert_pipeline
     
+    def calculate_metrics(self, y_true, y_pred):
+        accuracy = accuracy_score(y_true, y_pred)
+        precision = precision_score(y_true, y_pred, average='macro')
+        recall = recall_score(y_true, y_pred, average='macro')
+        f1 = f1_score(y_true, y_pred, average='macro')
+        return accuracy, precision, recall, f1
+            
+        
+    
+    def evaluate(self, y_true, y_pred):
+        # Calculate metrics
+        accuracy, precision, recall, f1 = self.calculate_metrics(y_true, y_pred)
+        evaluation_metrics = {'Accuracy': accuracy,
+                            'Precision': precision,
+                            'Recall': recall,
+                            'F1-Score': f1}
+        
+        return evaluation_metrics
+
+    
+    
+    
     def fit(self, X, y):
         if self.sk_pipeline is not None:
             self.sk_pipeline.set_params(**self.params['default'])
             self.sk_pipeline.fit(X, y)
         if self.bert_pipeline is not None:
-            encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
+            encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt', max_length=512)
             input_ids = encoded_texts['input_ids']
             attention_mask = encoded_texts['attention_mask']
-            encoder = LabelEncoder()
-            y_encoded = encoder.fit_transform(y)
-            labels_encoded = torch.tensor(y_encoded)
+            y_encoded = self.label_encoder.fit_transform(y)
+            self.update_label_mapping(self.label_encoder)
+            labels_encoded = torch.tensor(y_encoded, dtype=torch.long)
             dataset = TensorDataset(input_ids, attention_mask, labels_encoded)
-            dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0])
-            optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[2])
+            dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0], shuffle=True)
+            optimizer = optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[2])
             start_time = time.time()
             print('Started ...')
             for epoch in range(self.bert_epochs[0]):
@@ -89,26 +124,35 @@ class MyPipeline:
                     input_ids = batch[0].to(self.device)
                     attention_mask = batch[1].to(self.device)
                     labels = batch[2].to(self.device)
-                    optimizer.zero_grad()
-                    outputs = self.model(input_ids, attention_mask=attention_mask, labels=labels)
-                    loss = outputs[0]
+                    optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[2])
+                    outputs = self.model(input_ids, attention_mask=attention_mask)
+                    criterion = nn.CrossEntropyLoss()
+                    logits = outputs.logits
+                    loss = criterion(logits, labels)
                     loss.backward()
                     optimizer.step()
                 end_time = time.time()
                 epoch_time = end_time - start_time
             print("Time for all epochs:", epoch_time*self.bert_epochs[0])
+        self.update_label_mapping(self.label_encoder)
         return self
 
     def predict(self, X):
         if self.sk_pipeline is not None:
             return self.sk_pipeline.predict(X)
         elif self.bert_pipeline is not None:
-            encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
-            input_ids = encoded_texts['input_ids'].to(self.device)
-            attention_mask = encoded_texts['attention_mask'].to(self.device)
-            outputs = self.model(input_ids, attention_mask=attention_mask)
-            _, y_pred = torch.max(outputs[0], dim=1)
-            y_pred = y_pred.cpu().numpy()
-            return y_pred
+            try:
+                encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
+                input_ids = encoded_texts['input_ids'].to(self.device)
+                attention_mask = encoded_texts['attention_mask'].to(self.device)
+                outputs = self.model(input_ids, attention_mask=attention_mask)
+                _, y_pred = torch.max(outputs[0], dim=1)
+                y_pred = y_pred.cpu().numpy()
+                # Convert numerical predictions to text labels
+                y_pred_labels = [self.label_mapping[label] for label in y_pred]
+                return y_pred_labels
+            except Exception as e:
+                # Handle specific exceptions or log the error
+                raise RuntimeError("Error occurred during BERT prediction: " + str(e))
         else:
             raise ValueError('Both pipelines are None. Please provide a valid pipeline type.')

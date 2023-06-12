@@ -1,4 +1,4 @@
-from pipelines import MyPipeline
+from pipelines import SentimentPipeline
 from sklearn.model_selection import GridSearchCV
 from dotenv import load_dotenv
 import sys    
@@ -10,12 +10,12 @@ import os
 import yaml
 
 # Load environment variables from .env file
-load_dotenv()
-with open('src/sentiment_classification/models/config.yml', 'r') as f:
+config_path = os.getenv('LOCAL_ENV') + 'src/sentiment_classification/models/config.yml'
+with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
     
     
-my_pipeline = MyPipeline(pipeline_type=params['pipeline_type'], bert_model=params['model_name'])
+my_pipeline = SentimentPipeline(pipeline_type=params['pipeline_type'], bert_model=params['model_name'])
 
 def split_data(euans_data):
     euans_reviews = euans_data.Text.values.tolist()
@@ -37,7 +37,7 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     X_train, y_train = split_data(euans_data)
     X_train = bert_processing(X_train)
-    trained_model = my_pipeline.fit(X_train, y_train)
+    trained_model = my_pipeline.fit(X_train[:800], y_train[:800])
     print('training of BERT models has finished !')
     save_path = saved_model_path + '/bert.joblib'
     print(save_path)

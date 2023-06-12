@@ -27,7 +27,7 @@ def generate_results(test_data):
     # Select annotated data
     annotated_data = select_rows(test_data)
     # Select the input features
-    google_reviews = annotated_data['Review Text'].values.tolist()
+    google_reviews = annotated_data['Review'].values.tolist()
     # Select target labels
     gold_labels = annotated_data['Aspects'].values.tolist()
     # Make predictions on reviews
@@ -39,11 +39,12 @@ def generate_results(test_data):
     # get and save metrics
     metrics = my_pipeline.evaluate(gold_labels, annotated_data['Predicted Aspect Labels'])
     save_results(metrics, annotated_data)
+    
+
 
 def select_rows(test_data):
     # Remove the redundant rows
     # test_data = test_data.dropna(subset=['Improved Aspect Label']) will add this back when not using example file
-    #test_data['Aspect Label'] = test_data['Improved Aspect Label'].str.split(' & ')
     test_data['Aspects'] = test_data['Aspects'].apply(lambda x: x.split(' & ') if x != 'Transport & Parking' else [x])
     test_data = test_data.explode('Aspects')
     return test_data

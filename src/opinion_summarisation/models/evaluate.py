@@ -1,82 +1,98 @@
 import os
+import threading
+
 import torch
 import yaml
 import pandas as pd
-from rouge import Rouge
+import sys
+# sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
 import transformers
+from dotenv import load_dotenv
+from rouge import Rouge
 from summarizer import Summarizer
 from Pipelines import SummarizationPipeline
 
 rouge = Rouge()
 
-with open('src/opinion_summarisation/models/config.yml', 'r') as f:
+# Load environment variables from .env file
+load_dotenv()
+
+config_path = os.getenv('LOCAL_ENV') + 'src/opinion_summarisation/models/config.yml'
+
+with open(config_path, 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
-# clean this up later
-se2seq_config = config['se2seq_config']
-bert_config = config['berts']['bert_config']
-distilbert_config = config['berts']['distilbert_config']
-sbert_config = config['berts']['sbert_config']
 
-pipeline = SummarizationPipeline('bert', bert_config['model_name'])
+pipeline = SummarizationPipeline('distilbert-base-uncased', 'bert')
 
-def load_test_data(test_data_path : str) -> torch.utils.data.TensorDataset:
+def generate_dataset(test_data_path: str):
     google_data = pd.read_csv(test_data_path)
-    encodings = pipeline.tokenizer(google_data['Text'].tolist(), truncation=True, padding=True)
-    google_tensors = torch.utils.data.TensorDataset(torch.tensor(encodings['input_ids']),
-                                             torch.tensor(encodings['attention_mask']))
-    return google_tensors
+    reviews = google_data['JoinedReview'].tolist()
+    return reviews
 
-def load_ref_data(ref_data_path : str) -> list[str]:
+def load_ref_data(ref_data_path: str) -> list[str]:
     reference_df = pd.read_csv(ref_data_path)
-    return reference_df.Text.values.tolist()
-    
+    return reference_df['Text Summary'].values.tolist()
+
 def compute_metrics(reference, predictions) -> dict:
-    combined_ref = [' '.join(summary) for summary in reference]
-    combined_pred = [' '.join(summary) for summary in predictions]
-    scores = rouge.get_scores(combined_pred, combined_ref, avg=True)
+    # Remove empty predictions
+    non_empty_predictions = []
+    non_empty_references = []
+    for pred, ref in zip(predictions, reference):
+        if pred.strip():  # Check if summary is not empty after removing leading/trailing whitespace
+            non_empty_predictions.append(pred)
+            non_empty_references.append(ref)
+    scores = rouge.get_scores(non_empty_predictions, non_empty_references, avg=True)
     return scores
 
-def evaluate_model(test_data_path: str, ref_data_path: str):
-    google_dataset = load_test_data(test_data_path)
-    data_loader = torch.utils.data.DataLoader(google_dataset, batch_size=config['se2seq_config']['batch_size'])
-    pipeline.model.eval()
+
+def evaluate_model(test_data_path: str, ref_data_path: str, results_path: str):
+    google_dataset = generate_dataset(test_data_path)
     predictions = []
-    with torch.no_grad():
-        for batch in data_loader:
-            if isinstance(pipeline.extractive_model, Summarizer):
-                # BERT Extractive Summarizer model
-                input_ids = batch[0]
-                input_ids = input_ids.to(pipeline.device)
-                summaries = pipeline.extractive_model(input_ids)
-            elif isinstance(pipeline.model, transformers.BartForConditionalGeneration):
-                # Seq2Seq model
-                input_ids, attention_mask = batch
-                input_ids, attention_mask = input_ids.to(pipeline.device), attention_mask.to(pipeline.device)
-                outputs = pipeline.model.generate(
+    tokenizer = pipeline.tokenizer
+    model = pipeline.model
+    if isinstance(pipeline.extractive_model, Summarizer):
+        # Use the pipeline's extractive summarizer
+        with torch.no_grad():
+            print("Generating summaries using extractive summarizer...")
+            for input_text in google_dataset:
+                summary = pipeline.extractive_model(input_text)
+                predictions.append(summary)
+                
+        print("Finished generating summaries using extractive summarizer.")
+        
+    elif isinstance(model, transformers.BartForConditionalGeneration):
+        # Load a saved BART model
+        model = transformers.BartForConditionalGeneration.from_pretrained(saved_model_path)
+        with torch.no_grad():
+            print("Generating summaries using BART model...")
+            for input_text in google_dataset:
+                input_ids = tokenizer.encode(input_text, truncation=True, padding='max_length', max_length=pipeline.max_length, return_tensors='pt')
+                input_ids = input_ids.to(model.device)
+                model.eval()  # Switch to evaluation mode
+                outputs = model.generate(
                     input_ids=input_ids,
-                    attention_mask=attention_mask,
                     max_length=pipeline.max_summary_length,
                     num_beams=pipeline.num_beams,
                     early_stopping=True
                 )
-                summaries = pipeline.tokenizer.batch_decode(outputs, skip_special_tokens=True)
-            else:
-                raise ValueError("Unsupported model type.")
-
-            predictions.extend(summaries)
+                summary = tokenizer.decode(outputs[0], skip_special_tokens=True)
+                predictions.append(summary)
+        print("Finished generating summaries using BART model.")
+        
+    else:
+        raise ValueError("Unsupported model type.")
 
     reference_summaries = load_ref_data(ref_data_path)
     eval_metrics = pd.DataFrame(compute_metrics(reference_summaries, predictions))
-    eval_metrics.to_csv(results_path, index=False)
-
-
-
+    return eval_metrics
 
 if __name__ == '__main__':
-    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/predicted_sentiment_labels.csv'
-    saved_model_path = os.getenv('LOCAL_ENV') + 'models/opinion_summarisation/bertmodel.bin'
-    results_path = os.getenv('LOCAL_ENV') + 'results/opinion_summarisation/'+bert_config['model_name']+'.csv'
-    
-    pipeline.model = pipeline.model.from_pretrained(saved_model_path)
-
-    evaluate_model(loaded_data_path, results_path)
+    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/grouped_reviews.csv'
+    print('Evaluating model...')
+    ref_data_path = os.getenv('LOCAL_ENV') + 'data/processed/summarisation_data/summarised_ref_reviews.csv'
+    saved_model_path = os.getenv('LOCAL_ENV') + 'models/opinion_summarisation/distilbertmodel.bin'
+    results_path = os.getenv('LOCAL_ENV') + 'results/opinion_summarisation/eval_metrics.csv'
+    metrics = evaluate_model(loaded_data_path, ref_data_path, results_path)
+    metrics.to_csv(results_path, index=False)
+    print('Done!')
+    os._exit(0)

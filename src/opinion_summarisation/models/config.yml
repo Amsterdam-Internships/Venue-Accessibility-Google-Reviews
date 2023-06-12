@@ -1,4 +1,4 @@
-se2seq_config:
+seq2seq_config:
   model_name: "facebook/bart-large"
   tokenizer_name: "facebook/bart-large"
   max_length: 512
@@ -10,8 +10,13 @@ se2seq_config:
 berts:
   bert_config:
     model_name: 'bert-extractive-summarizer'
+    batch_size: 8
+    learning_rate: 0.00003
   distilbert_config:
     model_name: "distilbert-base-uncased"
+    batch_size: 8
+    num_epochs: 5
+    learning_rate: 0.00003
     hidden: [-1,-2]
     hidden_contact: True
   sbert_config:
