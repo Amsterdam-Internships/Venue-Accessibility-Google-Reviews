@@ -52,7 +52,7 @@ There are the following folders in the structure:
 
 ## Setup
 In order to setup the pipeline environment you need to download the google test daya from [here](https://drive.google.com/file/d/1j6jsiYxZuXe9tBaj_ov4GI7YL4i3Xfti/view?usp=share_link) and the euan's guide data [here](https://docs.google.com/spreadsheets/d/1G1mwijJqQ5LTivIA3fMOZm_3SEJ1Jg_v/edit?usp=share_link&ouid=106259336767035025054&rtpof=true&sd=true)
-To run this pipeline run the bash script titled 1) ['full_pipeline.sh'](./scripts/full_pipeline.sh)
+To run this pipeline run the bash script titled ['full_pipeline.sh'](./scripts/full_pipeline.sh)
 
 
 
