@@ -39,6 +39,7 @@ class MyPipeline:
             self.sk_pipeline = None
             self.bert_pipeline = None
         else:
+            self.model_name = bert_model
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
             self.num_labels = self.bert_params['num_of_labels']

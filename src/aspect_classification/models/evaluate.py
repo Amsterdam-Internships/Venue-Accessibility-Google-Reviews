@@ -2,7 +2,8 @@
 This is a script to use trained models to make predictions.
 '''
 import sys
-sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
+import os
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.data_cleaning import bert_processing
 from aspect_classification.data.preprocessing import Preprocessor
 from transformers import AutoTokenizer
@@ -14,7 +15,7 @@ import pandas as pd
 import numpy as np
 import ast
 import yaml
-import os
+
 
 # Load environment variables from .env file
 load_dotenv()

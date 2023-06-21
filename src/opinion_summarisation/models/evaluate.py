@@ -79,15 +79,18 @@ def evaluate_model(test_data_path: str, ref_data_path: str, results_path: str):
         raise ValueError("Unsupported model type.")
 
     reference_summaries = load_ref_data(ref_data_path)
+    output_summaries = pd.DataFrame({'Prediction': predictions})
     eval_metrics = pd.DataFrame(compute_metrics(reference_summaries, predictions))
+    output_summaries.to_csv(output_path, index=False)
     return eval_metrics
 
 if __name__ == '__main__':
     loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/grouped_reviews.csv'
+    output_path = os.getenv('LOCAL_ENV') + 'data/external/output_summaries.csv'
     print('Evaluating model...')
     ref_data_path = os.getenv('LOCAL_ENV') + 'data/interim/ref_summaries.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + 'models/opinion_summarisation/'+ pipeline.model+'.bin'
-    results_path = os.getenv('LOCAL_ENV') + 'results/opinion_summarisation/'+pipeline.model+'eval_metrics.csv'
+    results_path = os.getenv('LOCAL_ENV') + 'results/opinion_summarisation/'+pipeline.model+'_eval_metrics.csv'
     metrics = evaluate_model(loaded_data_path, ref_data_path, results_path)
     metrics.to_csv(results_path, index=False)
     print('Done!')

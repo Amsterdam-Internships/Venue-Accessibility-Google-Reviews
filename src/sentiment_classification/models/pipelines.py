@@ -42,6 +42,7 @@ class SentimentPipeline:
             self.sk_pipeline = None
             self.bert_pipeline = None
         else:
+            self.model_name = bert_model
             self.label_mapping = {0: 'Negative', 1: 'Positive'}
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.tokenizer = AutoTokenizer.from_pretrained(bert_model)

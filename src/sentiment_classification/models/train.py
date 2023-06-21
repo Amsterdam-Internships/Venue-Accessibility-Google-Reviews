@@ -1,12 +1,13 @@
 from pipelines import SentimentPipeline
 from sklearn.model_selection import GridSearchCV
+import os
 from dotenv import load_dotenv
 import sys    
-sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.data_cleaning import bert_processing
 import joblib
 import pandas as pd
-import os
+
 import yaml
 
 # Load environment variables from .env file

@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from dotenv import load_dotenv
 import yaml
+from evaluate import pipeline
 
 # Load environment variables from .env file
 load_dotenv()
@@ -50,6 +51,6 @@ def plot_metrics(rouge_scores):
     plt.close()
 
 if __name__ == '__main__':
-    save_path = os.getenv('LOCAL_ENV') + f'results/opinion_summarisation/bert_eval_metrics.png'
-    load_path = os.getenv('LOCAL_ENV') + f'results/opinion_summarisation/eval_metrics.csv'
+    save_path = os.getenv('LOCAL_ENV') + f'results/opinion_summarisation/'+pipeline.model+'evaluation_metrics.png'
+    load_path = os.getenv('LOCAL_ENV') + f'results/opinion_summarisation/'+pipeline.model+'_eval_metrics.csv'
     extract_metrics()

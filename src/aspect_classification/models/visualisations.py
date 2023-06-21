@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import numpy as np
 from dotenv import load_dotenv
+from train import my_pipeline
 
 # Load environment variables from .env file
 load_dotenv()
@@ -28,7 +29,7 @@ def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
     plt.ylabel('Score')
     plt.title('Evaluation Metrics')
     #TODO Add the model names to the file name
-    plt.savefig(save_path + 'evaluation_metrics.png')
+    plt.savefig(save_path + my_pipeline.model_name.split("/")[1] +'evaluation_metrics.png')
     plt.close()
 
 
@@ -36,5 +37,5 @@ def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
 
 if __name__ == '__main__':
     save_path = os.getenv('LOCAL_ENV') + 'results/aspect_classification/'
-    load_path = os.getenv('LOCAL_ENV') + 'results/aspect_classification/TinyBERT_General_4L_312D.csv'
+    load_path = os.getenv('LOCAL_ENV') + 'results/aspect_classification/'+ my_pipeline.model_name.split("/")[1] + '.csv'
     extract_metrics()
