@@ -55,7 +55,7 @@ In order to setup the pipeline you need to download the google test data from [h
 
 To setup the environment please create your own .env file with a variable called $LOCAL_ENV this is where you should keep the file path of your home directory. Then you will be able to connect this to the relative paths of this repo. 
 
-E.g.  $LOCAL_ENV = /Users/yourname/Venue-Accessibility-Google-Reviews/src
+E.g.  $LOCAL_ENV = /Users/yourname/Venue-Accessibility-Google-Reviews
 
 To run this pipeline run the bash script titled ['full_pipeline.sh'](./scripts/full_pipeline.sh)
 
