@@ -1,6 +1,5 @@
 import re
 import nltk
-from gensim.parsing.preprocessing import STOPWORDS
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import *
 lemmatizer = WordNetLemmatizer()
@@ -22,7 +21,6 @@ class Preprocessor(object):
         re.compile(r'^(?i)\bneutral\b|(?i)\bnetural\b'): "Neutral"
         }
 
-    
     def remove_columns(self):
         pass
     

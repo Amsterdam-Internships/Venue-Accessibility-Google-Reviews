@@ -1,6 +1,6 @@
 # Set some environment stuffs
 export TRAINING_MODE='simple'
-source /Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/.env
+source ../.env
 
 # Create and process datasets
 
@@ -49,12 +49,6 @@ python "${LOCAL_ENV}src/sentiment_classification/models/visualisations.py"
 echo "Grouping review sentences by aspect..."
 
 python "${LOCAL_ENV}src/opinion_summarisation/data/group_test_reviews.py"
-
-# selecting longer reviews
-
-echo "Selecting longer reviews to summarise..."
-
-python "${LOCAL_ENV}src/opinion_summarisation/data/select_summary_reviews.py"
 
 # Opinion summarisation training
 

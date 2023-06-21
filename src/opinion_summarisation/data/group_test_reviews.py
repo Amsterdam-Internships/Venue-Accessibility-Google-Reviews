@@ -1,29 +1,16 @@
 import pandas as pd
 import os
-import ast
 import sys
-sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from dotenv import load_dotenv
-
+from preprocessing import Preprocessor
 # Load environment variables from .env file
 load_dotenv()
-
-def expand_aspects(reviews_df):
-    expanded_rows = []
-
-    for index, row in reviews_df.iterrows():
-        aspects = ast.literal_eval(row['Predicted Aspect Labels'])
-        for aspect in aspects:
-            expanded_row = row.copy()
-            expanded_row['Predicted Aspect Labels'] = aspect
-            expanded_rows.append(expanded_row)
-
-    expanded_df = pd.DataFrame(expanded_rows, columns=reviews_df.columns)
-    return expanded_df
+preprocessor = Preprocessor()
 
 def group_reviews_by_aspect():
     split_reviews = pd.read_csv(load_path)
-    expanded_reviews = expand_aspects(split_reviews)
+    expanded_reviews = preprocessor.expand_aspects(split_reviews)
     relevant_columns = expanded_reviews[['Venue Name', 'Sentences', 'Predicted Aspect Labels', 'Predicted Sentiment Labels']]
 
     # Create a new DataFrame to store the grouped reviews
@@ -40,10 +27,14 @@ def group_reviews_by_aspect():
         group_exists = (grouped_reviews['Venue Name'] == venue) & (grouped_reviews['Aspect'] == aspect) & (grouped_reviews['Sentiment'] == sentiment)
 
         if group_exists.any():
-            # Group already exists, join the review string with the existing JoinedReview in that group
+            # Group already exists, check if the review is already in the JoinedReview
             existing_index = grouped_reviews[group_exists].index[0]
-            joined_review = grouped_reviews.loc[existing_index, 'JoinedReview'] + ' ' + review
-            grouped_reviews.loc[existing_index, 'JoinedReview'] = joined_review
+            existing_joined_review = grouped_reviews.loc[existing_index, 'JoinedReview']
+            
+            # Check if the review is already present in the existing JoinedReview
+            if review not in existing_joined_review:
+                joined_review = existing_joined_review + ' ' + review
+                grouped_reviews.loc[existing_index, 'JoinedReview'] = joined_review
         else:
             # Group does not exist, create a new row for the group
             new_row = {'Venue Name': venue, 'Aspect': aspect, 'Sentiment': sentiment, 'JoinedReview': review}

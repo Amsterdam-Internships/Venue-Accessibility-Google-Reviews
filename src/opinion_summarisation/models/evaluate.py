@@ -83,11 +83,11 @@ def evaluate_model(test_data_path: str, ref_data_path: str, results_path: str):
     return eval_metrics
 
 if __name__ == '__main__':
-    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/selected_review_summaries.csv'
+    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/grouped_reviews.csv'
     print('Evaluating model...')
-    ref_data_path = os.getenv('LOCAL_ENV') + 'data/interim/selected_ref_summaries.csv'
-    saved_model_path = os.getenv('LOCAL_ENV') + 'models/opinion_summarisation/distilbertmodel.bin'
-    results_path = os.getenv('LOCAL_ENV') + 'results/opinion_summarisation/eval_metrics.csv'
+    ref_data_path = os.getenv('LOCAL_ENV') + 'data/interim/ref_summaries.csv'
+    saved_model_path = os.getenv('LOCAL_ENV') + 'models/opinion_summarisation/'+ pipeline.model+'.bin'
+    results_path = os.getenv('LOCAL_ENV') + 'results/opinion_summarisation/'+pipeline.model+'eval_metrics.csv'
     metrics = evaluate_model(loaded_data_path, ref_data_path, results_path)
     metrics.to_csv(results_path, index=False)
     print('Done!')
