@@ -50,38 +50,19 @@ There are the following folders in the structure:
     ```
 ---
 
-
-## Usage
-
-Explain example usage, possible arguments, etc. E.g.:
-
-To train... 
+## Setup
+In order to setup the pipeline environment you need to download the google test daya from [here](https://drive.google.com/file/d/1j6jsiYxZuXe9tBaj_ov4GI7YL4i3Xfti/view?usp=share_link) and the euan's guide data [here](https://docs.google.com/spreadsheets/d/1G1mwijJqQ5LTivIA3fMOZm_3SEJ1Jg_v/edit?usp=share_link&ouid=106259336767035025054&rtpof=true&sd=true)
+To run this pipeline run the bash script titled 1) ['full_pipeline.sh'](./scripts/full_pipeline.sh)
 
 
-```
-$ python train.py --some-importang-argument
-```
 
-
-|Argument | Type or Action | Description | Default |
-|---|:---:|:---:|:---:|
-|`--batch_size`| int| `Batch size.`|  32|
-|`--device`| str| `Training device, cpu or cuda:0.`| `cpu`|
-|`--early-stopping`|  `store_true`| `Early stopping for training of sparse transformer.`| True|
-|`--epochs`| int| `Number of epochs.`| 21|
-|`--input_size`|  int| `Input size for model, i.e. the concatenation length of te, se and target.`| 99|
-|`--loss`|  str|  `Type of loss to be used during training. Options: RMSE, MAE.`|`RMSE`|
-|`--lr`|  float| `Learning rate.`| 1e-3|
-|`--train_ratio`|  float| `Percentage of the training set.`| 0.7|
-|...|...|...|...|
-
-
----
 
 
 ## How it works
 
-You can explain roughly how the code works, what the main components are, how certain crucial steps are performed...
+The image below displays the workflow of the pipeline, these steps correspond to the folder structure of the pipeline.
+
+![](media/examples/pipeline_steps.png)
 
 ---
 ## Acknowledgements
