@@ -46,7 +46,7 @@ There are the following folders in the structure:
 
 2) Install all dependencies:
     ```bash
-    conda install environment.yml
+    conda install environment.yml or pip install requirements.txt
     ```
 ---
 
