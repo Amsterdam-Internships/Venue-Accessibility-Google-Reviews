@@ -1,0 +1,5 @@
+name: BachelorsProject
+channels:
+  - defaults
+  - conda-forge
+prefix: /usr/local/Caskroom/miniforge/base/envs/BachelorsProject

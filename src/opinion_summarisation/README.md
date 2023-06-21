@@ -1,0 +1,3 @@
+This folder conatins the source code the the Opinion Summarisation step of the pipeline. 
+1) [`data`](/src/opinion_summarisation/data/): This folder conatins classes related to functions that control the preprocessing data.
+1) [`models`](/src/opinion_summarisation/models/): This folder contains scripts that control the training, evaluation and pipeline configurations for this stage in the pipeline. 
