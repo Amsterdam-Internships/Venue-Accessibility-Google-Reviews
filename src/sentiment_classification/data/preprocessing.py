@@ -74,6 +74,7 @@ class Preprocessor(object):
         df = df.dropna(subset=['Gold Aspect Labels', 'Gold Sentiment Labels'])
         df = df[df['Gold Aspect Labels'] != '']
         df = df[df['Gold Sentiment Labels'] != '']
+        df = df[df['Sentiment'] != '']
         return df
     def remove_stopwords(self):
         pass

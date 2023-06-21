@@ -24,7 +24,7 @@ def expand_aspects(reviews_df):
 def group_reviews_by_aspect():
     split_reviews = pd.read_csv(load_path)
     expanded_reviews = expand_aspects(split_reviews)
-    relevant_columns = expanded_reviews[['Venue Name', 'Review', 'Predicted Aspect Labels', 'Predicted Sentiment Labels']]
+    relevant_columns = expanded_reviews[['Venue Name', 'Sentences', 'Predicted Aspect Labels', 'Predicted Sentiment Labels']]
 
     # Create a new DataFrame to store the grouped reviews
     grouped_reviews = pd.DataFrame(columns=['Venue Name', 'Aspect', 'Sentiment', 'JoinedReview'])
@@ -32,7 +32,7 @@ def group_reviews_by_aspect():
     # Iterate over each row in the relevant columns DataFrame
     for index, row in relevant_columns.iterrows():
         venue = row['Venue Name']
-        review = row['Review']
+        review = row['Sentences']
         aspect = row['Predicted Aspect Labels']
         sentiment = row['Predicted Sentiment Labels']
 
@@ -66,5 +66,3 @@ grouped_reviews = grouped_reviews.drop_duplicates()
 # Save the grouped reviews to a CSV file
 grouped_reviews.to_csv(save_path, index=False)
 
-# Print the grouped reviews
-print(grouped_reviews[:1])

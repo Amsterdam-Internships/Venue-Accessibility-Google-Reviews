@@ -5,11 +5,13 @@ import sys
 sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
 from aspect_classification.data.data_cleaning import bert_processing
 from pipelines import SentimentPipeline
+from sentiment_classification.data.preprocessing import Preprocessor
 from dotenv import load_dotenv
 import pandas as pd
 import yaml
 import os
 
+preprocessor = Preprocessor()
 # Load environment variables from .env file
 load_dotenv()
 config_path = os.getenv('LOCAL_ENV') + 'src/sentiment_classification/models/config.yml'
@@ -25,15 +27,14 @@ def select_rows(test_data):
 def generate_results(test_data):
     annotated_data = select_rows(test_data)
     # Select the input features
-    google_reviews = annotated_data['Review'].values.tolist()
+    google_reviews = annotated_data['Sentences'].values.tolist()
     # Select target labels
     gold_labels = annotated_data['Sentiment'].values.tolist()
     # Make predictions on reviews
     processed_reviews = bert_processing(google_reviews)
-
     predicted_labels = my_pipeline.predict(processed_reviews)
     # Assuming annotated_data is your DataFrame
-    annotated_data['Predicted Sentiment Labels'] = pd.Series(predicted_labels)
+    annotated_data['Predicted Sentiment Labels'] = predicted_labels
     # get and save metrics
     metrics = my_pipeline.evaluate(gold_labels, annotated_data['Predicted Sentiment Labels'])
     save_results(metrics, annotated_data)
@@ -42,18 +43,18 @@ def generate_results(test_data):
 def save_results(eval_metrics, predicted_df):
     # Save the predicted labels as a CSV file
     predicted_labels_path = interim_path + "/predicted_sentiment_labels.csv"
-    predicted_df.to_csv(predicted_labels_path)
+    predicted_df.to_csv(predicted_labels_path, index=False)
     
     # Create a DataFrame from the eval_metrics dictionary
     eval_metrics_df = pd.DataFrame.from_dict(eval_metrics, orient='index').transpose()
     
     # Save the evaluation metrics as a CSV file
     results_path_csv = results_path + '.csv'
-    eval_metrics_df.to_csv(results_path_csv)
+    eval_metrics_df.to_csv(results_path_csv, index=False)
     
     # Save the classification report as a text file
     report_path = results_path + "senitment_classification_report.tex"
-    eval_metrics_df.to_latex(report_path, index=True)
+    eval_metrics_df.to_latex(report_path, index=False)
 
 
 

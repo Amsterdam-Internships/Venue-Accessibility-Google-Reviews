@@ -3,7 +3,7 @@ seq2seq_config:
   tokenizer_name: "facebook/bart-large"
   max_length: 512
   num_beams: 4
-  max_summary_length: 150
+  max_summary_length: 20
   batch_size: 8
   learning_rate: 0.00003
   num_epochs: 5

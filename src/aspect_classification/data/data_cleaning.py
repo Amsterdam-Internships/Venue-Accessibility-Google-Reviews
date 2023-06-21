@@ -13,6 +13,7 @@ lemmatizer = WordNetLemmatizer()
 def stem_and_lemmatize(sentence):
     return lemmatizer.lemmatize(sentence)
 
+
 def count_sentences(text):
     sentences = nltk.sent_tokenize(text)
     return len(sentences)
@@ -56,7 +57,6 @@ def cleaning_selector(df, columns):
         target_aspects = ['Toilets','Transport & Parking','Access','Overview','Staff']
         df_aspects = select_aspects(target_aspects, df_cleaned)
         added_sentiments = convert_rating(df_aspects)
-        print(added_sentiments['Sentiment'])
         cleaned_sentiments = clean_sentiment(added_sentiments)
         return cleaned_sentiments
     else:
@@ -128,15 +128,13 @@ def tokenize_text(df):
     df["Text"] = df["Text"].apply(lambda x: nltk.regexp_tokenize(x, rule))
     return df
 
-def lemmatize_stemming(text):
-    return lemmatizer.lemmatize(text)
 
-def gensim_processing(text):
-    result = []
-    for token in gensim.utils.simple_preprocess(text):
-        if token not in gensim.parsing.preprocessing.STOPWORDS and len(token) > 3:
-            result.append(lemmatize_stemming(token))
-    return result
+# def gensim_processing(text):
+#     result = []
+#     for token in gensim.utils.simple_preprocess(text):
+#         if token not in gensim.parsing.preprocessing.STOPWORDS and len(token) > 3:
+#             result.append(lemmatize_stemming(token))
+#     return result
 
 def bert_processing(reviews):
     preprocessed_reviews = []

@@ -30,6 +30,7 @@ data/interim/*
 data/processed/aspect_classification_data/*
 data/processed/summarisation_data/*
 data/processed/experiments/test_labelling_sample.xlsx
+data/processed/aspect_classification_data/trial_samples
 
 # Media
 reports/figures/*

@@ -1,11 +1,7 @@
 import os
-import threading
-
 import torch
 import yaml
 import pandas as pd
-import sys
-# sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
 import transformers
 from dotenv import load_dotenv
 from rouge import Rouge
@@ -30,8 +26,8 @@ def generate_dataset(test_data_path: str):
     return reviews
 
 def load_ref_data(ref_data_path: str) -> list[str]:
-    reference_df = pd.read_csv(ref_data_path)
-    return reference_df['Text Summary'].values.tolist()
+    reference_df = pd.read_csv(ref_data_path, delimiter=';')
+    return reference_df['Summary'].values.tolist()
 
 def compute_metrics(reference, predictions) -> dict:
     # Remove empty predictions
@@ -55,7 +51,7 @@ def evaluate_model(test_data_path: str, ref_data_path: str, results_path: str):
         with torch.no_grad():
             print("Generating summaries using extractive summarizer...")
             for input_text in google_dataset:
-                summary = pipeline.extractive_model(input_text)
+                summary = pipeline.extractive_model(input_text,num_sentences=1)
                 predictions.append(summary)
                 
         print("Finished generating summaries using extractive summarizer.")
@@ -87,9 +83,9 @@ def evaluate_model(test_data_path: str, ref_data_path: str, results_path: str):
     return eval_metrics
 
 if __name__ == '__main__':
-    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/grouped_reviews.csv'
+    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/interim/selected_review_summaries.csv'
     print('Evaluating model...')
-    ref_data_path = os.getenv('LOCAL_ENV') + 'data/processed/summarisation_data/summarised_ref_reviews.csv'
+    ref_data_path = os.getenv('LOCAL_ENV') + 'data/interim/selected_ref_summaries.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + 'models/opinion_summarisation/distilbertmodel.bin'
     results_path = os.getenv('LOCAL_ENV') + 'results/opinion_summarisation/eval_metrics.csv'
     metrics = evaluate_model(loaded_data_path, ref_data_path, results_path)

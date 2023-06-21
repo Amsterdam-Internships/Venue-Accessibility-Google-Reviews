@@ -9,7 +9,6 @@ load_dotenv()
 
 def extract_metrics():
     eval_metrics = pd.read_csv(load_path)
-    eval_metrics = eval_metrics.drop('Unnamed: 0', axis=1)
 
     # Get the metric scores for the single row
     accuracy_score = eval_metrics['Accuracy'].values[0]
@@ -28,6 +27,7 @@ def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
     plt.xlabel('Metric')
     plt.ylabel('Score')
     plt.title('Evaluation Metrics')
+    #TODO Add the model names to the file name
     plt.savefig(save_path + 'evaluation_metrics.png')
     plt.close()
 

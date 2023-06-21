@@ -82,8 +82,13 @@ class SentimentPipeline:
         return self.bert_pipeline
     
     def calculate_metrics(self, y_true, y_pred):
+        # Assuming 'column_name' is the name of the column you want to check
         accuracy = accuracy_score(y_true, y_pred)
-        precision = precision_score(y_true, y_pred, average='macro')
+        precision = precision_score(y_true, y_pred, average='macro', zero_division=1)
+        if np.isclose(precision, 0.0):
+            labels_with_zero_precision = np.unique(y_pred)
+            for label_idx in labels_with_zero_precision:
+                print("Label with zero precision:", label_idx)
         recall = recall_score(y_true, y_pred, average='macro')
         f1 = f1_score(y_true, y_pred, average='macro')
         return accuracy, precision, recall, f1
@@ -92,6 +97,10 @@ class SentimentPipeline:
     
     def evaluate(self, y_true, y_pred):
         # Calculate metrics
+
+        # for tru_val, pred_val in zip(y_true, y_pred):
+        #    print(type(tru_val), type(pred_val))
+
         accuracy, precision, recall, f1 = self.calculate_metrics(y_true, y_pred)
         evaluation_metrics = {'Accuracy': accuracy,
                             'Precision': precision,
