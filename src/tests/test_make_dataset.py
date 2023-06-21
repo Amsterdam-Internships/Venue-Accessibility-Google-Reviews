@@ -24,32 +24,23 @@ FAILED tests/example_tests.py::test_that_will_fail - assert 0 == 1
 """
 
 import numpy as np
+import pandas as pd
+import os
+import sys
+import pytest
+from ..data.make_dataset import load_data, make_trainset, make_testset
 
+@pytest.fixture(scope="session")
+def test_data_paths():
+    # check the file path
+    train_path = os.environ.get('RAW_TRAIN_DATA_PATH')
+    
+    test_path = os.environ.get('RAW_TEST_DATA_PATH')
 
-def test_that_will_pass():
-    """
-    Describe what's the purpose of this test.
-    This test shows that np.nan_to_num (unsurprisingly) works as expected,
-    however, you can (and should) import stuffs from your own modules to test here.
-
-    """
-
-    input_data = np.array(
-        [[0.75, np.nan, np.nan],
-         [np.nan, 0, 0.0],
-         [np.nan, np.nan, 0.99],
-         [np.nan, np.nan, 0.42],
-        ]
-    )
-
-    expected_output = np.array(
-        [[0.75, 0, 0],
-         [0, 0, 0],
-         [0, 0, 0.99],
-         [0, 0, 0.42],
-        ]
-    )
-
-    calculated_output = np.nan_to_num(input_data)
-
-    assert np.array_equal(expected_output, calculated_output)
+    # check that file is saved 
+    processed_path = os.environ.get('PROCESSED_DATA')
+    
+    # Test that processed data file was created
+    assert os.path.exists(train_path) == True
+    assert os.path.exists(test_path) == True
+    assert os.path.exists(processed_path) == True

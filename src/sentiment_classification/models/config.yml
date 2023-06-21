@@ -1,0 +1,18 @@
+sk_params:
+  vectorizer:
+    max_df: [0.5, 0.75, 1.0]
+    ngram_range: [[1, 1], [1, 2], [1, 3]]
+    min_df: [1, 2, 3]
+  clf:
+    voting: ['hard', 'soft']
+    nb__alpha: [0.1, 0.5, 1.0]
+    lr__C: [0.1, 1.0, 10.0]
+bert_params:
+    epochs: [2, 10, 15]
+    batch_size: [16, 32, 64]
+    learning_rate: [2e-5, 3e-5, 5e-5]
+    num_of_labels: 2
+pipeline_type: 'bert pipeline'
+model_name: 'huawei-noah/TinyBERT_General_4L_312D'
+
+

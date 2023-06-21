@@ -1,18 +1,36 @@
 # env / packaging
 myenv/
 wheels/
-
+.env
 # bytecode stuffs
 __pycache__/
 *.py[cod]
 
 # jupyter
+notebooks/cache_dir
+notebooks/outputs
+notebooks/runs
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
+/pipeline_google_reviews.ipynb
+/Venue-Accessibility-Google-Reviews.code-workspace
+notebooks/Pipeline.ipynb
 
 # other
 .idea/*
 
+
 # Data
-GoogleReviews/
-EuansGuideData.xlsx
+models/*
+results/aspect_classification/TinyBERT_General_4L_312D.csv
+data/raw/test/GoogleReviews/
+data/raw/train/EuansGuideData.xlsx
+data/external/*
+data/interim/*
+data/processed/aspect_classification_data/*
+data/processed/summarisation_data/*
+data/processed/experiments/test_labelling_sample.xlsx
+data/processed/aspect_classification_data/trial_samples
+
+# Media
+reports/figures/*

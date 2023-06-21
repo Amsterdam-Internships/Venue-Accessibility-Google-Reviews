@@ -1,0 +1,1 @@
+This folder has subfolders where you can the data that you have processed in each stage of your project.

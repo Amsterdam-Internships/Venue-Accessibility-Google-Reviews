@@ -1,114 +1,79 @@
-# Amsterdam Internships - Example README
+# Venue Accessibility with Google Reviews 
 
-Explain in short what this repository is. Mind the target audience.
-No need to go into too much technical details if you expect some people would just use it as end-users 
-and don't care about the internals (so focus on what the code really *does*), not how.
-The *_How it works_* section below would contain more technical details for curious people.
+This project aims to highlight the perspective of people with Reduced Mobility (RM) living in Amsterdam via analysis of public venue reviews. This is done using Natural Language Processing (NLP) techniques such as Aspect Based Sentiment Analysis and Opinion Summarisation. 
 
-If applicable, you can also show an example of the final output.
+It is an extension of the work carried out by [L. Da Rocha Bazilio](https://github.com/Amsterdam-Internships/Venue-Accessibility-NLP), to understand how different models are able to extract aspects in reference to accessibility with data that is noisy e.g. a mixture of topics, instead of accessibility focused only.
 
-![](media/examples/emojis.png)
+In addition, understanding the impact of Opinion Summarisation on the reviews about accessibility. Also, how this can make activity and journey planning for those with RM easier. 
+
+
+This is an example of the UI of the application that pipeline will be connected to:
+![](media/examples/venue-accessibility-example-profile-cropped.png)
+
 
 ---
 
 
 ## Project Folder Structure
 
-Explain briefly what's where so people can find their way around. For example:
-
 There are the following folders in the structure:
 
-1) [`resources`](./resources): Random nice resources, e.g. [`useful links`](./resources/README.md)
+1) [`data`](./data): This folder includes data for the following purposes:
+    1) [`external`](./data/external/): This includes data from third party sources.
+    1) [`interim`](./data/interim/): Intermediate data that has been transformed.
+    1) [`processed`](./data/processed/): Finalised datasets for modelling.
+    1) [`raw`](./data/raw/): The original immutable data.
+1) [`datasets`](./datasets): This is where you should place your data for training and testing.
+1) [`media`](./media): This is where results of each step of the pipeline are stored as images.
+1) [`models`](./models/):Trained and serialized models, model predictions, or model summaries
+1) [`notebooks`](./notebooks): This contains the notebooks of the pipeline.
+1) [`reports`](./reports/): Generated analysis as HTML, PDF, LaTeX, etc.
+    1) [`figures`](./reports/figures/): Generated graphics and figures to be used in reporting.
+1) [`results`](./results): Here you will find the txt form of the results.
 1) [`src`](./src): Folder for all source files specific to this project
 1) [`scripts`](./scripts): Folder with example scripts for performing different tasks (could serve as usage documentation)
-1) [`tests`](./tests) Test example
-1) [`media`](./media): Folder containing media files (icons, video)
-1) ...
-
-OR
-
-Or use something like `tree` to include the overall structure with preferred level of detail (`-L 2` or `-d` or `-a`...)
-```buildoutcfg
-├── media --> you can still add comments and descriptions in this tree
-│   └── examples
-├── resources --> a lot of useful links here
-├── scripts
-├── src --
-└── tests
-```
-
-
-
-If you are lacking ideas on how to structure your code at the first place, take a look at [`CookieCutter`](https://drivendata.github.io/cookiecutter-data-science/)
-
+1) [`tests`](./tests) Here I store all of the tests for project
 ---
 
 
 ## Installation
 
-Explain how to set up everything. 
-Let people know if there are weird dependencies - if so feel free to add links to guides and tutorials.
-
-A person should be able to clone this repo, follow your instructions blindly, and still end up with something *fully working*!
 
 1) Clone this repository:
     ```bash
-    git clone https://github.com/Amsterdam-Internships/InternshipAmsterdamGeneral
+    git clone git@github.com:Amsterdam-Internships/Venue-Accessibility-Google-Reviews.git
     ```
 
-1) If you are using submodules don't forget to include `--recurse-submodules` to the step above or mention that people can still do it afterwards:
-   ```bash
-   git submodule update --init --recursive
-   ```
-
-1) Install all dependencies:
+2) Install all dependencies:
     ```bash
-    pip install -r requirements.txt
+    conda install environment.yml or pip install requirements.txt
     ```
 ---
 
+## Setup
+In order to setup the pipeline you need to download the google test data from [here](https://drive.google.com/file/d/1WrLIbSGdlAWDTXPwJo35xIgzQlaa0ujz/view?usp=sharing) and the euan's guide data [here](https://docs.google.com/spreadsheets/d/1G1mwijJqQ5LTivIA3fMOZm_3SEJ1Jg_v/edit?usp=share_link&ouid=106259336767035025054&rtpof=true&sd=true)
 
-## Usage
-
-Explain example usage, possible arguments, etc. E.g.:
-
-To train... 
+place the google test data in the [test folder](./data/raw/test/) and the euans dataset in the [train folder](./data/raw/train/).
 
 
-```
-$ python train.py --some-importang-argument
-```
+To setup the environment please create your own .env file with a variable called $LOCAL_ENV this is where you should keep the file path of your home directory. Then you will be able to connect this to the relative paths of this repo. 
 
-If there are too many command line arguments, you can add a nice table with explanation (thanks, [Diana Epureano](https://www.linkedin.com/in/diana-epureanu-235104153/)!)
+E.g.  $LOCAL_ENV = /Users/yourname/Venue-Accessibility-Google-Reviews
 
-|Argument | Type or Action | Description | Default |
-|---|:---:|:---:|:---:|
-|`--batch_size`| int| `Batch size.`|  32|
-|`--device`| str| `Training device, cpu or cuda:0.`| `cpu`|
-|`--early-stopping`|  `store_true`| `Early stopping for training of sparse transformer.`| True|
-|`--epochs`| int| `Number of epochs.`| 21|
-|`--input_size`|  int| `Input size for model, i.e. the concatenation length of te, se and target.`| 99|
-|`--loss`|  str|  `Type of loss to be used during training. Options: RMSE, MAE.`|`RMSE`|
-|`--lr`|  float| `Learning rate.`| 1e-3|
-|`--train_ratio`|  float| `Percentage of the training set.`| 0.7|
-|...|...|...|...|
+To run this pipeline run the bash script titled ['full_pipeline.sh'](./scripts/full_pipeline.sh)
 
 
-Alternatively, as a way of documenting the intended usage, you could add a `scripts` folder with a number of scripts for setting up the environment, performing training in different modes or different tasks, evaluation, etc (thanks, [Tom Lotze](https://www.linkedin.com/in/tom-lotze/)!)
 
----
 
 
 ## How it works
 
-You can explain roughly how the code works, what the main components are, how certain crucial steps are performed...
+The image below displays the workflow of the pipeline, these steps correspond to the folder structure of the pipeline.
+
+![](media/examples/pipeline_steps.png)
 
 ---
 ## Acknowledgements
 
 
-Don't forget to acknowledge any work by others that you have used for your project. Add links and check whether the authors have explicitly stated citation preference for using the DOI or citing a paper or so. 
-For example:
-
-Our code uses [YOLOv5](https://github.com/ultralytics/yolov5) [![DOI](https://zenodo.org/badge/264818686.svg)](https://zenodo.org/badge/latestdoi/264818686)
-
+This repository was created in collaboration with [Amsterdam Intelligence](https://amsterdamintelligence.com/) for the [City of Amsterdam](https://www.amsterdam.nl/). It is based on [the prior work](https://github.com/Amsterdam-Internships/Venue-Accessibility-NLP) of [Lizzy Da Rocha Bazilio](https://www.linkedin.com/in/lizzy-da-rocha-bazilio/).
