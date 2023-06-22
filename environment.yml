@@ -16,14 +16,10 @@ dependencies:
   - pytorch
   - gensim
   - wordcloud
-  - pylatex
-  - textblob
-  - sumy
   - spacy
   - statsmodels
   - pytest
   - python-dotenv
-  - top2vec
   - ansi2html
   - jupyter
 prefix: /Users/mylene/opt/anaconda3/envs/BachelorsProject
