@@ -1,6 +1,7 @@
 from Pipelines import SummarizationPipeline
-import sys    
-sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
+import sys 
+import os   
+sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 import pandas as pd
 from summarizer import Summarizer
 import transformers

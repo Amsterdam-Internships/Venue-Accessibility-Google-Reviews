@@ -1,13 +1,17 @@
 import os
+import sys
 import torch
 import yaml
+sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 import pandas as pd
 import transformers
 from dotenv import load_dotenv
 from rouge import Rouge
 from summarizer import Summarizer
 from Pipelines import SummarizationPipeline
+from opinion_summarisation.data.preprocessing import Preprocessor
 
+preprocessor = Preprocessor()
 rouge = Rouge()
 
 # Load environment variables from .env file
@@ -51,7 +55,11 @@ def evaluate_model(test_data_path: str, ref_data_path: str, results_path: str):
         with torch.no_grad():
             print("Generating summaries using extractive summarizer...")
             for input_text in google_dataset:
-                summary = pipeline.extractive_model(input_text,num_sentences=1)
+                if preprocessor.count_sentences(input_text) == 1:
+                    summary = input_text.replace('\n', '').strip()
+                else:
+                    summary = pipeline.extractive_model(input_text, num_sentences=1)
+                
                 predictions.append(summary)
                 
         print("Finished generating summaries using extractive summarizer.")
