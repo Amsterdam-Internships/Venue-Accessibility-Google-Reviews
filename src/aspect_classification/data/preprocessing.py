@@ -1,6 +1,5 @@
 import re
 import nltk
-nltk.download('stopwords')
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import *
 lemmatizer = WordNetLemmatizer()
