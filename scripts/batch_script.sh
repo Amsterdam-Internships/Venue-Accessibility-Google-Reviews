@@ -22,5 +22,5 @@ conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
 cd /var/scratch/mbn781/Venue-Accessibility-Google-Reviews/scripts
 
 # Run your command or script
-bash full_pipeline.sh
+# bash full_pipeline.sh
 # End of script
