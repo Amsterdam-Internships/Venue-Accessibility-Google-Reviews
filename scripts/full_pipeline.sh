@@ -12,7 +12,7 @@
 module load cuda10.0/toolkit
 module load cuDNN/cuda10.0
 
-conda init bash
+# conda init bash
 
 source ~/.bashrc
 # Activate your desired Python environment, if needed
@@ -24,7 +24,7 @@ cd /var/scratch/mbn781/Venue-Accessibility-Google-Reviews
 
 # Set some environment stuffs
 export TRAINING_MODE='simple'
-source ../.env
+source ./.env
 
 # Create and process datasets
 
