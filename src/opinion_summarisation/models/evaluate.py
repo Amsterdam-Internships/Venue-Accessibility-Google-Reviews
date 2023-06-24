@@ -2,7 +2,7 @@ import os
 import sys
 import torch
 import yaml
-sys.path.append(os.getenv('LOCAL_ENV')+'/src')
+sys.path.append(os.getenv('LOCAL_ENV')+'src')
 import pandas as pd
 import transformers
 from dotenv import load_dotenv
@@ -16,7 +16,7 @@ rouge = Rouge()
 
 # Load environment variables from .env file
 load_dotenv()
-
+print(os.getenv('LOCAL_ENV'))
 config_path = os.getenv('LOCAL_ENV') + 'src/opinion_summarisation/models/config.yml'
 
 with open(config_path, 'r') as f:
