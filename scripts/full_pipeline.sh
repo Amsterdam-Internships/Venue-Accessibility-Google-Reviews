@@ -12,7 +12,7 @@
 module load cuda10.0/toolkit
 module load cuDNN/cuda10.0
 
-# conda init bash
+conda init bash
 
 source ~/.bashrc
 # Activate your desired Python environment, if needed
