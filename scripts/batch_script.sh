@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=test
-#SBATCH --time=00:15:00
+#SBATCH --time=00:25:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=defq
@@ -12,7 +12,7 @@
 module load cuda10.0/toolkit
 module load cuDNN/cuda10.0
 
-
+source ~/.bashrc
 # Activate your desired Python environment, if needed
 conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
 
