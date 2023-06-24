@@ -1,7 +1,3 @@
-
-# Activate the Conda environment
-conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
-
 # Set some environment stuffs
 export TRAINING_MODE='simple'
 source ../.env
