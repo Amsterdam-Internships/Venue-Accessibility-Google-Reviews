@@ -1,3 +1,9 @@
+# Set the Conda environment path
+CONDA_ENV_PATH="/var/scratch/mbn781/anaconda3/envs/BachelorsProject"
+
+# Activate the Conda environment
+source "${CONDA_ENV_PATH}/bin/activate"
+
 # Set some environment stuffs
 export TRAINING_MODE='simple'
 source ../.env
