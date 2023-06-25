@@ -3,7 +3,7 @@ This is a script to use trained models to make predictions.
 '''
 import sys
 import os
-sys.path.append(os.getenv('LOCAL_ENV') + '/src')
+sys.path.append(os.getenv('LOCAL_ENV') + 'src')
 from aspect_classification.data.data_cleaning import bert_processing
 from aspect_classification.data.preprocessing import Preprocessor
 from transformers import AutoTokenizer

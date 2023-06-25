@@ -4,7 +4,7 @@ from pipelines import MyPipeline
 from sklearn.model_selection import GridSearchCV
 from dotenv import load_dotenv
 import sys    
-sys.path.append(os.getenv('LOCAL_ENV') + '/src')
+sys.path.append(os.getenv('LOCAL_ENV') + 'src')
 from aspect_classification.data.data_cleaning import bert_processing
 import joblib
 import pandas as pd

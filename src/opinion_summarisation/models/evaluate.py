@@ -3,7 +3,7 @@ import sys
 import torch
 import yaml
 print(os.getenv('LOCAL_ENV'))
-sys.path.append(os.getenv('LOCAL_ENV')+'/src')
+sys.path.append(os.getenv('LOCAL_ENV')+'src')
 import pandas as pd
 import transformers
 from dotenv import load_dotenv
