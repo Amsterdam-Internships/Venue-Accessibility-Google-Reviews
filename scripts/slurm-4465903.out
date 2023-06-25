@@ -1,0 +1,125 @@
+no change     /var/scratch/mbn781/anaconda3/condabin/conda
+no change     /var/scratch/mbn781/anaconda3/bin/conda
+no change     /var/scratch/mbn781/anaconda3/bin/conda-env
+no change     /var/scratch/mbn781/anaconda3/bin/activate
+no change     /var/scratch/mbn781/anaconda3/bin/deactivate
+no change     /var/scratch/mbn781/anaconda3/etc/profile.d/conda.sh
+no change     /var/scratch/mbn781/anaconda3/etc/fish/conf.d/conda.fish
+no change     /var/scratch/mbn781/anaconda3/shell/condabin/Conda.psm1
+no change     /var/scratch/mbn781/anaconda3/shell/condabin/conda-hook.ps1
+no change     /var/scratch/mbn781/anaconda3/lib/python3.9/site-packages/xontrib/conda.xsh
+no change     /var/scratch/mbn781/anaconda3/etc/profile.d/conda.csh
+no change     /home/mbn781/.bashrc
+No action taken.
+Preparing and cleaning data...
+[nltk_data] Downloading package punkt to /home/mbn781/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+[nltk_data] Downloading package stopwords to /home/mbn781/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/aspect_classification/data/data_cleaning.py:36: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df["Text"] = df["Text"].apply(lambda x: x.replace("\n", ' '))
+Done !
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['cls.predictions.decoder.weight', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.LayerNorm.bias', 'fit_denses.4.bias', 'fit_denses.0.weight', 'fit_denses.2.weight', 'fit_denses.1.bias', 'cls.predictions.bias', 'cls.seq_relationship.weight', 'fit_denses.3.weight', 'fit_denses.3.bias', 'cls.seq_relationship.bias', 'fit_denses.0.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.LayerNorm.weight', 'fit_denses.4.weight', 'fit_denses.2.bias', 'fit_denses.1.weight']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Started ...
+Time for all epochs: 14.52479362487793
+training of BERT models has finished !
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/models/aspect_classification/transformer_models/bert.joblib
+Making aspect label predictions on unseen data...
+[nltk_data] Downloading package punkt to /home/mbn781/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+[nltk_data] Downloading package stopwords to /home/mbn781/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['cls.predictions.transform.LayerNorm.bias', 'fit_denses.3.bias', 'fit_denses.2.bias', 'cls.predictions.decoder.weight', 'fit_denses.0.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'fit_denses.1.bias', 'cls.predictions.transform.LayerNorm.weight', 'fit_denses.1.weight', 'fit_denses.3.weight', 'cls.seq_relationship.weight', 'fit_denses.2.weight', 'cls.predictions.bias', 'fit_denses.0.weight', 'fit_denses.4.bias', 'cls.seq_relationship.bias', 'fit_denses.4.weight']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+/var/scratch/mbn781/anaconda3/envs/BachelorsProject/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/aspect_classification/models/evaluate.py:62: FutureWarning: In future versions `DataFrame.to_latex` is expected to utilise the base implementation of `Styler.to_latex` for formatting and rendering. The arguments signature may therefore change. It is recommended instead to use `DataFrame.style.to_latex` which also contains additional functionality.
+  eval_metrics_df.to_latex(report_path, index=False)
+Index(['Accuracy', 'Precision', 'Recall', 'F1-Score'], dtype='object')
+Creating graphs of aspect evaluation metrics...
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.bias', 'fit_denses.3.weight', 'fit_denses.0.bias', 'cls.predictions.bias', 'fit_denses.1.bias', 'fit_denses.2.bias', 'cls.predictions.transform.dense.bias', 'fit_denses.2.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.decoder.weight', 'fit_denses.3.bias', 'fit_denses.1.weight', 'cls.predictions.transform.dense.weight', 'fit_denses.4.weight', 'fit_denses.4.bias', 'fit_denses.0.weight']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Training sentiment classifiers...
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['fit_denses.1.bias', 'fit_denses.1.weight', 'cls.seq_relationship.weight', 'cls.predictions.transform.LayerNorm.weight', 'fit_denses.3.weight', 'fit_denses.2.weight', 'cls.seq_relationship.bias', 'cls.predictions.decoder.weight', 'fit_denses.3.bias', 'cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'fit_denses.4.weight', 'fit_denses.4.bias', 'cls.predictions.transform.dense.bias', 'fit_denses.0.bias', 'cls.predictions.transform.LayerNorm.bias', 'fit_denses.0.weight', 'fit_denses.2.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Started ...
+Time for all epochs: 168.60223150253296
+training of BERT models has finished !
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/models/sentiment_analysis/bert.joblib
+Making sentiment label predictions on unseen data...
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['cls.predictions.transform.dense.weight', 'fit_denses.0.weight', 'fit_denses.2.weight', 'fit_denses.1.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'fit_denses.1.weight', 'fit_denses.4.weight', 'fit_denses.2.bias', 'fit_denses.3.bias', 'cls.seq_relationship.weight', 'fit_denses.0.bias', 'cls.predictions.decoder.weight', 'fit_denses.3.weight', 'cls.predictions.bias', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.bias', 'fit_denses.4.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/sentiment_classification/models/evaluate.py:59: FutureWarning: In future versions `DataFrame.to_latex` is expected to utilise the base implementation of `Styler.to_latex` for formatting and rendering. The arguments signature may therefore change. It is recommended instead to use `DataFrame.style.to_latex` which also contains additional functionality.
+  eval_metrics_df.to_latex(report_path, index=False)
+Creating graphs of sentiment evaluation metrics...
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['fit_denses.4.weight', 'fit_denses.0.bias', 'fit_denses.1.weight', 'fit_denses.2.bias', 'cls.predictions.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.LayerNorm.bias', 'fit_denses.3.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.weight', 'fit_denses.4.bias', 'fit_denses.2.weight', 'fit_denses.3.weight', 'cls.seq_relationship.bias', 'fit_denses.1.bias', 'fit_denses.0.weight', 'cls.predictions.decoder.weight']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Grouping review sentences by aspect...
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py:41: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  grouped_reviews = grouped_reviews.append(new_row, ignore_index=True)
+Training the summarisation step... 
+Some weights of the model checkpoint at distilbert-base-uncased were not used when initializing DistilBertModel: ['vocab_transform.bias', 'vocab_transform.weight', 'vocab_projector.bias', 'vocab_projector.weight', 'vocab_layer_norm.bias', 'vocab_layer_norm.weight']
+- This IS expected if you are initializing DistilBertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing DistilBertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+saved
+Model is an extractive summarizer. No training required.
+Making predictions on the summarisation... 
+Some weights of the model checkpoint at distilbert-base-uncased were not used when initializing DistilBertModel: ['vocab_projector.weight', 'vocab_transform.weight', 'vocab_transform.bias', 'vocab_layer_norm.bias', 'vocab_layer_norm.weight', 'vocab_projector.bias']
+- This IS expected if you are initializing DistilBertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing DistilBertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Creating graphs for summarisation evaluation... 
+Some weights of the model checkpoint at distilbert-base-uncased were not used when initializing DistilBertModel: ['vocab_layer_norm.bias', 'vocab_projector.weight', 'vocab_transform.weight', 'vocab_transform.bias', 'vocab_layer_norm.weight', 'vocab_projector.bias']
+- This IS expected if you are initializing DistilBertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing DistilBertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews
