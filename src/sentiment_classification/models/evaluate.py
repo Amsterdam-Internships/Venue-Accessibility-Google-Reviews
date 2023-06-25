@@ -4,6 +4,8 @@ This is a script to use trained models to make predictions.
 import sys
 import os
 from dotenv import load_dotenv
+# Load environment variables from .env file
+load_dotenv()
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.data_cleaning import bert_processing
 from pipelines import SentimentPipeline
@@ -13,8 +15,7 @@ import yaml
 
 
 preprocessor = Preprocessor()
-# Load environment variables from .env file
-load_dotenv()
+
 config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
