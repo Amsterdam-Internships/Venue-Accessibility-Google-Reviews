@@ -3,6 +3,9 @@ import sys
 import torch
 import yaml
 from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 print(os.getenv('LOCAL_ENV'))
 sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 import pandas as pd
@@ -15,8 +18,6 @@ from opinion_summarisation.data.preprocessing import Preprocessor
 preprocessor = Preprocessor()
 rouge = Rouge()
 
-# Load environment variables from .env file
-load_dotenv()
 
 config_path = os.getenv('LOCAL_ENV') + '/src/opinion_summarisation/models/config.yml'
 

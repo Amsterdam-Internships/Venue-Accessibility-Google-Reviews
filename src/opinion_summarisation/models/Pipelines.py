@@ -3,13 +3,12 @@ import torch
 import sys
 import os   
 from dotenv import load_dotenv
-sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 import transformers
 from summarizer import Summarizer
 
 # Load environment variables from .env file
 load_dotenv()
-
+sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 config_path = os.getenv('LOCAL_ENV') + '/src/opinion_summarisation/models/config.yml'
 
 with open(config_path, 'r') as f:

@@ -2,11 +2,11 @@ import pandas as pd
 import os
 import sys
 from dotenv import load_dotenv
-sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from preprocessing import Preprocessor
 # Load environment variables from .env file
 load_dotenv()
 preprocessor = Preprocessor()
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 
 def group_reviews_by_aspect():
     split_reviews = pd.read_csv(load_path)
