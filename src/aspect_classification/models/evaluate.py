@@ -19,7 +19,7 @@ import yaml
 
 # Load environment variables from .env file
 load_dotenv()
-config_path = os.getenv('LOCAL_ENV') + 'src/aspect_classification/models/config.yml'
+config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
      

@@ -18,7 +18,7 @@ rouge = Rouge()
 # Load environment variables from .env file
 load_dotenv()
 
-config_path = os.getenv('LOCAL_ENV') + 'src/opinion_summarisation/models/config.yml'
+config_path = os.getenv('LOCAL_ENV') + '/src/opinion_summarisation/models/config.yml'
 
 with open(config_path, 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)

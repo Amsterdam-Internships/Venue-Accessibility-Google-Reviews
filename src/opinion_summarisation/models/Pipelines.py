@@ -1,8 +1,8 @@
 import yaml
 import torch
-import sys    
-sys.path.append('/Users/mylene/BachelorsProject/Venue-Accessibility-Google-Reviews/src')
-import os
+import sys
+import os   
+sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 from dotenv import load_dotenv
 import transformers
 from summarizer import Summarizer
@@ -10,7 +10,7 @@ from summarizer import Summarizer
 # Load environment variables from .env file
 load_dotenv()
 
-config_path = os.getenv('LOCAL_ENV') + 'src/opinion_summarisation/models/config.yml'
+config_path = os.getenv('LOCAL_ENV') + '/src/opinion_summarisation/models/config.yml'
 
 with open(config_path, 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
