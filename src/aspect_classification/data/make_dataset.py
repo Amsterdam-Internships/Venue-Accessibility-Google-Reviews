@@ -39,10 +39,10 @@ def make_testset():
 
 # Call main function
 if __name__ == '__main__':
-    training_file_path = os.environ.get('LOCAL_ENV') + 'data/raw/train/EuansGuideData.xlsx'
-    test_file_path = os.environ.get('LOCAL_ENV') + 'data/processed/experiments/sample_good_reviews.csv'
-    processed_train_path = os.environ.get('LOCAL_ENV') + 'data/processed/aspect_classification_data/processed_euans_reviews.csv'
-    processed_test_path = os.environ.get('LOCAL_ENV') + 'data/processed/aspect_classification_data/processed_google_sample_reviews.csv'
+    training_file_path = os.environ.get('LOCAL_ENV') + '/data/raw/train/EuansGuideData.xlsx'
+    test_file_path = os.environ.get('LOCAL_ENV') + '/data/processed/experiments/sample_good_reviews.csv'
+    processed_train_path = os.environ.get('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
+    processed_test_path = os.environ.get('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_google_sample_reviews.csv'
     make_trainset()
     make_testset()
     print('Done !')

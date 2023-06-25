@@ -13,7 +13,7 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-config_path = os.getenv('LOCAL_ENV') + 'src/opinion_summarisation/models/config.yml'
+config_path = os.getenv('LOCAL_ENV') + '/src/opinion_summarisation/models/config.yml'
 
 with open(config_path, 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
@@ -77,11 +77,11 @@ if __name__ == '__main__':
     if pipeline.config['model_name'] == "facebook/bart-large":
         names = pipeline.config['model_name'].split("/")
         
-        saved_model_path = os.getenv('LOCAL_ENV') + f'models/opinion_summarisation/{names[1]}' + '.bin'
+        saved_model_path = os.getenv('LOCAL_ENV') + f'/models/opinion_summarisation/{names[1]}' + '.bin'
     else:
         name = pipeline.config['model_name']
-        saved_model_path = os.getenv('LOCAL_ENV') + f'models/opinion_summarisation/{name}' + '.bin'
+        saved_model_path = os.getenv('LOCAL_ENV') + f'/models/opinion_summarisation/{name}' + '.bin'
         print('saved')
-    loaded_data_path = os.getenv('LOCAL_ENV') + 'data/processed/aspect_classification_data/processed_euans_reviews.csv'
+    loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
     train_bert_models()
 

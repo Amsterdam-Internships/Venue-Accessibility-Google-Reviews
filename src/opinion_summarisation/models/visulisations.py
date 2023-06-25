@@ -8,7 +8,7 @@ from evaluate import pipeline
 # Load environment variables from .env file
 load_dotenv()
 
-config_path = os.getenv('LOCAL_ENV') + 'src/opinion_summarisation/models/config.yml'
+config_path = os.getenv('LOCAL_ENV') + '/src/opinion_summarisation/models/config.yml'
 
 with open(config_path, 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
@@ -51,6 +51,6 @@ def plot_metrics(rouge_scores):
     plt.close()
 
 if __name__ == '__main__':
-    save_path = os.getenv('LOCAL_ENV') + f'results/opinion_summarisation/'+pipeline.model+'evaluation_metrics.png'
-    load_path = os.getenv('LOCAL_ENV') + f'results/opinion_summarisation/'+pipeline.model+'_eval_metrics.csv'
+    save_path = os.getenv('LOCAL_ENV') + f'/results/opinion_summarisation/'+pipeline.model+'evaluation_metrics.png'
+    load_path = os.getenv('LOCAL_ENV') + f'/results/opinion_summarisation/'+pipeline.model+'_eval_metrics.csv'
     extract_metrics()

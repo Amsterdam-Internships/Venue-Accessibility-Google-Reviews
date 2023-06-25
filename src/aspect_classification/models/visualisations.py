@@ -36,6 +36,6 @@ def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
 
 
 if __name__ == '__main__':
-    save_path = os.getenv('LOCAL_ENV') + 'results/aspect_classification/'
-    load_path = os.getenv('LOCAL_ENV') + 'results/aspect_classification/'+ my_pipeline.model_name.split("/")[1] + '.csv'
+    save_path = os.getenv('LOCAL_ENV') + '/results/aspect_classification/'
+    load_path = os.getenv('LOCAL_ENV') + '/results/aspect_classification/'+ my_pipeline.model_name.split("/")[1] + '.csv'
     extract_metrics()

@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import sys
-sys.path.append(os.getenv('LOCAL_ENV') + 'src')
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from dotenv import load_dotenv
 from preprocessing import Preprocessor
 # Load environment variables from .env file
@@ -47,8 +47,8 @@ def group_reviews_by_aspect():
 
 
 # Example usage
-load_path = os.getenv('LOCAL_ENV') + 'data/interim/predicted_sentiment_labels.csv'
-save_path = os.getenv('LOCAL_ENV') + 'data/interim/grouped_reviews.csv'
+load_path = os.getenv('LOCAL_ENV') + '/data/interim/predicted_sentiment_labels.csv'
+save_path = os.getenv('LOCAL_ENV') + '/data/interim/grouped_reviews.csv'
 grouped_reviews = group_reviews_by_aspect()
 
 # Remove duplicates

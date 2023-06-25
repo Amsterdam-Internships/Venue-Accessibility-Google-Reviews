@@ -29,6 +29,6 @@ def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
     plt.close()
 
 if __name__ == '__main__':
-    save_path = os.getenv('LOCAL_ENV') + 'results/sentiment_classification/'
-    load_path = os.getenv('LOCAL_ENV') + 'results/sentiment_classification/'+ my_pipeline.model_name.split("/")[1] + '.csv'
+    save_path = os.getenv('LOCAL_ENV') + '/results/sentiment_classification/'
+    load_path = os.getenv('LOCAL_ENV') + '/results/sentiment_classification/'+ my_pipeline.model_name.split("/")[1] + '.csv'
     extract_metrics()

@@ -3,7 +3,7 @@ This is a script to use trained models to make predictions.
 '''
 import sys
 import os
-sys.path.append(os.getenv('LOCAL_ENV') + 'src')
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.data_cleaning import bert_processing
 from pipelines import SentimentPipeline
 from sentiment_classification.data.preprocessing import Preprocessor
@@ -15,7 +15,7 @@ import yaml
 preprocessor = Preprocessor()
 # Load environment variables from .env file
 load_dotenv()
-config_path = os.getenv('LOCAL_ENV') + 'src/sentiment_classification/models/config.yml'
+config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
      
@@ -63,12 +63,12 @@ def save_results(eval_metrics, predicted_df):
 
 if __name__ == '__main__':
     # Get the file paths from environment variables
-    test_data_path = os.getenv('LOCAL_ENV') + 'data/interim/predicted_aspect_labels.csv'
-    loaded_model_path = os.getenv('LOCAL_ENV') + 'models/sentiment_classification/transformer_models/bert.joblib'
+    test_data_path = os.getenv('LOCAL_ENV') + '/data/interim/predicted_aspect_labels.csv'
+    loaded_model_path = os.getenv('LOCAL_ENV') + '/models/sentiment_classification/transformer_models/bert.joblib'
     # Define the directory path
     names = params['model_name'].split("/")
-    results_path = os.getenv('LOCAL_ENV') + f"results/sentiment_classification/{names[1]}"
-    interim_path = os.getenv('LOCAL_ENV') + 'data/interim'
+    results_path = os.getenv('LOCAL_ENV') + f"/results/sentiment_classification/{names[1]}"
+    interim_path = os.getenv('LOCAL_ENV') + '/data/interim'
 
     # Call the function to generate results
     test_data = pd.read_csv(test_data_path)
