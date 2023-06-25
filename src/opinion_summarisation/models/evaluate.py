@@ -2,11 +2,11 @@ import os
 import sys
 import torch
 import yaml
+from dotenv import load_dotenv
 print(os.getenv('LOCAL_ENV'))
 sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 import pandas as pd
 import transformers
-from dotenv import load_dotenv
 from rouge import Rouge
 from summarizer import Summarizer
 from Pipelines import SummarizationPipeline

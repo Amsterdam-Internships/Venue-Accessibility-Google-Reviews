@@ -1,8 +1,8 @@
 import pandas as pd
 import os
 import sys
-sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from dotenv import load_dotenv
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from preprocessing import Preprocessor
 # Load environment variables from .env file
 load_dotenv()
