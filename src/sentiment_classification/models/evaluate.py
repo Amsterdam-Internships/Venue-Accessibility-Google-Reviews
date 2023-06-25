@@ -3,11 +3,11 @@ This is a script to use trained models to make predictions.
 '''
 import sys
 import os
+from dotenv import load_dotenv
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.data_cleaning import bert_processing
 from pipelines import SentimentPipeline
 from sentiment_classification.data.preprocessing import Preprocessor
-from dotenv import load_dotenv
 import pandas as pd
 import yaml
 

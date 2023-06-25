@@ -3,12 +3,12 @@ This is a script to use trained models to make predictions.
 '''
 import sys
 import os
+from dotenv import load_dotenv
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.data_cleaning import bert_processing
 from aspect_classification.data.preprocessing import Preprocessor
 from transformers import AutoTokenizer
 from pipelines import MyPipeline
-from dotenv import load_dotenv
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd

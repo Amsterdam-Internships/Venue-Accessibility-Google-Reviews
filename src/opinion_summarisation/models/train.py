@@ -1,11 +1,11 @@
 from Pipelines import SummarizationPipeline
 import sys 
-import os   
+import os 
+from dotenv import load_dotenv
 sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 import pandas as pd
 from summarizer import Summarizer
 import transformers
-from dotenv import load_dotenv
 import torch
 import yaml
 import os
