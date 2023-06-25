@@ -1,0 +1,92 @@
+no change     /var/scratch/mbn781/anaconda3/condabin/conda
+no change     /var/scratch/mbn781/anaconda3/bin/conda
+no change     /var/scratch/mbn781/anaconda3/bin/conda-env
+no change     /var/scratch/mbn781/anaconda3/bin/activate
+no change     /var/scratch/mbn781/anaconda3/bin/deactivate
+no change     /var/scratch/mbn781/anaconda3/etc/profile.d/conda.sh
+no change     /var/scratch/mbn781/anaconda3/etc/fish/conf.d/conda.fish
+no change     /var/scratch/mbn781/anaconda3/shell/condabin/Conda.psm1
+no change     /var/scratch/mbn781/anaconda3/shell/condabin/conda-hook.ps1
+no change     /var/scratch/mbn781/anaconda3/lib/python3.9/site-packages/xontrib/conda.xsh
+no change     /var/scratch/mbn781/anaconda3/etc/profile.d/conda.csh
+no change     /home/mbn781/.bashrc
+No action taken.
+Preparing and cleaning data...
+[nltk_data] Downloading package punkt to /home/mbn781/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+[nltk_data] Downloading package stopwords to /home/mbn781/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/aspect_classification/data/data_cleaning.py:36: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df["Text"] = df["Text"].apply(lambda x: x.replace("\n", ' '))
+Done !
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['fit_denses.2.weight', 'cls.predictions.transform.dense.bias', 'fit_denses.4.bias', 'cls.predictions.transform.LayerNorm.weight', 'fit_denses.3.weight', 'fit_denses.4.weight', 'fit_denses.0.weight', 'fit_denses.0.bias', 'cls.predictions.transform.dense.weight', 'fit_denses.1.weight', 'fit_denses.1.bias', 'cls.predictions.transform.LayerNorm.bias', 'fit_denses.3.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'fit_denses.2.bias', 'cls.predictions.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Started ...
+Time for all epochs: 15.195618152618408
+training of BERT models has finished !
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/models/aspect_classification/transformer_models/bert.joblib
+Making aspect label predictions on unseen data...
+Traceback (most recent call last):
+  File "/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/aspect_classification/models/evaluate.py", line 6, in <module>
+    sys.path.append(os.getenv('LOCAL_ENV') + '/src')
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+Creating graphs of aspect evaluation metrics...
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['fit_denses.4.bias', 'cls.seq_relationship.bias', 'fit_denses.0.bias', 'fit_denses.3.bias', 'cls.predictions.decoder.weight', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'fit_denses.3.weight', 'fit_denses.0.weight', 'fit_denses.1.weight', 'cls.predictions.transform.LayerNorm.bias', 'fit_denses.1.bias', 'cls.seq_relationship.weight', 'cls.predictions.bias', 'fit_denses.2.weight', 'fit_denses.4.weight', 'fit_denses.2.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Training sentiment classifiers...
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['cls.predictions.decoder.weight', 'fit_denses.3.weight', 'fit_denses.1.bias', 'fit_denses.2.weight', 'cls.predictions.transform.dense.bias', 'fit_denses.0.bias', 'fit_denses.1.weight', 'fit_denses.4.weight', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.bias', 'cls.predictions.transform.LayerNorm.weight', 'fit_denses.4.bias', 'fit_denses.2.bias', 'cls.seq_relationship.weight', 'fit_denses.0.weight', 'cls.seq_relationship.bias', 'fit_denses.3.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Started ...
+Time for all epochs: 158.24888610839844
+training of BERT models has finished !
+/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/models/sentiment_analysis/bert.joblib
+Making sentiment label predictions on unseen data...
+Traceback (most recent call last):
+  File "/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/sentiment_classification/models/evaluate.py", line 6, in <module>
+    sys.path.append(os.getenv('LOCAL_ENV') + '/src')
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+Creating graphs of sentiment evaluation metrics...
+Some weights of the model checkpoint at huawei-noah/TinyBERT_General_4L_312D were not used when initializing BertForSequenceClassification: ['fit_denses.1.bias', 'fit_denses.3.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'fit_denses.4.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.bias', 'fit_denses.3.bias', 'cls.seq_relationship.bias', 'cls.seq_relationship.weight', 'fit_denses.4.weight', 'fit_denses.1.weight', 'fit_denses.2.bias', 'fit_denses.0.weight', 'cls.predictions.decoder.weight', 'fit_denses.0.bias', 'fit_denses.2.weight']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at huawei-noah/TinyBERT_General_4L_312D and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Grouping review sentences by aspect...
+Traceback (most recent call last):
+  File "/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/data/group_test_reviews.py", line 4, in <module>
+    sys.path.append(os.getenv('LOCAL_ENV') + '/src')
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+Training the summarisation step... 
+Traceback (most recent call last):
+  File "/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/models/train.py", line 1, in <module>
+    from Pipelines import SummarizationPipeline
+  File "/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/models/Pipelines.py", line 5, in <module>
+    sys.path.append(os.getenv('LOCAL_ENV')+'/src')
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+Making predictions on the summarisation... 
+None
+Traceback (most recent call last):
+  File "/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/models/evaluate.py", line 6, in <module>
+    sys.path.append(os.getenv('LOCAL_ENV')+'/src')
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+Creating graphs for summarisation evaluation... 
+None
+Traceback (most recent call last):
+  File "/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/models/visulisations.py", line 6, in <module>
+    from evaluate import pipeline
+  File "/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/src/opinion_summarisation/models/evaluate.py", line 6, in <module>
+    sys.path.append(os.getenv('LOCAL_ENV')+'/src')
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
