@@ -24,7 +24,8 @@ def make_testset():
     sample_test_df = pd.read_csv(test_file_path)
     selected_rows = preprocessor.remove_rows(sample_test_df)
     renamed_aspects = preprocessor.relabel(selected_rows, ['Gold Aspect Labels', 'Aspect'])
-    renamed_sentiments = preprocessor.relabel(renamed_aspects, ['Gold Sentiment Labels', 'Sentiment'])
+    exploded_sentiments = preprocessor.explode_rows(renamed_aspects, 'Gold Sentiment Labels')
+    renamed_sentiments = preprocessor.relabel(exploded_sentiments, ['Gold Sentiment Labels', 'Sentiment'])
     renamed_sentiments.to_csv(processed_test_path)
 
 # def load_data():
@@ -40,7 +41,7 @@ def make_testset():
 # Call main function
 if __name__ == '__main__':
     training_file_path = os.environ.get('LOCAL_ENV') + '/data/raw/train/EuansGuideData.xlsx'
-    test_file_path = os.environ.get('LOCAL_ENV') + '/data/processed/experiments/sample_good_reviews.csv'
+    test_file_path = os.environ.get('LOCAL_ENV') + '/data/processed/experiments/full_sample_good_reviews.csv'
     processed_train_path = os.environ.get('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
     processed_test_path = os.environ.get('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_google_sample_reviews.csv'
     make_trainset()

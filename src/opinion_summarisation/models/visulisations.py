@@ -39,7 +39,7 @@ def plot_metrics(rouge_scores):
     # Customize the plot
     ax.set_ylabel('% of overalp between reference summaries and generated summaries', fontsize=12)
     ax.set_xlabel
-    ax.set_title('The Recall-Oriented Understudy for Gisting Evaluation (ROUGE) Scores', fontsize=12)
+    ax.set_title('The Recall-Oriented Understudy for Gisting Evaluation (ROUGE) Scores of '+ pipeline.model, fontsize=12)
     ax.legend()
 
     x_labels = ['ROUGE-1', 'ROUGE-2', 'ROUGE-L']

@@ -15,13 +15,14 @@ class Preprocessor(object):
         self.labels_map = {
         re.compile(r'^(?i)\bother\b'): "Overview",
         re.compile(r'(?i)\b(transport|parking)\b'): "Transport & Parking",
-        re.compile(r'^(?i)\bentrance\b|^(?i)general\saccessibility|general\saccess$|wheelchair|wheechair|^(?i)noise\slevels$'): "Access",
-        re.compile(r'^(?i)\btoilets\b|^(?i)\btoilet\b|^(?i)\btoielts\b'): "Toilets",
+        re.compile(r'^(?i)\bentrance\b|^(?i)general\saccessibility|general\saccess$|wheelchair|wheelchaiir|wheechair|^(?i)noise\slevels$'): "Access",
+        re.compile(r'^(?i)\btoilets\b|^(?i)\btoilet\b|^(?i)\btoliet\b|^(?i)\btoielts\b'): "Toilets",
         re.compile(r'^(?i)\bstaff\b'): "Staff",
         re.compile(r'^(?i)\bpositive\b'): "Positive",
         re.compile(r'^(?i)\bnegative\b'): "Negative",
         re.compile(r'^(?i)\bneutral\b|(?i)\bnetural\b'): "Neutral"
         }
+
 
     def remove_columns(self):
         pass
@@ -36,10 +37,11 @@ class Preprocessor(object):
         Returns:
             pandas.DataFrame: The DataFrame with exploded rows.
         """
-        df[column] = df[column].apply(lambda x: x.split(', ') if isinstance(x, str) and ', ' in x else x)
+        df[column] = df[column].apply(lambda x: x.split(', ') if isinstance(x, str) and (', ' in x or ',' in x) else x)
         df = df.explode(column)
         df[column] = df[column].str.strip()
         return df
+
 
 
     def relabel(self, df, columns):
@@ -68,13 +70,17 @@ class Preprocessor(object):
             return self.explode_rows(df, columns[1])
         else:
             return df
-
-    
+        
     def remove_rows(self, df):
         df = df.dropna(subset=['Gold Aspect Labels', 'Gold Sentiment Labels'])
         df = df[df['Gold Aspect Labels'] != '']
         df = df[df['Gold Sentiment Labels'] != '']
+        df = df[~df['Gold Sentiment Labels'].str.contains(re.compile(r'(?i)\bneutral\b|(?i)\bnetural\b'))]
+        df['nonsense flag'] = df['Gold Aspect Labels'].str.contains(r'(?i)\bnonsense\b')
+        df = df[df['nonsense flag'] != True]
         return df
+
+    
     def remove_stopwords(self):
         pass
     def tokenize(self):

@@ -27,9 +27,9 @@ def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
     plt.bar(metrics, scores)
     plt.xlabel('Metric')
     plt.ylabel('Score')
-    plt.title('Evaluation Metrics')
+    plt.title('Evaluation Metrics of ' + my_pipeline.model_name.split("/")[1])
     #TODO Add the model names to the file name
-    plt.savefig(save_path + my_pipeline.model_name.split("/")[1] +'evaluation_metrics.png')
+    plt.savefig(save_path + my_pipeline.model_name.split("/")[1] +'_evaluation_metrics.png')
     plt.close()
 
 
