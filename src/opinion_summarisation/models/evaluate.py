@@ -5,8 +5,7 @@ import yaml
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
-print(os.getenv('LOCAL_ENV'))
+load_dotenv(override=True)
 sys.path.append(os.getenv('LOCAL_ENV')+'/src')
 import pandas as pd
 import transformers
@@ -98,7 +97,7 @@ if __name__ == '__main__':
     loaded_data_path = os.getenv('LOCAL_ENV') + '/data/interim/grouped_reviews.csv'
     output_path = os.getenv('LOCAL_ENV') + '/data/external/output_summaries.csv'
     print('Evaluating model...')
-    ref_data_path = os.getenv('LOCAL_ENV') + '/data/interim/ref_summaries.csv'
+    ref_data_path = os.getenv('LOCAL_ENV') + '/data/processed/summarisation_data/summarised_ref_reviews.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + '/models/opinion_summarisation/'+ pipeline.model+'.bin'
     results_path = os.getenv('LOCAL_ENV') + '/results/opinion_summarisation/'+pipeline.model+'_eval_metrics.csv'
     metrics = evaluate_model(loaded_data_path, ref_data_path, results_path)

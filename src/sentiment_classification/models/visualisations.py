@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from train import my_pipeline
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(override=True)
 
 def extract_metrics():
     eval_metrics = pd.read_csv(load_path)
@@ -24,11 +24,12 @@ def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
     plt.bar(metrics, scores)
     plt.xlabel('Metric')
     plt.ylabel('Score')
-    plt.title('Evaluation Metrics of ' + my_pipeline.model_name.split("/")[1])
-    plt.savefig(save_path + my_pipeline.model_name.split("/")[1] +'_evaluation_metrics.png')
+    plt.title(f'Evaluation Metrics of {names}')
+    plt.savefig(save_path + f'{names}_evaluation_metrics.png')
     plt.close()
 
 if __name__ == '__main__':
+    names = my_pipeline.model_name.split("/")[-1] if "/" in my_pipeline.model_name else [my_pipeline.model_name]
     save_path = os.getenv('LOCAL_ENV') + '/results/sentiment_classification/'
-    load_path = os.getenv('LOCAL_ENV') + '/results/sentiment_classification/'+ my_pipeline.model_name.split("/")[1] + '.csv'
+    load_path = os.getenv('LOCAL_ENV') + f'/results/sentiment_classification/{names}.csv'
     extract_metrics()

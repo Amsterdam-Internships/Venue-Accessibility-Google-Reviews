@@ -19,23 +19,10 @@ def make_trainset():
     clean_train_df.to_csv(processed_train_path)
     
 def make_testset():
-    # test_data = load_data()
-    # clean_test_df = cleaning_selector(test_data, ["Name","Review Rate", "Review Text"])
     sample_test_df = pd.read_csv(test_file_path)
-    selected_rows = preprocessor.remove_rows(sample_test_df)
+    selected_rows = preprocessor.remove_rows(sample_test_df, 'Gold Aspect Labels')
     renamed_aspects = preprocessor.relabel(selected_rows, ['Gold Aspect Labels', 'Aspect'])
-    exploded_sentiments = preprocessor.explode_rows(renamed_aspects, 'Gold Sentiment Labels')
-    renamed_sentiments = preprocessor.relabel(exploded_sentiments, ['Gold Sentiment Labels', 'Sentiment'])
-    renamed_sentiments.to_csv(processed_test_path)
-
-# def load_data():
-#     df_list = []
-#     for filename in os.listdir(test_file_path):
-#         if filename.endswith('.csv'):
-#             df = pd.read_csv(os.path.join(test_file_path, filename))
-#             df_list.append(df)
-#     google_data = pd.concat(df_list, axis=0, ignore_index=True)
-#     return google_data
+    renamed_aspects.to_csv(processed_test_path)
 
 
 # Call main function

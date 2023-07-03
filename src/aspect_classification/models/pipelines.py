@@ -4,22 +4,26 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
-from sklearn.preprocessing import LabelBinarizer, LabelEncoder
+from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from dotenv import load_dotenv
 import torch
+import pandas as pd
 import torch.nn as nn
 import torch.nn.functional as F
+from transformers import AdamW
 import time
 import yaml
-import os 
+import os
+import optuna
+import csv
+
 # Load environment variables from .env file
 load_dotenv()
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
-
 
 class MyPipeline:
     def __init__(self, pipeline_type='default', bert_model=None):
@@ -34,24 +38,27 @@ class MyPipeline:
                     ], voting=self.sk_params['clf']['voting'])
                 )
             ])
-            # self.bert_pipeline = None
+            self.bert_pipeline = None
         elif bert_model is None:
             self.sk_pipeline = None
             self.bert_pipeline = None
         else:
+            self.hyperparameters = []
+            self.sk_pipeline = None
             self.model_name = bert_model
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
             self.num_labels = self.bert_params['num_of_labels']
-            self.model = AutoModelForSequenceClassification.from_pretrained(bert_model, num_labels=self.num_labels)
+            self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name, num_labels=self.num_labels)
+            self.best_params = None
             bert_classifier = Pipeline([
                 ('tokenizer', self.tokenizer),
                 (bert_model, self.model)
             ])
-            self.sk_pipeline = None
+            self.best_loss = float('inf')
             self.bert_pipeline = bert_classifier
-            self.label_encoder = LabelEncoder()
-            self.label_binarizer = LabelBinarizer()
+            self.classes = None
+            self.label_binarizer = MultiLabelBinarizer()
             # Load BERT parameters from config file
             self.bert_epochs = self.bert_params['epochs']
             self.bert_batch_size = self.bert_params['batch_size']
@@ -75,84 +82,69 @@ class MyPipeline:
     def get_bert_pipeline(self):
         return self.bert_pipeline
     
-    def format_metrics(self, y_true, y_pred):
-        formatted_values = []
-        for true_val, pred_row in zip(y_true, y_pred):
-            for pred_val in pred_row:
-                formatted_values.append((true_val, pred_val))
-        return formatted_values
-    
     def split_metrics(self, formatted_values):
         true_values =[]
-        predicted_values = []
-        for y_true, y_pred in formatted_values:
-            true_values.append(y_true)
-            predicted_values.append(y_pred)
-        return true_values, predicted_values
+        for y_true in formatted_values:
+            true_values.append(y_true.split(','))
+        return true_values
     
-    
-    def calculate_metrics(self, formatted_values):
-        true_values, predicted_values = self.split_metrics(formatted_values)
-        accuracy = accuracy_score(true_values, predicted_values)
-        precision = precision_score(true_values, predicted_values, average='macro')
-        recall = recall_score(true_values, predicted_values, average='macro')
-        f1 = f1_score(true_values, predicted_values, average='macro')
+    def calculate_metrics(self, y_true, y_pred):
+        true_values = self.split_metrics(y_true)
+        accuracy = accuracy_score(true_values, y_pred, average='weighted')
+        precision = precision_score(true_values, y_pred, average='weighted')
+        recall = recall_score(true_values, y_pred, average='weighted')
+        f1 = f1_score(true_values, y_pred, average='weighted')
         return accuracy, precision, recall, f1
             
-        
-    
-    def evaluate(self, y_true, y_pred):
-        # Calculate metrics
-        formatted_values = self.format_metrics(y_true, y_pred)
-        accuracy, precision, recall, f1 = self.calculate_metrics(formatted_values)
-        evaluation_metrics = {'Accuracy': accuracy,
-                            'Precision': precision,
-                            'Recall': recall,
-                            'F1-Score': f1}
-        
-        return evaluation_metrics
 
 
-
-
-    
-    def fit(self, X, y):
+    def fit(self, X, y, parameter_path):
         if self.sk_pipeline is not None:
             self.sk_pipeline.set_params(**self.params['default'])
             self.sk_pipeline.fit(X, y)
         if self.bert_pipeline is not None:
+            self.model.to(self.device)
+
+            # Prepare the dataset and dataloader
             encoded_texts = self.tokenizer(X, padding='max_length', truncation=True, return_tensors='pt', max_length=19)
             input_ids = encoded_texts['input_ids']
             attention_mask = encoded_texts['attention_mask']
-            y_encoded = self.label_encoder.fit_transform(y)  
-            # Adjust label encoding
-            labels_encoded = torch.tensor(y_encoded, dtype=torch.long)  # Convert to torch.long type
+            y_binarised = self.label_binarizer.fit_transform(y)
+            self.classes = self.label_binarizer.classes_
+            labels_binarised = torch.tensor(y_binarised, dtype=torch.long)
+            dataset = TensorDataset(input_ids, attention_mask, labels_binarised)
+            dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0], shuffle=True)
 
-            dataset = TensorDataset(input_ids, attention_mask, labels_encoded)
-            dataloader = DataLoader(dataset, batch_size=self.bert_batch_size[0], shuffle=True)  # Add shuffle for better training
+            study = optuna.create_study(direction="minimize")
+            study.optimize(lambda trial: self.objective(trial, X, y), n_trials=10)
 
-            optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.bert_learning_rate[2])
-            criterion = nn.CrossEntropyLoss()  # Use CrossEntropyLoss for multi-class labels
-            start_time = time.time()
+            best_trial = study.best_trial
+            best_params = best_trial.params
+            best_learning_rate = best_params["learning_rate"]
+            best_batch_size = best_params["batch_size"]
+            best_num_epochs = best_params["num_epochs"]
+
+            self.best_params = {
+                "learning_rate": best_learning_rate,
+                "batch_size": best_batch_size,
+                "num_epochs": best_num_epochs,
+            }
 
             print('Started ...')
-            for epoch in range(self.bert_epochs[0]):
-                for batch in dataloader:
-                    input_ids = batch[0].to(self.device)
-                    attention_mask = batch[1].to(self.device)
-                    labels = batch[2].to(self.device)
-                    optimizer.zero_grad()
-                    outputs = self.model(input_ids, attention_mask=attention_mask)
-                    logits = outputs.logits
-                    loss = criterion(logits, labels)
-                    loss.backward()
-                    optimizer.step()
-                end_time = time.time()
-                epoch_time = end_time - start_time
-            print("Time for all epochs:", epoch_time * self.bert_epochs[0])
+            start_time = time.time()
+
+            self.best_loss = self.train_model(dataloader, best_learning_rate, best_num_epochs, best_batch_size)
+
+            end_time = time.time()
+            total_time = end_time - start_time
+            epoch_time = total_time / best_num_epochs
+            print("Time for all epochs:", epoch_time * best_num_epochs)
+            self.save_hyperparameters_to_csv(self.hyperparameters, parameter_path + 'hyperparameters.csv')
+
         return self
 
-    def predict(self, X):
+
+    def predict(self, X, model_path):
         if self.sk_pipeline is not None:
             return self.sk_pipeline.predict(X)
         elif self.bert_pipeline is not None:
@@ -160,34 +152,28 @@ class MyPipeline:
                 encoded_texts = self.tokenizer(X, padding=True, truncation=True, return_tensors='pt')
                 input_ids = encoded_texts['input_ids'].to(self.device)
                 attention_mask = encoded_texts['attention_mask'].to(self.device)
-                outputs = self.model(input_ids, attention_mask=attention_mask)
-                logits = outputs.logits  # Get the predicted logits
-
+                
+                # Load the fine-tuned model from a file
+                fine_tuned_model = torch.load(model_path)
+                fine_tuned_model.to(self.device)
+                
+                outputs = fine_tuned_model(input_ids, attention_mask=attention_mask)
+                logits = outputs.logits
                 # Apply sigmoid activation function to obtain probabilities
                 probabilities = F.sigmoid(logits)
 
                 # Set a threshold to determine the predicted labels
-                threshold = 0.5
+                threshold = 0.75
                 predicted_labels = (probabilities > threshold).int().tolist()
-
-                # Define the aspect labels
-                aspect_labels = ['Access', 'Overview', 'Staff', 'Toilets', 'Transport & Parking']
 
                 # Convert the predicted labels to a list of aspects for each input sample
                 predictions = []
                 for labels in predicted_labels:
-                    prediction = [aspect_labels[i] for i, label in enumerate(labels) if label==1]
+                    prediction = [self.classes[i] for i, label in enumerate(labels) if label==1]
                     predictions.append(prediction)
-                    
                 return predictions
             except Exception as e:
                 # Handle specific exceptions or log the error
                 raise RuntimeError("Error occurred during BERT prediction: " + str(e))
         else:
             raise ValueError('Both pipelines are None. Please provide a valid pipeline type.')
-
-
-
-
-
-

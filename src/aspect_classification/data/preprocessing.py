@@ -2,9 +2,19 @@ import re
 import nltk
 nltk.download('punkt')
 nltk.download('stopwords')
+from dotenv import load_dotenv
+# Load environment variables from .env file
+load_dotenv(override=True)
+import sys
+import os
+import ast
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
+import numpy as np
+from aspect_classification.models.newpipelines import EuansDataset, AspectClassificationPipeline
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import *
 lemmatizer = WordNetLemmatizer()
+pipeline = AspectClassificationPipeline(pipeline_type='transformer')
 
 class Preprocessor(object):
     def __init__(self, ):
@@ -17,31 +27,51 @@ class Preprocessor(object):
         re.compile(r'(?i)\b(transport|parking)\b'): "Transport & Parking",
         re.compile(r'^(?i)\bentrance\b|^(?i)general\saccessibility|general\saccess$|wheelchair|wheelchaiir|wheechair|^(?i)noise\slevels$'): "Access",
         re.compile(r'^(?i)\btoilets\b|^(?i)\btoilet\b|^(?i)\btoliet\b|^(?i)\btoielts\b'): "Toilets",
-        re.compile(r'^(?i)\bstaff\b'): "Staff",
-        re.compile(r'^(?i)\bpositive\b'): "Positive",
-        re.compile(r'^(?i)\bnegative\b'): "Negative",
-        re.compile(r'^(?i)\bneutral\b|(?i)\bnetural\b'): "Neutral"
+        re.compile(r'^(?i)\bstaff\b'): "Staff"
         }
+        
+    def encode_datasets(self, text):
+        new_encodings = pipeline.tokenizer(text, truncation=True, padding=True, max_length=512)
+        return new_encodings
+
+    def create_datasets(self, data):
+        labels, texts = self.split_data(data)
+        encodings = self.encode_datasets(texts)
+        new_dataset = EuansDataset(encodings, labels)
+        return new_dataset
+    
+    def convert_to_list(self, data):
+        label_strings = data.labels.values.tolist()
+        labels_only = [ast.literal_eval(value) for value in label_strings]
+        return [labels.split(", ") if ", " in labels else labels for labels in labels_only]
+
+
+    def split_data(self, data):
+        data = data.rename(columns={"Aspect": "labels", "Sentences": "text"})
+        labels = self.convert_to_list(data)
+        labels = pipeline.label_binarizer.fit_transform(labels)
+        labels = labels.astype(np.float32)
+        reviews = data.text.values.tolist()
+        return labels,reviews
 
 
     def remove_columns(self):
         pass
     
-    def explode_rows(self, df, column):
+    def split_and_remove_duplicates(self, df, column):
         """
-        This function explodes the rows in the column that contains comma-separated values.
+        This function splits the values in a column by comma and removes duplicate values.
 
         Args:
-            df (pandas.DataFrame): The DataFrame containing the 'Aspect' column.
+            df (pandas.DataFrame): The DataFrame containing the column to be processed.
+            column (str): The name of the column to split and remove duplicates.
 
         Returns:
-            pandas.DataFrame: The DataFrame with exploded rows.
+            pandas.DataFrame: The DataFrame with split and deduplicated values in the specified column.
         """
-        df[column] = df[column].apply(lambda x: x.split(', ') if isinstance(x, str) and (', ' in x or ',' in x) else x)
-        df = df.explode(column)
-        df[column] = df[column].str.strip()
+        df[column] = df[column].apply(lambda x: [val.strip() for val in set(x.split(", "))] if isinstance(x, str) and (", " in x or "," in x) else x)
+        df[column] = df[column].apply(lambda x: x if isinstance(x, list) else [x] if isinstance(x, str) else x)
         return df
-
 
 
     def relabel(self, df, columns):
@@ -54,6 +84,7 @@ class Preprocessor(object):
         Returns:
             pandas.DataFrame: The DataFrame with relabeled euans guide formatted labels.
         """
+        df[columns[0]] = df[columns[0]].astype(str).fillna('').str.strip()
         gold_labels = df[columns[0]].values.tolist()
         for i, label in enumerate(gold_labels):
             for pattern, euans_label in self.labels_map.items():
@@ -66,18 +97,13 @@ class Preprocessor(object):
                     if pattern.match(label):
                         gold_labels[i] = euans_label
         df[columns[1]] = gold_labels
-        if columns[1] == "Aspect":
-            return self.explode_rows(df, columns[1])
-        else:
-            return df
-        
-    def remove_rows(self, df):
-        df = df.dropna(subset=['Gold Aspect Labels', 'Gold Sentiment Labels'])
-        df = df[df['Gold Aspect Labels'] != '']
-        df = df[df['Gold Sentiment Labels'] != '']
-        df = df[~df['Gold Sentiment Labels'].str.contains(re.compile(r'(?i)\bneutral\b|(?i)\bnetural\b'))]
-        df['nonsense flag'] = df['Gold Aspect Labels'].str.contains(r'(?i)\bnonsense\b')
+        return self.split_and_remove_duplicates(df, columns[1])
+
+    def remove_rows(self, df, row):
+        df = df[df[row] != '']
+        df['nonsense flag'] = df[row].str.contains(r'(?i)\bnonsense\b')
         df = df[df['nonsense flag'] != True]
+        df = df.dropna(subset=[row])
         return df
 
     
@@ -87,7 +113,12 @@ class Preprocessor(object):
         pass
     def vectorize(self):
         pass
+    def split_reviews(self, review):
+        if len(nltk.sent_tokenize(review)) > 1:
+            return nltk.sent_tokenize(review)
+        else:
+            return [review]
     def split_aspects(self, column):
         column['Split Aspect Labels'] = column['Gold Aspect Labels'].apply(lambda x: x.split(", "))
-        column['Aspect'] = column.explode('Split Aspect Labels')
+        # column['Aspect'] = column.explode('Split Aspect Labels')
         return column

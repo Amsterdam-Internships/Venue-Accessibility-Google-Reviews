@@ -4,11 +4,20 @@ import re
 import numpy as np
 import nltk
 import gensim
+from dotenv import load_dotenv
+# Load environment variables from .env file
+load_dotenv(override=True)
+import sys
+import os
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
+from aspect_classification.models.newpipelines import AspectClassificationPipeline 
 from gensim.utils import simple_preprocess
 from gensim.parsing.preprocessing import STOPWORDS
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.stem.porter import *
 lemmatizer = WordNetLemmatizer()
+
+pipline = AspectClassificationPipeline(pipeline_type='transformer', model_type='huawei-noah/TinyBERT_General_4L_312D')
     
 def stem_and_lemmatize(sentence):
     return lemmatizer.lemmatize(sentence)
@@ -77,7 +86,7 @@ def replace_substrings(s):
     
 def clean_sentiment(df):
     df['Sentiment'] = df['Sentiment'].apply(lambda x: replace_substrings(x))
-    return remove_sentiment(df)
+    return df
     
 def filter_aspects(df, aspects):
     cleaned_aspects = [aspect.strip() for aspect in aspects]
@@ -119,8 +128,8 @@ def remove_sentiment(df):
 def create_sentiment(df):
     conv_df = convert_rating(df)
     labelled_df = asign_label(conv_df)
-    binary_df = remove_sentiment(labelled_df)
-    return binary_df
+    # binary_df = remove_sentiment(labelled_df)
+    return labelled_df
 
 
 def tokenize_text(df):
@@ -128,29 +137,19 @@ def tokenize_text(df):
     df["Text"] = df["Text"].apply(lambda x: nltk.regexp_tokenize(x, rule))
     return df
 
-
-# def gensim_processing(text):
-#     result = []
-#     for token in gensim.utils.simple_preprocess(text):
-#         if token not in gensim.parsing.preprocessing.STOPWORDS and len(token) > 3:
-#             result.append(lemmatize_stemming(token))
-#     return result
-
 def bert_processing(reviews):
+    # Load the BERT tokenizer
+    tokenizer = pipline.tokenizer(pipline.model_name)
+
     preprocessed_reviews = []
     for review in reviews:
-        # remove punctuation, special characters, and numbers from the text data
-        tokenizer = nltk.RegexpTokenizer(r'\w+')
-        tokens = tokenizer.tokenize(str(review))
+        # Tokenize the text using the BERT tokenizer
+        tokens = tokenizer.tokenize(review)
         
-        # remove stop words from the text data.
-        stop_words = set(nltk.corpus.stopwords.words('english'))
-        tokens = [token for token in tokens if token.lower() not in stop_words]
-        
-        # convert all text to lowercase.
+        # Convert tokens to lowercase
         tokens = [token.lower() for token in tokens]
         
-        # join the tokens for each review into a single string
+        # Join the tokens for each review into a single string
         preprocessed_review = ' '.join(tokens)
         preprocessed_reviews.append(preprocessed_review)
     return preprocessed_reviews

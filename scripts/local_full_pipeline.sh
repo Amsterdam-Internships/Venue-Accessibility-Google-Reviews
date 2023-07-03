@@ -10,7 +10,6 @@ echo "Preparing and cleaning data..."
 
 python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
 
-
 # train aspect classifiers
 
 python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
@@ -26,6 +25,10 @@ python "${LOCAL_ENV}/src/aspect_classification/models/evaluate.py"
 echo "Creating graphs of aspect evaluation metrics..."
 
 python "${LOCAL_ENV}/src/aspect_classification/models/visualisations.py"
+
+echo "Performing formatting for sentiments..."
+
+python "${LOCAL_ENV}/src/sentiment_classification/data/make_dataset.py"
 
 
 # train sentiment classifiers

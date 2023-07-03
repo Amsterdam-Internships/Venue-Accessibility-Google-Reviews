@@ -2,6 +2,9 @@
 myenv/
 wheels/
 .env
+wandb
+tmp_trainer
+results/run-0/*
 # bytecode stuffs
 __pycache__/
 *.py[cod]
