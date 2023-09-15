@@ -1,15 +1,19 @@
+from typing import Any, Dict, List, Optional, Tuple, Union
 from dotenv import load_dotenv
+from transformers.trainer_utils import PredictionOutput
 # Load environment variables from .env file
 load_dotenv()
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments, pipeline
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import f1_score, precision_score, recall_score
 import torch
 from transformers import Trainer
 from torch import nn
-from torch.utils.data import DataLoader
+import torch.nn.functional as F
+from torch.utils.data import DataLoader, Dataset
 from datasets import load_metric
-import optuna
+from optuna import trial
+import numpy as np
 import yaml
 import os
 
@@ -42,6 +46,7 @@ class AspectClassificationPipeline:
                 problem_type="multi_label_classification")
             self.trainer = None
             self.label_binarizer = MultiLabelBinarizer()
+            self.label_mapping = {0: 'Access', 1: 'Overview', 2: 'Staff', 3: 'Toilets', 4: 'Transport & Parking'}
             
     def optuna_hp_space(self, trial):
         '''
@@ -50,7 +55,7 @@ class AspectClassificationPipeline:
         return {
             'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32, 64]),
-            'epochs': trial.suggest_categorical('epochs', [2, 3, 4, 5]),
+            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
         }
         
     def model_init(self, trial):
@@ -61,30 +66,30 @@ class AspectClassificationPipeline:
             problem_type="multi_label_classification"
         )
         
+    def extract_labels(self, predicted_probabilities):
+        label_text = self.label_binarizer.classes_
+        label_index = np.argmax(predicted_probabilities, axis=1)
+        predicted_labels_text = [label_text[i] for i in label_index]
+        return predicted_labels_text
+
+        
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
-        logits = torch.Tensor(eval_pred.predictions)
-        preds = torch.sigmoid(logits)
-        # Apply a threshold to the predictions to get binary predictions
+        # logits = torch.Tensor(eval_pred.predictions)
+        # outputs = torch.relu(logits)
+        # preds = F.sigmoid(outputs) # This is correct because each label event is independent
+        # threshold = 0.5 #correct threshold to use when using the sigmoid activation function
+        logits = eval_pred.predictions
+        preds = torch.sigmoid(torch.Tensor(logits))
         threshold = 0.5
-        preds = (preds > threshold)
-        f1 = f1_score(labels, preds, average='samples')
-        precision = precision_score(labels, preds, average='samples')
-        recall = recall_score(labels, preds, average='samples')
+        probs = (preds > threshold).float()
+        f1 = f1_score(labels, probs, average='samples')
+        precision = precision_score(labels, probs, average='samples')
+        recall = recall_score(labels, probs, average='samples')
         return {"f1 score": f1,
                 "precision": precision,
                 "recall": recall}
-        
-    
-    def make_predictions(self, texts, model_path):
-        # Load the fine-tuned model for prediction
-        nlp = pipeline('text-classification', model=model_path, tokenizer=model_path)
-        # Make predictions on the given texts
-        predictions = nlp(texts)
-        # Return the predictions
-        return predictions
-
-                
+                        
 class EuansDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
         self.encodings = encodings
@@ -97,9 +102,8 @@ class EuansDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.labels)
-                
-
-  
+    
+                  
 class MultiLabelClassTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -107,6 +111,12 @@ class MultiLabelClassTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
         labels = inputs.get("labels")
         outputs = model(**inputs)
-        logits = outputs.get("logits")
-        loss = nn.MultiLabelSoftMarginLoss()(logits, labels)
+        # logits = outputs.get("logits")
+        logits = outputs.logits
+        # probabilities = torch.sigmoid(logits)
+        loss = nn.BCEWithLogitsLoss()(logits, labels.float())
         return (loss, outputs) if return_outputs else loss
+    
+    # def prediction_step(self, model: Module, inputs: Dict[str, Tensor | Any], prediction_loss_only: bool, ignore_keys: List[str] | None = None) -> Tuple[Tensor | None, Tensor | None, Tensor | None]:
+    #     return super().prediction_step(model, inputs, prediction_loss_only, ignore_keys)
+

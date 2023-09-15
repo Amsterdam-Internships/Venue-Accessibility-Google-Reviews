@@ -1,6 +1,7 @@
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
+from transformers import TrainingArguments
 from newpipelines import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer
 from datasets import Dataset
 # Load environment variables from .env file
@@ -13,7 +14,6 @@ import torch
 import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
-# from aspect_classification.data.data_cleaning import bert_processing
 from aspect_classification.data.preprocessing import Preprocessor
 
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
@@ -42,6 +42,7 @@ def split_data(euans_data):
     euans_labels = my_pipeline.label_binarizer.fit_transform(euans_labels)
     euans_labels = euans_labels.astype(np.float32)
     euans_reviews = euans_data.Text.values.tolist()
+    euans_classes = my_pipeline.label_binarizer.classes_
     return train_test_split(euans_reviews, euans_labels, test_size=.2)
 
 def train_classic_models():
@@ -61,7 +62,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:10000])
+    train_dataset, val_dataset = create_datasets(euans_data[:1000])
 
     # train the model
     my_pipeline.trainer = MultiLabelClassTrainer(
@@ -83,11 +84,11 @@ def train_bert_models():
     
     best_parameters = best_trial.hyperparameters
     
-    new_training_args = my_pipeline.training_args(
+    new_training_args = TrainingArguments(
         output_dir='./results/aspect_classification/',
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
-        num_of_train_epochs=best_parameters['num_of_train_epochs']
+        num_train_epochs=best_parameters['num_train_epochs']
     )
     my_pipeline.trainer = MultiLabelClassTrainer(
         model = my_pipeline.model,
@@ -101,6 +102,8 @@ def train_bert_models():
     name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     save_path = saved_model_path+f"{name}"
     my_pipeline.trainer.save_model(save_path)
+    my_pipeline.tokenizer.save_pretrained(save_path)
+
 
 if __name__ == '__main__':
     # Get the file paths from environment variables

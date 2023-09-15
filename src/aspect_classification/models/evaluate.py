@@ -8,7 +8,7 @@ import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
-from transformers import TrainingArguments, pipeline
+from transformers import TrainingArguments, pipeline, AutoModelForSequenceClassification
 from newpipelines import AspectClassificationPipeline, MultiLabelClassTrainer
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -30,7 +30,7 @@ preprocessor = Preprocessor()
 
 def generate_results(test_data):
     # Select annotated data only for the aspect classification task
-    eval_dataset = preprocessor.create_datasets(test_data[['Sentences', 'Aspect']])    
+    eval_set = preprocessor.create_datasets(test_data[['Sentences', 'Aspect']])
     # Define the TrainingArguments for evaluation
     eval_args = TrainingArguments(
         output_dir="./results/aspect_classification",
@@ -41,18 +41,20 @@ def generate_results(test_data):
     
     # Create a dummy Trainer for evaluation
     trainer = MultiLabelClassTrainer(
-        model=pipeline('text-classification', model=loaded_model_path, tokenizer=loaded_model_path),  # Your loaded model
+        model=AutoModelForSequenceClassification.from_pretrained(loaded_model_path),  # Your loaded model
         args=eval_args,
-        eval_dataset=eval_dataset,
+        eval_dataset=eval_set,
         compute_metrics=my_pipeline.compute_metrics,
     )
     
     # Perform evaluation
-    evaluation_result = trainer.evaluate(eval_dataset=eval_dataset)
-    predicted_labels = trainer.predict(eval_dataset=eval_dataset)
+    evaluation_result = trainer.evaluate(eval_dataset=eval_set)
+    result = trainer.predict(eval_set)
+    predicted_labels = my_pipeline.extract_labels(result.predictions)
     # Assuming annotated_data is your DataFrame
-    eval_dataset['Predicted Aspect Labels'] = pd.Series(predicted_labels)
-    save_results(evaluation_result, eval_dataset)
+    
+    test_data['Predicted Aspect Labels'] = predicted_labels
+    save_results(evaluation_result, test_data)
     
 def save_results(eval_metrics, predicted_df):
     # Save the predicted labels as a CSV file
@@ -77,6 +79,7 @@ if __name__ == '__main__':
     # Get the file paths from environment variables
     test_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_google_sample_reviews.csv'
     loaded_model_path = os.getenv('LOCAL_ENV') + f'/models/aspect_classification/transformer_models/{names}'
+    print(loaded_model_path)
     results_path = os.getenv('LOCAL_ENV') + f"/results/aspect_classification/{names}"
     interim_path = os.getenv('LOCAL_ENV') + '/data/interim'
 
