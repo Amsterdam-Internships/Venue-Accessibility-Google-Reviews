@@ -3,14 +3,12 @@ from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
 from transformers import TrainingArguments
 from newpipelines import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer
-from datasets import Dataset
 # Load environment variables from .env file
 load_dotenv(override=True)
 import pandas as pd
 import numpy as np
 import joblib
 import yaml
-import torch
 import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
@@ -42,7 +40,6 @@ def split_data(euans_data):
     euans_labels = my_pipeline.label_binarizer.fit_transform(euans_labels)
     euans_labels = euans_labels.astype(np.float32)
     euans_reviews = euans_data.Text.values.tolist()
-    euans_classes = my_pipeline.label_binarizer.classes_
     return train_test_split(euans_reviews, euans_labels, test_size=.2)
 
 def train_classic_models():
@@ -62,7 +59,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:1000])
+    train_dataset, val_dataset = create_datasets(euans_data[:5000])
 
     # train the model
     my_pipeline.trainer = MultiLabelClassTrainer(

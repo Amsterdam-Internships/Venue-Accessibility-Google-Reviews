@@ -12,23 +12,22 @@ def extract_metrics():
     eval_metrics = pd.read_csv(load_path)
 
     # Get the metric scores for the single row
-    accuracy_score = eval_metrics['Accuracy'].values[0]
-    precision_score = eval_metrics['Precision'].values[0]
-    recall_score = eval_metrics['Recall'].values[0]
-    f1_score = eval_metrics['F1-Score'].values[0]
+    total_loss = eval_metrics['eval_loss'].values[0]
+    precision_score = eval_metrics['eval_precision'].values[0]
+    recall_score = eval_metrics['eval_recall'].values[0]
+    f1_score = eval_metrics['eval_f1 score'].values[0]
 
-    plot_metrics(accuracy_score, precision_score, recall_score, f1_score)
+    plot_metrics(total_loss, precision_score, recall_score, f1_score)
 
-def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
+def plot_metrics(total_loss, precision_score, recall_score, f1_score):
     # Create a bar plot for all four metrics
     plt.figure(figsize=(8, 6))
-    metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
-    scores = [accuracy_score, precision_score, recall_score, f1_score]
+    metrics = ['loss', 'Precision', 'Recall', 'F1-Score']
+    scores = [total_loss, precision_score, recall_score, f1_score]
     plt.bar(metrics, scores)
     plt.xlabel('Metric')
     plt.ylabel('Score')
     plt.title(f'Evaluation Metrics of {names}')
-    #TODO Add the model names to the file name
     plt.savefig(save_path +f'{names}_evaluation_metrics.png')
     plt.close()
 

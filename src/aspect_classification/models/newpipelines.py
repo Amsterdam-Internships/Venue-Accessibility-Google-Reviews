@@ -47,6 +47,8 @@ class AspectClassificationPipeline:
             self.trainer = None
             self.label_binarizer = MultiLabelBinarizer()
             self.label_mapping = {0: 'Access', 1: 'Overview', 2: 'Staff', 3: 'Toilets', 4: 'Transport & Parking'}
+            self.encoded_pred_lables = []
+            self.decoded_pred_labels = []
             
     def optuna_hp_space(self, trial):
         '''
@@ -66,11 +68,14 @@ class AspectClassificationPipeline:
             problem_type="multi_label_classification"
         )
         
-    def extract_labels(self, predicted_probabilities):
-        label_text = self.label_binarizer.classes_
-        label_index = np.argmax(predicted_probabilities, axis=1)
-        predicted_labels_text = [label_text[i] for i in label_index]
-        return predicted_labels_text
+    def extract_labels(self):
+        for guess in self.encoded_pred_lables:
+            sublist = []
+            for i, value in enumerate(guess):
+               if value == 1:
+                sublist.append(self.label_mapping[i])
+            self.decoded_pred_labels.append(sublist)
+        return self.decoded_pred_labels
 
         
     def compute_metrics(self, eval_pred):
@@ -82,10 +87,11 @@ class AspectClassificationPipeline:
         logits = eval_pred.predictions
         preds = torch.sigmoid(torch.Tensor(logits))
         threshold = 0.5
-        probs = (preds > threshold).float()
-        f1 = f1_score(labels, probs, average='samples')
-        precision = precision_score(labels, probs, average='samples')
-        recall = recall_score(labels, probs, average='samples')
+        pred_labels = (preds > threshold).float()
+        self.encoded_pred_lables = pred_labels
+        f1 = f1_score(labels, pred_labels, average='samples')
+        precision = precision_score(labels, pred_labels, average='samples')
+        recall = recall_score(labels, pred_labels, average='samples')
         return {"f1 score": f1,
                 "precision": precision,
                 "recall": recall}
@@ -107,6 +113,7 @@ class EuansDataset(torch.utils.data.Dataset):
 class MultiLabelClassTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.all_predictions = []
         
     def compute_loss(self, model, inputs, return_outputs=False):
         labels = inputs.get("labels")
@@ -117,6 +124,7 @@ class MultiLabelClassTrainer(Trainer):
         loss = nn.BCEWithLogitsLoss()(logits, labels.float())
         return (loss, outputs) if return_outputs else loss
     
-    # def prediction_step(self, model: Module, inputs: Dict[str, Tensor | Any], prediction_loss_only: bool, ignore_keys: List[str] | None = None) -> Tuple[Tensor | None, Tensor | None, Tensor | None]:
-    #     return super().prediction_step(model, inputs, prediction_loss_only, ignore_keys)
+    # def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys):
+    #     outputs = super().prediction_step(model, inputs, prediction_loss_only, ignore_keys)
+       
 

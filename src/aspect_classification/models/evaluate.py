@@ -49,17 +49,13 @@ def generate_results(test_data):
     
     # Perform evaluation
     evaluation_result = trainer.evaluate(eval_dataset=eval_set)
-    result = trainer.predict(eval_set)
-    predicted_labels = my_pipeline.extract_labels(result.predictions)
     # Assuming annotated_data is your DataFrame
-    
-    test_data['Predicted Aspect Labels'] = predicted_labels
+    test_data['Predicted Aspect Labels'] = my_pipeline.extract_labels()
     save_results(evaluation_result, test_data)
     
 def save_results(eval_metrics, predicted_df):
     # Save the predicted labels as a CSV file
     predicted_labels_path = interim_path + "/predicted_aspect_labels.csv"
-    print(predicted_df.head())
     predicted_df.to_csv(predicted_labels_path)
     
     # Create a DataFrame from the eval_metrics dictionary
