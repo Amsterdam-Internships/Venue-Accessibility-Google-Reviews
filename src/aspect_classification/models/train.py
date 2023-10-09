@@ -59,7 +59,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:5000])
+    train_dataset, val_dataset = create_datasets(euans_data)
 
     # train the model
     my_pipeline.trainer = MultiLabelClassTrainer(

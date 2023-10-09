@@ -1,6 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
 from dotenv import load_dotenv
-from transformers.trainer_utils import PredictionOutput
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
@@ -9,11 +7,6 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 import torch
 from transformers import Trainer
 from torch import nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader, Dataset
-from datasets import load_metric
-from optuna import trial
-import numpy as np
 import yaml
 import os
 
@@ -80,10 +73,7 @@ class AspectClassificationPipeline:
         
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
-        # logits = torch.Tensor(eval_pred.predictions)
-        # outputs = torch.relu(logits)
-        # preds = F.sigmoid(outputs) # This is correct because each label event is independent
-        # threshold = 0.5 #correct threshold to use when using the sigmoid activation function
+        #correct threshold to use when using the sigmoid activation function
         logits = eval_pred.predictions
         preds = torch.sigmoid(torch.Tensor(logits))
         threshold = 0.5
@@ -118,9 +108,7 @@ class MultiLabelClassTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
         labels = inputs.get("labels")
         outputs = model(**inputs)
-        # logits = outputs.get("logits")
         logits = outputs.logits
-        # probabilities = torch.sigmoid(logits)
         loss = nn.BCEWithLogitsLoss()(logits, labels.float())
         return (loss, outputs) if return_outputs else loss
     

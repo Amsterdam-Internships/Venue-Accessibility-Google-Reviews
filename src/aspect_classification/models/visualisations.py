@@ -10,7 +10,6 @@ load_dotenv(override=True)
 
 def extract_metrics():
     eval_metrics = pd.read_csv(load_path)
-
     # Get the metric scores for the single row
     total_loss = eval_metrics['eval_loss'].values[0]
     precision_score = eval_metrics['eval_precision'].values[0]

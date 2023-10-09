@@ -2,19 +2,14 @@
 This is a script to use trained models to make predictions.
 '''
 from dotenv import load_dotenv
-# Load environment variables from .env file
 load_dotenv(override=True)
 import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
-from transformers import TrainingArguments, pipeline, AutoModelForSequenceClassification
+from transformers import TrainingArguments, AutoModelForSequenceClassification
 from newpipelines import AspectClassificationPipeline, MultiLabelClassTrainer
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
-import numpy as np
-import ast
 import yaml
 
 
