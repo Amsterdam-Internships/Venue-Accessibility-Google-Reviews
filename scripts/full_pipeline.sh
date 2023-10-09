@@ -1,11 +1,11 @@
 #!/bin/bash
 
-SBATCH --job-name=baseline
-SBATCH --time=03:00:00
-SBATCH -N 1
-SBATCH --ntasks-per-node=1
-SBATCH --partition=proq
-SBATCH --gres=gpu:1
+#SBATCH --job-name=baseline
+#SBATCH --time=03:00:00
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=1
+#SBATCH --partition=proq
+#SBATCH --gres=gpu:1
 
 
 # Load any necessary modules
