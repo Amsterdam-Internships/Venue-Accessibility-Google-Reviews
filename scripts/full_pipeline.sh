@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH --job-name=test
-#SBATCH --time=00:25:00
-#SBATCH -N 1
-#SBATCH --ntasks-per-node=1
-#SBATCH --partition=defq
-#SBATCH --gres=gpu:1
+SBATCH --job-name=baseline
+SBATCH --time=03:00:00
+SBATCH -N 1
+SBATCH --ntasks-per-node=1
+SBATCH --partition=proq
+SBATCH --gres=gpu:1
 
 
 # Load any necessary modules
@@ -31,6 +31,8 @@ echo "Preparing and cleaning data..."
 
 python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
 
+# Check if the GPU is actually being used
+nvidia-smi
 
 # train aspect classifiers
 
