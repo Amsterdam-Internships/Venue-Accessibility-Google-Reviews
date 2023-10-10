@@ -82,7 +82,8 @@ def train_bert_models():
     best_parameters = best_trial.hyperparameters
     
     new_training_args = TrainingArguments(
-        output_dir='./results/aspect_classification/',
+        output_dir='./models/aspect_classification/transformer_models',
+        logging_dir='./logs/aspect_classification/',
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs']
