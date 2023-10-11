@@ -14,6 +14,8 @@ module load cuDNN/cuda10.0
 
 conda init bash
 
+echo 'export LOCAL_ENV=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/'
+
 source ~/.bashrc
 # Activate your desired Python environment, if needed
 conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
@@ -31,12 +33,13 @@ echo "Preparing and cleaning data..."
 
 python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
 
-# Check if the GPU is actually being used
-nvidia-smi
-
 # train aspect classifiers
 
 python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
+
+# Check if the GPU is actually being used
+
+nvidia-smi
 
 # Evaluation step
 
