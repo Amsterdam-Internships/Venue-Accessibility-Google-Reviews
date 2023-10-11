@@ -78,11 +78,13 @@ def train_bert_models():
         hp_space=my_pipeline.optuna_hp_space,
         n_trials=10
     )
+    name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
+    save_path = saved_model_path+f"{name}"
     
     best_parameters = best_trial.hyperparameters
     
     new_training_args = TrainingArguments(
-        output_dir=saved_model_path,
+        output_dir=save_path,
         logging_dir=logs_path,
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
@@ -93,12 +95,11 @@ def train_bert_models():
         args=new_training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
-        compute_metrics=my_pipeline.compute_metrics,
+        compute_metrics=my_pipeline.compute_metrics
     )
     my_pipeline.trainer.train()
     print('Training of BERT models has finished!')
-    name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
-    save_path = saved_model_path+f"{name}"
+    
     print(save_path)
     my_pipeline.trainer.save_model(save_path)
     my_pipeline.tokenizer.save_pretrained(save_path)
