@@ -14,7 +14,7 @@ module load cuDNN/cuda10.0
 
 conda init bash
 
-echo 'export LOCAL_ENV=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/'
+export LOCAL_ENV=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/
 
 source ~/.bashrc
 # Activate your desired Python environment, if needed
