@@ -100,11 +100,10 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics
     )
-    print(torch.cuda.is_available()) 
-    device = my_pipeline.trainer.args.device  # Getting the device
-    print(f"Here Training device: {device}")
     
     my_pipeline.trainer.train()
+    device = my_pipeline.trainer.args.device  # Getting the device
+    print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     
     print(save_path)
