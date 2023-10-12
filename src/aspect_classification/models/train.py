@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import yaml
+import torch
 import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
