@@ -86,6 +86,8 @@ def train_bert_models():
     new_training_args = TrainingArguments(
         output_dir=save_path,
         logging_dir=logs_path,
+        logging_strategy='epoch',
+        logging_steps=10, 
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs']
@@ -97,6 +99,9 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics
     )
+    
+    print(my_pipeline.trainer.args.device + ' is being used for training')
+    
     my_pipeline.trainer.train()
     print('Training of BERT models has finished!')
     
