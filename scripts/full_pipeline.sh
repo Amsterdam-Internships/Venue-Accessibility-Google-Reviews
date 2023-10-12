@@ -27,6 +27,7 @@ cd /var/scratch/mbn781/Venue-Accessibility-Google-Reviews
 
 # Set some environment stuffs
 export TRAINING_MODE='simple'
+export CUDA_VISIBLE_DEVICES=0
 source ./.env
 
 # Create and process datasets
