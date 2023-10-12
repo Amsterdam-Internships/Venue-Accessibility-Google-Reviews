@@ -60,10 +60,10 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
     train_dataset, val_dataset = create_datasets(euans_data[:200])
-    print(my_pipeline.device)
+    print(f"my device {my_pipeline.device}")
     #train the model
     my_pipeline.trainer = MultiLabelClassTrainer(
-        model=None,
+        model=my_pipeline.model,
         args = my_pipeline.training_args,
         train_dataset = train_dataset,
         eval_dataset = val_dataset,
@@ -99,6 +99,7 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics
     )
+    print(torch.cuda.is_available()) 
     device = my_pipeline.trainer.args.device  # Getting the device
     print(f"Here Training device: {device}")
     
