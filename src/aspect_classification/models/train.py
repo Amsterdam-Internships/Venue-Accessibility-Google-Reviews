@@ -99,8 +99,8 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics
     )
-    
-    print(my_pipeline.trainer.args.device + ' is being used for training')
+    device = my_pipeline.trainer.args.device  # Getting the device
+    print(f"Here Training device: {device}")
     
     my_pipeline.trainer.train()
     print('Training of BERT models has finished!')
