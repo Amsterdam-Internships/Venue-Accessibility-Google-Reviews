@@ -7,7 +7,6 @@
 #SBATCH --partition=proq
 #SBATCH --gres=gpu:1
 
-source ~/.bashrc
 
 # Load any necessary modules
 module load cuda10.0/toolkit
@@ -19,6 +18,7 @@ export LOCAL_ENV=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/
 
 echo "LOCAL_ENV is set to: $LOCAL_ENV"
 
+source ~/.bashrc
 # Activate your desired Python environment, if needed
 conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
 
