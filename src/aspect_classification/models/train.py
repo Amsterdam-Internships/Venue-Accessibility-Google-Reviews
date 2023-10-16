@@ -61,6 +61,8 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
     train_dataset, val_dataset = create_datasets(euans_data)
+    train_dataset = train_dataset.map(my_pipeline.tokenizer, batched=True)
+    val_dataset = val_dataset.map(my_pipeline.tokenizer, batched=True)
     print(f"my device {my_pipeline.device}")
     #train the model
     my_pipeline.trainer = MultiLabelClassTrainer(

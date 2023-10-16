@@ -36,7 +36,8 @@ class AspectClassificationPipeline:
             self.tokenizer = AutoTokenizer.from_pretrained(
                 self.model_args['model_name_or_path'],
                 max_length=512,
-                problem_type="multi_label_classification")
+                problem_type="multi_label_classification",
+                truncation=True)
             self.trainer = None
             self.label_binarizer = MultiLabelBinarizer()
             self.label_mapping = {0: 'Access', 1: 'Overview', 2: 'Staff', 3: 'Toilets', 4: 'Transport & Parking'}
