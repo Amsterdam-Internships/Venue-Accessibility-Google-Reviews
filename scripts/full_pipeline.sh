@@ -7,12 +7,11 @@
 #SBATCH --partition=proq
 #SBATCH --gres=gpu:1
 
-echo "Testing the GPU..."
-python gpu_test.py
+
 
 # Load any necessary modules
-module load cuda11.1/toolkit
-module load cuDNN/cuda11.1
+#module load cuda11.1/toolkit
+#module load cuDNN/cuda11.1
 
 conda init bash
 
@@ -23,6 +22,9 @@ echo "LOCAL_ENV is set to: $LOCAL_ENV"
 source ~/.bashrc
 # Activate your desired Python environment, if needed
 conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
+
+echo "Testing the GPU..."
+python gpu_test.py
 
 # Change to your working directory
 cd /var/scratch/mbn781/Venue-Accessibility-Google-Reviews
