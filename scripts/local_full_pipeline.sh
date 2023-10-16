@@ -26,50 +26,50 @@ echo "Creating graphs of aspect evaluation metrics..."
 
 python "${LOCAL_ENV}/src/aspect_classification/models/visualisations.py"
 
-echo "Performing formatting for sentiments..."
+# echo "Performing formatting for sentiments..."
 
-python "${LOCAL_ENV}/src/sentiment_classification/data/make_dataset.py"
-
-
-# train sentiment classifiers
-
-echo "Training sentiment classifiers..."
-
-python "${LOCAL_ENV}/src/sentiment_classification/models/train.py"
+# python "${LOCAL_ENV}/src/sentiment_classification/data/make_dataset.py"
 
 
-# Sentiment evaluation step
+# # train sentiment classifiers
 
-echo "Making sentiment label predictions on unseen data..."
+# echo "Training sentiment classifiers..."
 
-python "${LOCAL_ENV}/src/sentiment_classification/models/evaluate.py"
-
-
-echo "Creating graphs of sentiment evaluation metrics..."
-
-python "${LOCAL_ENV}/src/sentiment_classification/models/visualisations.py"
-
-# Grouping reviews
-
-echo "Grouping review sentences by aspect..."
-
-python "${LOCAL_ENV}/src/opinion_summarisation/data/group_test_reviews.py"
-
-# Opinion summarisation training
+# python "${LOCAL_ENV}/src/sentiment_classification/models/train.py"
 
 
-echo "Training the summarisation step... "
+# # Sentiment evaluation step
 
-python "${LOCAL_ENV}/src/opinion_summarisation/models/train.py"
+# echo "Making sentiment label predictions on unseen data..."
 
-
-# Opinion Summarisation evaluation 
-
-echo "Making predictions on the summarisation... "
-
-python "${LOCAL_ENV}/src/opinion_summarisation/models/evaluate.py"
+# python "${LOCAL_ENV}/src/sentiment_classification/models/evaluate.py"
 
 
-echo "Creating graphs for summarisation evaluation... "
+# echo "Creating graphs of sentiment evaluation metrics..."
 
-python "${LOCAL_ENV}/src/opinion_summarisation/models/visulisations.py"
+# python "${LOCAL_ENV}/src/sentiment_classification/models/visualisations.py"
+
+# # Grouping reviews
+
+# echo "Grouping review sentences by aspect..."
+
+# python "${LOCAL_ENV}/src/opinion_summarisation/data/group_test_reviews.py"
+
+# # Opinion summarisation training
+
+
+# echo "Training the summarisation step... "
+
+# python "${LOCAL_ENV}/src/opinion_summarisation/models/train.py"
+
+
+# # Opinion Summarisation evaluation 
+
+# echo "Making predictions on the summarisation... "
+
+# python "${LOCAL_ENV}/src/opinion_summarisation/models/evaluate.py"
+
+
+# echo "Creating graphs for summarisation evaluation... "
+
+# python "${LOCAL_ENV}/src/opinion_summarisation/models/visulisations.py"
