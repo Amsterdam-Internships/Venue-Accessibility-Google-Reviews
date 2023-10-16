@@ -8,10 +8,9 @@
 #SBATCH --gres=gpu:1
 
 
-
 # Load any necessary modules
-#module load cuda11.1/toolkit
-#module load cuDNN/cuda11.1
+module load cuda11.1/toolkit
+module load cuDNN/cuda11.1
 
 conda init bash
 
@@ -23,11 +22,14 @@ source ~/.bashrc
 # Activate your desired Python environment, if needed
 conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
 
-echo "Testing the GPU..."
-python gpu_test.py
-
 # Change to your working directory
 cd /var/scratch/mbn781/Venue-Accessibility-Google-Reviews
+
+# Test that the GPU is working
+
+echo "Is the GPU being used..."
+python test_gpu.py
+
 
 # Set some environment stuffs
 export TRAINING_MODE='simple'
