@@ -28,7 +28,7 @@ cd /var/scratch/mbn781/Venue-Accessibility-Google-Reviews
 # Test that the GPU is working
 
 echo "Is the GPU being used..."
-python "${LOCAL_ENV}/scripst/test_gpu.py"
+python "${LOCAL_ENV}scripts/test_gpu.py"
 
 
 # Set some environment stuffs
