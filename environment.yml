@@ -22,7 +22,6 @@ dependencies:
   - python-dotenv
   - ansi2html
   - jupyter
-  - pip
 pip:
     - -r file:requirements.txt
 prefix: /Users/mylene/opt/anaconda3/envs/BachelorsProject
