@@ -9,8 +9,8 @@
 
 
 # Load any necessary modules
-module load cuda11.1/toolkit
-module load cuDNN/cuda11.1
+module load cuda11.1/toolkit/11.1.1
+module load cuDNN/cuda11.1/8.0.5
 
 conda init bash
 
