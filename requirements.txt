@@ -16,3 +16,5 @@ seaborn==0.12.2
 setuptools==67.8.0
 torch==2.0.1
 transformers==4.24.0
+fuzzywuzzy==0.18.0
+accelerate==0.23.0
