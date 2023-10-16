@@ -18,3 +18,5 @@ torch==2.0.1
 transformers==4.24.0
 fuzzywuzzy==0.18.0
 accelerate==0.23.0
+wandb==0.15.12
+optuna==3.3.0
