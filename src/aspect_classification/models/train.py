@@ -57,6 +57,9 @@ def train_classic_models():
     joblib.dump(trained_model, save_path)
 
 def train_bert_models():
+    name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
+    save_path = saved_model_path+f"{name}"
+    
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
@@ -83,8 +86,7 @@ def train_bert_models():
         output_dir=save_path,
         logs_path=logs_path
     )
-    name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
-    save_path = saved_model_path+f"{name}"
+
     
     best_parameters = best_trial.hyperparameters
     
