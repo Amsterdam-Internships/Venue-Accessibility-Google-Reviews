@@ -79,7 +79,9 @@ def train_bert_models():
         direction='maximize',
         backend='optuna',
         hp_space=my_pipeline.optuna_hp_space,
-        n_trials=10
+        n_trials=10,
+        output_dir=save_path,
+        logs_path=logs_path
     )
     name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     save_path = saved_model_path+f"{name}"
