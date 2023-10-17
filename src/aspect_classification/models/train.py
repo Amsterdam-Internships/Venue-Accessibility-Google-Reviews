@@ -66,6 +66,7 @@ def train_bert_models():
     train_dataset, val_dataset = create_datasets(euans_data)
     # train_dataset = train_dataset.map(my_pipeline.tokenizer, batched=True)
     # val_dataset = val_dataset.map(my_pipeline.tokenizer, batched=True)
+    my_pipeline.training_args.output_dir = save_path
     print(f"my device {my_pipeline.device}")
     #train the model
     my_pipeline.trainer = MultiLabelClassTrainer(
@@ -82,9 +83,7 @@ def train_bert_models():
         direction='maximize',
         backend='optuna',
         hp_space=my_pipeline.optuna_hp_space,
-        n_trials=10,
-        output_dir=save_path,
-        logs_path=logs_path
+        n_trials=10
     )
 
     
