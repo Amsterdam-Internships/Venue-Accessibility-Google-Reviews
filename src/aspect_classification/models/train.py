@@ -24,8 +24,8 @@ processor = Preprocessor()
 custom_trainer = MultiLabelClassTrainer(model=my_pipeline.model)
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512, batched=True)
-    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=512, batched=True)
+    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512, return_tensors='pt')
+    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=512, return_tensors='pt')
     return new_train_encodings, new_val_encodings
 
 def create_datasets(euans_data):
@@ -61,8 +61,8 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
     train_dataset, val_dataset = create_datasets(euans_data)
-    train_dataset = train_dataset.map(my_pipeline.tokenizer, batched=True)
-    val_dataset = val_dataset.map(my_pipeline.tokenizer, batched=True)
+    # train_dataset = train_dataset.map(my_pipeline.tokenizer, batched=True)
+    # val_dataset = val_dataset.map(my_pipeline.tokenizer, batched=True)
     print(f"my device {my_pipeline.device}")
     #train the model
     my_pipeline.trainer = MultiLabelClassTrainer(
@@ -93,6 +93,7 @@ def train_bert_models():
         logging_steps=10, 
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
+        per_device_eval_batch_size=best_parameters['per_device_train_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs']
     )
     my_pipeline.trainer = MultiLabelClassTrainer(
