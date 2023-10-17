@@ -24,8 +24,8 @@ processor = Preprocessor()
 custom_trainer = MultiLabelClassTrainer(model=my_pipeline.model)
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512)
-    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=512)
+    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512, batched=True)
+    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=512, batched=True)
     return new_train_encodings, new_val_encodings
 
 def create_datasets(euans_data):
