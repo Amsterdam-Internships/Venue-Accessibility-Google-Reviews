@@ -32,7 +32,7 @@ def plot_metrics(total_loss, precision_score, recall_score, f1_score):
 
 
 if __name__ == '__main__':
-    names = my_pipeline.model_name.split("/")[-1] if "/" in my_pipeline.model_name else [my_pipeline.model_name]
+    names = my_pipeline.model_name.split("/")[-1] if "/" in my_pipeline.model_name else my_pipeline.model_name
     save_path = os.getenv('LOCAL_ENV') + '/results/aspect_classification/'
     load_path = os.getenv('LOCAL_ENV') + f'/results/aspect_classification/{names}.csv'
     extract_metrics()
