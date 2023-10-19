@@ -28,7 +28,9 @@ models/*
 data/raw/test/GoogleReviews/
 data/raw/train/EuansGuideData.xlsx
 data/external/*
-data/interim/*
+# data/interim/*
+data/interim/predicted_sentiment_labels.csv
+data/interim/grouped_reviews.csv
 data/processed/aspect_classification_data/*
 data/processed/summarisation_data/*
 data/processed/experiments/test_labelling_sample.xlsx
