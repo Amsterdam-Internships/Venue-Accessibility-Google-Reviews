@@ -66,7 +66,7 @@ def save_results(eval_metrics, predicted_df):
 
 if __name__ == '__main__':
     # Define the directory path
-    names = params['model_name_or_path'].split("/")[-1] if "/" in params['model_name_or_path'] else [params['model_name_or_path']]
+    names = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     # Get the file paths from environment variables
     test_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_google_sample_reviews.csv'
     loaded_model_path = os.getenv('LOCAL_ENV') + f'/models/aspect_classification/transformer_models/{names}'

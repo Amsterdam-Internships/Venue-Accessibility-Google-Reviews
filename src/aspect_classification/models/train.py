@@ -57,9 +57,8 @@ def train_classic_models():
     joblib.dump(trained_model, save_path)
 
 def train_bert_models():
-    name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name[0]
+    name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     save_path = saved_model_path+f"{name}"
-    
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
@@ -68,6 +67,7 @@ def train_bert_models():
     # val_dataset = val_dataset.map(my_pipeline.tokenizer, batched=True)
     my_pipeline.training_args.output_dir = save_path
     print(f"my device {my_pipeline.device}")
+    print(f"my model {my_pipeline.model_name}")
     #train the model
     my_pipeline.trainer = MultiLabelClassTrainer(
         model=my_pipeline.model,
@@ -111,8 +111,6 @@ def train_bert_models():
     device = my_pipeline.trainer.args.device  # Getting the device
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
-    
-    print(save_path)
     my_pipeline.trainer.save_model(save_path)
     my_pipeline.tokenizer.save_pretrained(save_path)
 
