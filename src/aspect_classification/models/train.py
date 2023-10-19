@@ -57,7 +57,7 @@ def train_classic_models():
     joblib.dump(trained_model, save_path)
 
 def train_bert_models():
-    name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
+    name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name[0]
     save_path = saved_model_path+f"{name}"
     
     # load the data
