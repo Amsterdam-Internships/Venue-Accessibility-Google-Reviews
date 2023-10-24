@@ -1,4 +1,4 @@
-from src.sentiment_classification.models.sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
+from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
 import os
 from dotenv import load_dotenv
