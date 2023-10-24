@@ -18,7 +18,7 @@ with open(config_path, 'r') as f:
     params = params['bert_params']
     
     
-my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', bert_model=params['model_name_or_path'])
+my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
 
 custom_trainer = MultiClassTrainer(model=my_pipeline.model)
 
