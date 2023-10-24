@@ -66,6 +66,7 @@ def train_bert_models():
     my_pipeline.training_args.output_dir = save_path
     print(f"my device {my_pipeline.device}")
     print(f"my model {my_pipeline.model_name}")
+    
     #train the model
     my_pipeline.trainer = MultiLabelClassTrainer(
         model=my_pipeline.model,
@@ -75,7 +76,7 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
-        device=my_pipeline.device
+        device=my_pipeline.device,
     )
     # optimising hyperparameters
     best_trial = my_pipeline.trainer.hyperparameter_search(
@@ -94,8 +95,9 @@ def train_bert_models():
         logging_strategy='epoch',
         logging_steps=10, 
         learning_rate=best_parameters['learning_rate'],
+        auto_find_batch_size=True,
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
-        per_device_eval_batch_size=best_parameters['per_device_train_batch_size'],
+        per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
     )
