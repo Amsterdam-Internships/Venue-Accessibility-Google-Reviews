@@ -1,12 +1,11 @@
-#!/bin/bash
-
 #SBATCH --job-name=baseline
 #SBATCH --time=03:15:00
-#SBATCH -N 1
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=proq
 #SBATCH --gres=gpu:1
-#SBATCH --mem=8G
+#SBATCH --cpus-per-task=4  # Adjust the number of CPU cores as needed
+#SBATCH --mem=16G  # Increase memory allocation as needed
 
 
 # Load any necessary modules
