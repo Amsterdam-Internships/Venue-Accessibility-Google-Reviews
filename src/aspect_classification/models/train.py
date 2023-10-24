@@ -75,7 +75,6 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
-        accelerator="auto",
         device=my_pipeline.device
     )
     # optimising hyperparameters
