@@ -1,5 +1,5 @@
 bert_params:
-  model_name_or_path: bert-base-uncased
+  model_name_or_path: distilbert-base-uncased
   num_of_labels: 5
   learning_rate: 0.001
   batch_size: 16
