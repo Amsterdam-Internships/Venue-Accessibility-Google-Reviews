@@ -14,7 +14,7 @@ import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
-torch.cuda.set_per_process_memory_fraction(0.1, device=0)  # Adjust as needed
+torch.cuda.set_per_process_memory_fraction(0.1, device=1)  # Adjust as needed
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 
 with open(config_path, 'r') as f:
@@ -75,6 +75,7 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
+        accelerator="auto",
     )
     # optimising hyperparameters
     best_trial = my_pipeline.trainer.hyperparameter_search(

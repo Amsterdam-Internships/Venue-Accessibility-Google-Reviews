@@ -6,6 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=proq
 #SBATCH --gres=gpu:1
+#SBATCH --mem=8G
 
 
 # Load any necessary modules
