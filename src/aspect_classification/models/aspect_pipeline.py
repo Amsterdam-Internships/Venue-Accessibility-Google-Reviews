@@ -10,7 +10,6 @@ from torch import nn
 import yaml
 import os
 
-torch.cuda.set_per_process_memory_fraction(0.5, device=0)  # Adjust as needed
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 
 class AspectClassificationPipeline:
@@ -43,8 +42,6 @@ class AspectClassificationPipeline:
             self.label_mapping = {0: 'Access', 1: 'Overview', 2: 'Staff', 3: 'Toilets', 4: 'Transport & Parking'}
             self.encoded_pred_lables = []
             self.decoded_pred_labels = []
-            # Set the max split size and clear GPU cache
-            #torch.cuda.set_per_process_memory_fraction(0.5, device=0)  # Adjust as needed
             
     def optuna_hp_space(self, trial):
         '''
