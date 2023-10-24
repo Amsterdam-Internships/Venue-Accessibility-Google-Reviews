@@ -63,8 +63,6 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
     train_dataset, val_dataset = create_datasets(euans_data)
-    # train_dataset = train_dataset.map(my_pipeline.tokenizer, batched=True)
-    # val_dataset = val_dataset.map(my_pipeline.tokenizer, batched=True)
     my_pipeline.training_args.output_dir = save_path
     print(f"my device {my_pipeline.device}")
     print(f"my model {my_pipeline.model_name}")

@@ -69,7 +69,7 @@ def save_results(eval_metrics, predicted_df):
 
 if __name__ == '__main__':
     # Define the directory path
-    names = params['model_name_or_path'].split("/")[-1] if "/" in params['model_name_or_path'] else [params['model_name_or_path']]
+    names = params['model_name_or_path'].split("/")[-1] if "/" in params['model_name_or_path'] else params['model_name_or_path']
     # Get the file paths from environment variables
     test_data_path = os.getenv('LOCAL_ENV') + 'data/interim/data_for_sentiment_prediction.csv'
     loaded_model_path = os.getenv('LOCAL_ENV') + f'/models/sentiment_classification/transformer_models/{names}'

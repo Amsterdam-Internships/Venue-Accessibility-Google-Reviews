@@ -58,10 +58,11 @@ def train_bert_models():
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
     train_dataset, val_dataset = create_datasets(euans_data)
-
+    save_path = saved_model_path + f'/{names}'
+    my_pipeline.training_args.output_dir = save_path
     # train the model
     my_pipeline.trainer = MultiClassTrainer(
-        model=None,
+        model=my_pipeline.model,
         args = my_pipeline.training_args,
         train_dataset = train_dataset,
         eval_dataset = val_dataset,
@@ -80,10 +81,15 @@ def train_bert_models():
     best_parameters = best_trial.hyperparameters
     
     new_training_args = my_pipeline.training_args(
-        output_dir=f'./results/sentiment_classification/{names}',
+        output_dir=save_path,
+        logging_dir=logs_path,
+        logging_strategy='epoch',
+        logging_steps=10,
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
-        num_of_train_epochs=best_parameters['num_of_train_epochs']
+        per_device_eval_batch_size=best_parameters['per_device_train_batch_size'],
+        num_train_epochs=best_parameters['num_train_epochs'],
+        gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
     )
     my_pipeline.trainer = MultiClassTrainer(
         model = my_pipeline.model,
@@ -92,16 +98,20 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
     )
+    device = my_pipeline.trainer.args.device
     my_pipeline.trainer.train()
+    print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     save_path = saved_model_path+f"{names}"
     my_pipeline.trainer.save_model(save_path)
+    my_pipeline.tokenizer.save_pretrained(save_path)
 
 if __name__ == '__main__':
     # Get the file paths from environment variables
     names = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
-    saved_model_path = os.getenv('LOCAL_ENV') + '/models/sentiment_analysis'
+    saved_model_path = os.getenv('LOCAL_ENV') + 'models/sentiment_classification/transformer_models'
+    logs_path = os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/'
     if params['bert_params']['model_name_or_path'] == 'default':
         train_classic_models()
     else:
