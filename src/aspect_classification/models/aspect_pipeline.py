@@ -2,36 +2,31 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import f1_score, precision_score, recall_score
 import torch
 from transformers import Trainer
 from torch import nn
-from torch.utils.data import DataLoader
-from datasets import load_metric
-import evaluate
-import optuna
 import yaml
 import os
 
 
-config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
+config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 
-class SentimentClassificationPipeline:
+class AspectClassificationPipeline:
     def __init__(self, pipeline_type='default', model_type=None):
         with open(config_path, 'r') as f:
             params = yaml.load(f, Loader=yaml.FullLoader)
         self.bert_params = params['bert_params']
-        self.sk_params = params['sk_params']
         if pipeline_type == 'transformer':
             self.model_name = self.bert_params['model_name_or_path']
             self.model_args = {'model_name_or_path': self.model_name}
             self.model = AutoModelForSequenceClassification.from_pretrained(
                 self.model_args['model_name_or_path'],
                 num_labels=self.bert_params['num_of_labels'],
-                problem_type="single_label_classification")
+                problem_type="multi_label_classification")
             self.training_args = TrainingArguments(
-                output_dir='./results/sentiment_classification',
+                output_dir='./results',
                 learning_rate=self.bert_params['learning_rate'],
                 per_device_eval_batch_size=self.bert_params['batch_size'],
                 num_train_epochs=self.bert_params['epochs'],
@@ -39,10 +34,18 @@ class SentimentClassificationPipeline:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.tokenizer = AutoTokenizer.from_pretrained(
                 self.model_args['model_name_or_path'],
+                use_fast=True,
                 max_length=512,
-                problem_type="singe_label_classification")
+                problem_type="multi_label_classification",
+                truncation=True)
             self.trainer = None
-            self.label_binarizer = LabelBinarizer()
+            self.label_binarizer = MultiLabelBinarizer()
+            self.label_mapping = {0: 'Access', 1: 'Overview', 2: 'Staff', 3: 'Toilets', 4: 'Transport & Parking'}
+            self.encoded_pred_lables = []
+            self.decoded_pred_labels = []
+            # Set the max split size and clear GPU cache
+            torch.cuda.set_per_process_memory_fraction(0.8, device=0)  # Adjust as needed
+            torch.cuda.empty_cache()
             
     def optuna_hp_space(self, trial):
         '''
@@ -50,8 +53,9 @@ class SentimentClassificationPipeline:
         '''
         return {
             'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True),
-            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32, 64]),
-            'epochs': trial.suggest_categorical('epochs', [2, 3, 4, 5]),
+            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32]),
+            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
+            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4])
         }
         
     def model_init(self, trial):
@@ -59,21 +63,34 @@ class SentimentClassificationPipeline:
             self.model_args['model_name_or_path'],
             num_labels=self.bert_params['num_of_labels'],
             max_length=512,
-            problem_type="single_label_classification"
+            problem_type="multi_label_classification"
         )
+        
+    def extract_labels(self):
+        for guess in self.encoded_pred_lables:
+            sublist = []
+            for i, value in enumerate(guess):
+               if value == 1:
+                sublist.append(self.label_mapping[i])
+            self.decoded_pred_labels.append(sublist)
+        return self.decoded_pred_labels
+
         
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
-        logits = torch.Tensor(eval_pred.predictions)
-        preds = torch.argmax(logits, dim=1)
-        f1 = f1_score(labels, preds, average='weighted')
-        precision = precision_score(labels, preds, average='weighted')
-        recall = recall_score(labels, preds, average='weighted')
+        #correct threshold to use when using the sigmoid activation function
+        logits = eval_pred.predictions
+        preds = torch.sigmoid(torch.Tensor(logits))
+        threshold = 0.5
+        pred_labels = (preds > threshold).float()
+        self.encoded_pred_lables = pred_labels
+        f1 = f1_score(labels, pred_labels, average='samples')
+        precision = precision_score(labels, pred_labels, average='samples')
+        recall = recall_score(labels, pred_labels, average='samples')
         return {"f1 score": f1,
                 "precision": precision,
                 "recall": recall}
-
-                
+                        
 class EuansDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
         self.encodings = encodings
@@ -86,16 +103,19 @@ class EuansDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.labels)
-                
-
-  
-class MultiClassTrainer(Trainer):
+    
+                  
+class MultiLabelClassTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.all_predictions = []
         
     def compute_loss(self, model, inputs, return_outputs=False):
         labels = inputs.get("labels")
         outputs = model(**inputs)
-        logits = outputs.get("logits")
-        loss = nn.CrossEntropyLoss()(logits, labels)
+        logits = outputs.logits
+        loss = nn.BCEWithLogitsLoss()(logits, labels.float())
         return (loss, outputs) if return_outputs else loss
+    
+       
+

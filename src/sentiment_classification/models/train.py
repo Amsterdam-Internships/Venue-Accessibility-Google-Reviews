@@ -1,4 +1,4 @@
-from new_pipelines import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
+from src.sentiment_classification.models.sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
 import os
 from dotenv import load_dotenv
@@ -57,7 +57,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:2000])
+    train_dataset, val_dataset = create_datasets(euans_data)
 
     # train the model
     my_pipeline.trainer = MultiClassTrainer(

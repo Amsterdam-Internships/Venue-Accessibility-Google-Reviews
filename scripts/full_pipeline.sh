@@ -63,23 +63,23 @@ echo "Creating graphs of aspect evaluation metrics..."
 python "${LOCAL_ENV}/src/aspect_classification/models/visualisations.py"
 
 
-# # train sentiment classifiers
+# train sentiment classifiers
 
-# echo "Training sentiment classifiers..."
+echo "Training sentiment classifiers..."
 
-# python "${LOCAL_ENV}/src/sentiment_classification/models/train.py"
-
-
-# # Sentiment evaluation step
-
-# echo "Making sentiment label predictions on unseen data..."
-
-# python "${LOCAL_ENV}/src/sentiment_classification/models/evaluate.py"
+python "${LOCAL_ENV}/src/sentiment_classification/models/train.py"
 
 
-# echo "Creating graphs of sentiment evaluation metrics..."
+# Sentiment evaluation step
 
-# python "${LOCAL_ENV}/src/sentiment_classification/models/visualisations.py"
+echo "Making sentiment label predictions on unseen data..."
+
+python "${LOCAL_ENV}/src/sentiment_classification/models/evaluate.py"
+
+
+echo "Creating graphs of sentiment evaluation metrics..."
+
+python "${LOCAL_ENV}/src/sentiment_classification/models/visualisations.py"
 
 # # Grouping reviews
 

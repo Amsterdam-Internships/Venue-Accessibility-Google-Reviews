@@ -8,7 +8,7 @@ import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
 from transformers import TrainingArguments, AutoModelForSequenceClassification
-from newpipelines import AspectClassificationPipeline, MultiLabelClassTrainer
+from aspect_pipeline import AspectClassificationPipeline, MultiLabelClassTrainer
 import pandas as pd
 import yaml
 

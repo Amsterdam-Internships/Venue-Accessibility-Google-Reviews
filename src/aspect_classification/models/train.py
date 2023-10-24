@@ -2,7 +2,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
 from transformers import TrainingArguments
-from newpipelines import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer
+from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer
 # Load environment variables from .env file
 load_dotenv(override=True)
 import pandas as pd

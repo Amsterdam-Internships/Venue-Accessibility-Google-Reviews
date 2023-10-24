@@ -2,32 +2,32 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import f1_score, precision_score, recall_score
 import torch
 from transformers import Trainer
 from torch import nn
+import optuna
 import yaml
 import os
 
 
-config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
+config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
 
-class AspectClassificationPipeline:
+class SentimentClassificationPipeline:
     def __init__(self, pipeline_type='default', model_type=None):
         with open(config_path, 'r') as f:
             params = yaml.load(f, Loader=yaml.FullLoader)
         self.bert_params = params['bert_params']
-        self.sk_params = params['sk_params']
         if pipeline_type == 'transformer':
             self.model_name = self.bert_params['model_name_or_path']
             self.model_args = {'model_name_or_path': self.model_name}
             self.model = AutoModelForSequenceClassification.from_pretrained(
                 self.model_args['model_name_or_path'],
                 num_labels=self.bert_params['num_of_labels'],
-                problem_type="multi_label_classification")
+                problem_type="single_label_classification")
             self.training_args = TrainingArguments(
-                output_dir='./results',
+                output_dir='./results/sentiment_classification',
                 learning_rate=self.bert_params['learning_rate'],
                 per_device_eval_batch_size=self.bert_params['batch_size'],
                 num_train_epochs=self.bert_params['epochs'],
@@ -35,18 +35,10 @@ class AspectClassificationPipeline:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.tokenizer = AutoTokenizer.from_pretrained(
                 self.model_args['model_name_or_path'],
-                use_fast=True,
                 max_length=512,
-                problem_type="multi_label_classification",
-                truncation=True)
+                problem_type="singe_label_classification")
             self.trainer = None
-            self.label_binarizer = MultiLabelBinarizer()
-            self.label_mapping = {0: 'Access', 1: 'Overview', 2: 'Staff', 3: 'Toilets', 4: 'Transport & Parking'}
-            self.encoded_pred_lables = []
-            self.decoded_pred_labels = []
-            # Set the max split size and clear GPU cache
-            torch.cuda.set_per_process_memory_fraction(0.5, device=0)  # Adjust as needed
-            torch.cuda.empty_cache()
+            self.label_binarizer = LabelBinarizer()
             
     def optuna_hp_space(self, trial):
         '''
@@ -64,34 +56,21 @@ class AspectClassificationPipeline:
             self.model_args['model_name_or_path'],
             num_labels=self.bert_params['num_of_labels'],
             max_length=512,
-            problem_type="multi_label_classification"
+            problem_type="single_label_classification"
         )
-        
-    def extract_labels(self):
-        for guess in self.encoded_pred_lables:
-            sublist = []
-            for i, value in enumerate(guess):
-               if value == 1:
-                sublist.append(self.label_mapping[i])
-            self.decoded_pred_labels.append(sublist)
-        return self.decoded_pred_labels
-
         
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
-        #correct threshold to use when using the sigmoid activation function
-        logits = eval_pred.predictions
-        preds = torch.sigmoid(torch.Tensor(logits))
-        threshold = 0.5
-        pred_labels = (preds > threshold).float()
-        self.encoded_pred_lables = pred_labels
-        f1 = f1_score(labels, pred_labels, average='samples')
-        precision = precision_score(labels, pred_labels, average='samples')
-        recall = recall_score(labels, pred_labels, average='samples')
+        logits = torch.Tensor(eval_pred.predictions)
+        preds = torch.argmax(logits, dim=1)
+        f1 = f1_score(labels, preds, average='weighted')
+        precision = precision_score(labels, preds, average='weighted')
+        recall = recall_score(labels, preds, average='weighted')
         return {"f1 score": f1,
                 "precision": precision,
                 "recall": recall}
-                        
+
+                
 class EuansDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
         self.encodings = encodings
@@ -104,21 +83,16 @@ class EuansDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.labels)
-    
-                  
-class MultiLabelClassTrainer(Trainer):
+                
+
+  
+class MultiClassTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.all_predictions = []
         
     def compute_loss(self, model, inputs, return_outputs=False):
         labels = inputs.get("labels")
         outputs = model(**inputs)
-        logits = outputs.logits
-        loss = nn.BCEWithLogitsLoss()(logits, labels.float())
+        logits = outputs.get("logits")
+        loss = nn.CrossEntropyLoss()(logits, labels)
         return (loss, outputs) if return_outputs else loss
-    
-    # def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys):
-    #     outputs = super().prediction_step(model, inputs, prediction_loss_only, ignore_keys)
-       
-
