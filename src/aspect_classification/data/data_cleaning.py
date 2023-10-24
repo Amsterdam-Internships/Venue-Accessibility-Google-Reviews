@@ -10,7 +10,7 @@ load_dotenv(override=True)
 import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
-from aspect_classification.models.newpipelines import AspectClassificationPipeline 
+from aspect_classification.models.aspect_pipeline import AspectClassificationPipeline 
 from gensim.utils import simple_preprocess
 from gensim.parsing.preprocessing import STOPWORDS
 from nltk.stem import WordNetLemmatizer, SnowballStemmer

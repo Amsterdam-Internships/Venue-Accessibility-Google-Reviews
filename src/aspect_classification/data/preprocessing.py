@@ -12,7 +12,7 @@ import ast
 import numpy as np
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 import numpy as np
-from aspect_classification.models.newpipelines import EuansDataset, AspectClassificationPipeline
+from aspect_classification.models.aspect_pipeline import EuansDataset, AspectClassificationPipeline
 from nltk.stem import WordNetLemmatizer
 from fuzzywuzzy import fuzz
 from nltk.stem.porter import *
