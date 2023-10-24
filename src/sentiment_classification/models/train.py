@@ -100,6 +100,7 @@ def train_bert_models():
     )
     device = my_pipeline.trainer.args.device
     my_pipeline.trainer.train()
+    torch.cuda.empty_cache()
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     save_path = saved_model_path+f"{names}"

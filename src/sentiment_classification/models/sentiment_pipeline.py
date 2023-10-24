@@ -39,6 +39,8 @@ class SentimentClassificationPipeline:
                 problem_type="singe_label_classification")
             self.trainer = None
             self.label_binarizer = LabelBinarizer()
+            # Set the max split size and clear GPU cache
+            torch.cuda.set_per_process_memory_fraction(0.5, device=0)  # Adjust as needed
             
     def optuna_hp_space(self, trial):
         '''

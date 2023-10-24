@@ -107,6 +107,7 @@ def train_bert_models():
     )
     
     my_pipeline.trainer.train()
+    torch.cuda.empty_cache()
     device = my_pipeline.trainer.args.device  # Getting the device
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')

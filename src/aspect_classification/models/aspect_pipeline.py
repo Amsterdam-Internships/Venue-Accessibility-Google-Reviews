@@ -44,8 +44,7 @@ class AspectClassificationPipeline:
             self.encoded_pred_lables = []
             self.decoded_pred_labels = []
             # Set the max split size and clear GPU cache
-            torch.cuda.set_per_process_memory_fraction(0.8, device=0)  # Adjust as needed
-            torch.cuda.empty_cache()
+            torch.cuda.set_per_process_memory_fraction(0.5, device=0)  # Adjust as needed
             
     def optuna_hp_space(self, trial):
         '''
