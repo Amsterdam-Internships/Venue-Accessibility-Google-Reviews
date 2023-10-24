@@ -76,7 +76,6 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
-        device=my_pipeline.device,
     )
     # optimising hyperparameters
     best_trial = my_pipeline.trainer.hyperparameter_search(
