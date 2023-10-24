@@ -53,6 +53,7 @@ class AspectClassificationPipeline:
             'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
+            'gradient_accumulation_steps': trial.suggest('gradient_accumulation_steps', [1, 2, 3, 4])
         }
         
     def model_init(self, trial):
