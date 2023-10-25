@@ -8,6 +8,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=16G  # Increase memory allocation as needed
 #SBATCH --constraint=TitanX
+
+
 # Load any necessary modules
 module load cuda11.1/toolkit/11.1.1
 module load cuDNN/cuda11.1/8.0.5
