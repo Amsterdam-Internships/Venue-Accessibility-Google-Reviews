@@ -5,6 +5,7 @@ from transformers import TrainingArguments
 from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer
 # Load environment variables from .env file
 load_dotenv(override=True)
+import gc
 import pandas as pd
 import numpy as np
 import joblib
@@ -111,6 +112,7 @@ def train_bert_models():
     
     my_pipeline.trainer.train()
     torch.cuda.empty_cache()
+    gc.collect()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
