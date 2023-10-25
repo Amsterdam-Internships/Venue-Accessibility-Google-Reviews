@@ -4,11 +4,10 @@
 #SBATCH --time=03:15:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --partition=proq
+#SBATCH --partition=defq
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=4  # Adjust the number of CPU cores as needed
 #SBATCH --mem=16G  # Increase memory allocation as needed
-
+#SBATCH --constraint=TitanX
 # Load any necessary modules
 module load cuda11.1/toolkit/11.1.1
 module load cuDNN/cuda11.1/8.0.5
