@@ -14,7 +14,7 @@ import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
-torch.cuda.set_per_process_memory_fraction(0.01, device=0)  # Adjust as needed
+# torch.cuda.set_per_process_memory_fraction(0.01, device=0)  # Adjust as needed
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 
 with open(config_path, 'r') as f:
@@ -42,6 +42,7 @@ def split_data(euans_data):
     euans_labels = euans_labels.astype(np.float32)
     euans_reviews = euans_data.Text.values.tolist()
     return train_test_split(euans_reviews, euans_labels, test_size=.2)
+
 
 def train_classic_models():
     grid_search = GridSearchCV(
@@ -110,6 +111,7 @@ def train_bert_models():
     
     my_pipeline.trainer.train()
     torch.cuda.empty_cache()
+    check_memory()
     device = my_pipeline.trainer.args.device  # Getting the device
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
