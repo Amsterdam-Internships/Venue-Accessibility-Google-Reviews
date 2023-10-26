@@ -101,7 +101,7 @@ def train_bert_models():
         per_device_train_batch_size=2,
         per_device_eval_batch_size=2,
         num_train_epochs=best_parameters['num_train_epochs'],
-        gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
+        gradient_accumulation_steps=1
     )
     my_pipeline.trainer = MultiLabelClassTrainer(
         model = my_pipeline.model,
