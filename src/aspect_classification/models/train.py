@@ -96,7 +96,6 @@ def train_bert_models():
         logging_strategy='epoch',
         logging_steps=10, 
         learning_rate=best_parameters['learning_rate'],
-        auto_find_batch_size=True,
         gradient_checkpointing=True,
         fp16=True,
         per_device_train_batch_size=2,
