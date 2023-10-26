@@ -64,7 +64,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:200])
+    train_dataset, val_dataset = create_datasets(euans_data)
     my_pipeline.training_args.output_dir = save_path
     print(f"my device {my_pipeline.device}")
     print(f"my model {my_pipeline.model_name}")
@@ -96,6 +96,7 @@ def train_bert_models():
         logging_strategy='epoch',
         logging_steps=10, 
         learning_rate=best_parameters['learning_rate'],
+        auto_find_batch_size=True,
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
@@ -110,7 +111,7 @@ def train_bert_models():
     )
     
     my_pipeline.trainer.train()
-    torch.cuda.empty_cache()
+    # torch.cuda.empty_cache()
     gc.collect()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
