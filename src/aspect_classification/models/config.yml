@@ -2,7 +2,7 @@ bert_params:
   model_name_or_path: bert-base-uncased
   num_of_labels: 5
   learning_rate: 0.001
-  batch_size: 16
+  batch_size: 1
   epochs: 2
   gradient_accumulation_steps: 4
 sk_params:
