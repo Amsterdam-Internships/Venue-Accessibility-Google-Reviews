@@ -96,12 +96,13 @@ def train_bert_models():
         logging_strategy='epoch',
         logging_steps=10, 
         learning_rate=best_parameters['learning_rate'],
+        auto_find_batch_size=True,
         gradient_checkpointing=True,
         fp16=True,
-        per_device_train_batch_size=2,
-        per_device_eval_batch_size=2,
+        per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
+        per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
-        gradient_accumulation_steps=1
+        gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
     )
     my_pipeline.trainer = MultiLabelClassTrainer(
         model = my_pipeline.model,
