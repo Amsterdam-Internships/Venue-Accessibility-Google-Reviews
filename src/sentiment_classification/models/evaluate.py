@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from transformers import TrainingArguments, pipeline
-from src.sentiment_classification.models.sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer
+from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer
 from sentiment_classification.data.preprocessing import Preprocessor
 import pandas as pd
 import yaml
