@@ -115,7 +115,7 @@ if __name__ == '__main__':
     loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + 'models/sentiment_classification/transformer_models'
     logs_path = os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/'
-    if params['bert_params']['model_name_or_path'] == 'default':
+    if params['bert_params'] == 'default':
         train_classic_models()
     else:
         train_bert_models()
