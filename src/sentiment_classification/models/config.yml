@@ -13,6 +13,6 @@ bert_params:
   learning_rate: 0.001
   batch_size: 16
   epochs: 2
-  gradient_accumulation_steps: 4
+  gradient_accumulation_steps: 16
 
 
