@@ -20,7 +20,7 @@ with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
     params = params['bert_params']
      
-my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', bert_model=params['model_name_or_path'])
+my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
 
 
 def generate_results(test_data):
