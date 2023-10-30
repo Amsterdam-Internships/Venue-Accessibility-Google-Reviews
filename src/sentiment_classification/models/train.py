@@ -71,7 +71,7 @@ def train_bert_models():
     )
     
     best_parameters = best_trial.hyperparameters
-    per_device_train_bs = best_parameters['per_device_train_batch_size'] // best_parameters['gradient_accumulation_steps']
+    
     
     new_training_args = my_pipeline.training_args(
         output_dir=save_path,
@@ -79,8 +79,8 @@ def train_bert_models():
         logging_strategy='epoch',
         logging_steps=10,
         learning_rate=best_parameters['learning_rate'],
-        per_device_train_batch_size=per_device_train_bs,
-        per_device_eval_batch_size=per_device_train_bs,
+        per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
+        per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
     )
