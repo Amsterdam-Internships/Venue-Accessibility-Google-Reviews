@@ -38,7 +38,7 @@ def create_datasets(euans_data):
 
 def split_data(euans_data):
     euans_data = euans_data.rename(columns={"Sentiment": "labels"})
-    euans_labels = euans_data.labels.values.tolist()
+    euans_labels = [[label] for label in euans_data.labels.values.tolist()]
     euans_labels = my_pipeline.label_binarizer.fit_transform(euans_labels)
     euans_labels = euans_labels.astype(np.float32)
     euans_reviews = euans_data.Text.values.tolist()
