@@ -9,7 +9,7 @@ sk_params:
     lr__C: [0.1, 1.0, 10.0]
 bert_params:
   model_name_or_path: huawei-noah/TinyBERT_General_4L_312D
-  num_of_labels: 5
+  num_of_labels: 2
   learning_rate: 0.001
   batch_size: 16
   epochs: 2
