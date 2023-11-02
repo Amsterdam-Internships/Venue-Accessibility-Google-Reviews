@@ -75,7 +75,7 @@ class SentimentClassificationPipeline:
         labels = eval_pred.label_ids
         logits = torch.Tensor(eval_pred.predictions)
         preds = torch.argmax(logits, dim=1)
-        accuracy = accuracy_score(labels, preds, average='weighted')
+        accuracy = accuracy_score(labels, preds)
         f1 = f1_score(labels, preds, average='weighted')
         precision = precision_score(labels, preds, average='weighted')
         recall = recall_score(labels, preds, average='weighted')
