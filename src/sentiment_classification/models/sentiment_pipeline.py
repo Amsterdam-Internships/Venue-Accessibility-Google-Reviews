@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.preprocessing import LabelBinarizer
-from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 import torch
 import numpy as np
 from transformers import Trainer
@@ -75,12 +75,14 @@ class SentimentClassificationPipeline:
         labels = eval_pred.label_ids
         logits = torch.Tensor(eval_pred.predictions)
         preds = torch.argmax(logits, dim=1)
+        accuracy = accuracy_score(labels, preds, average='weighted')
         f1 = f1_score(labels, preds, average='weighted')
         precision = precision_score(labels, preds, average='weighted')
         recall = recall_score(labels, preds, average='weighted')
         return {"f1 score": f1,
                 "precision": precision,
-                "recall": recall}
+                "recall": recall,
+                "accuracy": accuracy}
 
                 
 class EuansDataset(torch.utils.data.Dataset):
