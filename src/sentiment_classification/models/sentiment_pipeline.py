@@ -5,6 +5,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trai
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import f1_score, precision_score, recall_score
 import torch
+import numpy as np
 from transformers import Trainer
 from torch import nn
 import optuna
@@ -38,7 +39,9 @@ class SentimentClassificationPipeline:
                 max_length=512,
                 problem_type="singe_label_classification")
             self.trainer = None
-            self.label_binarizer = LabelBinarizer()
+            self.label_mapping = {'negative': 0, 'neutral': 1, 'positive': 2}
+            self.encoded_sent_labels = []
+            self.decoded_sent_labels = []
             
     def optuna_hp_space(self, trial):
         '''
@@ -46,9 +49,9 @@ class SentimentClassificationPipeline:
         '''
         return {
             'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True),
-            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [2, 2, 2, 2]),
+            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16, 32]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
-            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4])
+            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
         }
         
     def model_init(self, trial):
@@ -58,6 +61,14 @@ class SentimentClassificationPipeline:
             max_length=512,
             problem_type="single_label_classification"
         )
+        
+    def encode_labels(self, labels):
+        self.encoded_sent_labels = [self.label_mapping[label] for label in labels]
+        return np.array(self.encoded_sent_labels, dtype=np.int64)
+    
+    def decode_labels(self, encoded_labels):
+        self.decoded_sent_labels = [list(self.label_mapping.keys())[list(self.label_mapping.values()).index(encoded_label in encoded_labels)]]
+        return self.decoded_sent_labels
         
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
@@ -90,9 +101,12 @@ class MultiClassTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-    def compute_loss(self, model, inputs, return_outputs=False):
+    def compute_loss(self, model, inputs, return_outputs=False):        
         labels = inputs.get("labels")
+        labels = labels.to(torch.long)
+        print(labels.shape)
         outputs = model(**inputs)
         logits = outputs.get("logits")
+        print("Logits shape:", logits.shape)
         loss = nn.CrossEntropyLoss()(logits, labels)
         return (loss, outputs) if return_outputs else loss

@@ -38,17 +38,15 @@ def create_datasets(euans_data):
 def split_data(euans_data):
     euans_data = euans_data.rename(columns={"Sentiment": "labels"})
     euans_labels = euans_data.labels.values.tolist()
-    euans_labels = my_pipeline.label_binarizer.fit_transform(euans_labels)
-    euans_labels = euans_labels.astype(np.float32)
+    euans_labels = my_pipeline.encode_labels(euans_labels)
     euans_reviews = euans_data.Text.values.tolist()
-    return train_test_split(euans_reviews, euans_labels, test_size=.2)
+    return train_test_split(euans_reviews, euans_labels, test_size=.2, stratify=euans_labels)
 
 def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
     train_dataset, val_dataset = create_datasets(euans_data)
-    print(len(train_dataset), len(val_dataset))
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     # train the model

@@ -30,13 +30,13 @@ class Preprocessor(object):
 
     def relabel(self, df, columns):
         """
-        This function should take the Aspect column and relabel the aspects to the Euan's Guide format.
+        This function should take the Sentiment column and relabel the Sentiment to the needed Guide format.
 
         Args:
             df (pandas.DataFrame): The DataFrame containing the gold labels column.
 
         Returns:
-            pandas.DataFrame: The DataFrame with relabeled euans guide formatted labels.
+            pandas.DataFrame: The DataFrame with re-formatted labels.
         """
         gold_labels = df[columns[0]].values.tolist()
         for i, label in enumerate(gold_labels):
@@ -51,8 +51,8 @@ class Preprocessor(object):
                         gold_labels[i] = euans_label
         df[columns[1]] = gold_labels
     
-    def remove_rows(self, df):
-        df = df[df['Sentiment'] != 'Mixed']
+    def remove_rows(self, df, column):
+        df = df[df[column] != 'neutral']
         return df
     def remove_stopwords(self):
         pass

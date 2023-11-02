@@ -65,6 +65,12 @@ source ./.env
 # python "${LOCAL_ENV}/src/aspect_classification/models/visualisations.py"
 
 
+# Preparing sentiment label format
+
+# echo "Preparing sentiment label format..."
+
+# python "${LOCAL_ENV}/src/sentiment_classification/data/make_dataset.py"
+
 # train sentiment classifiers
 
 echo "Training sentiment classifiers..."
