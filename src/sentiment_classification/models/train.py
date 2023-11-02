@@ -101,7 +101,7 @@ if __name__ == '__main__':
     # Get the file paths from environment variables
     names = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
-    saved_model_path = os.getenv('LOCAL_ENV') + 'models/sentiment_classification/transformer_models'
+    saved_model_path = os.getenv('LOCAL_ENV') + '/models/sentiment_classification'
     logs_path = os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/'
     if params == 'default':
         train_classic_models()

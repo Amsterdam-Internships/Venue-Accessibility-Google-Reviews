@@ -66,7 +66,8 @@ class SentimentClassificationPipeline:
         self.encoded_sent_labels = [self.label_mapping[label] for label in labels]
         return np.array(self.encoded_sent_labels, dtype=np.int64)
     
-    def decode_labels(self, encoded_labels):
+    def decode_labels(self, class_probabilities):
+        encoded_labels = class_probabilities.argmax(dim=1)
         self.decoded_sent_labels = [list(self.label_mapping.keys())[list(self.label_mapping.values()).index(encoded_label in encoded_labels)]]
         return self.decoded_sent_labels
         
@@ -104,9 +105,7 @@ class MultiClassTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):        
         labels = inputs.get("labels")
         labels = labels.to(torch.long)
-        print(labels.shape)
         outputs = model(**inputs)
         logits = outputs.get("logits")
-        print("Logits shape:", logits.shape)
         loss = nn.CrossEntropyLoss()(logits, labels)
         return (loss, outputs) if return_outputs else loss

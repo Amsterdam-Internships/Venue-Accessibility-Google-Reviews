@@ -44,16 +44,15 @@ def generate_results(test_data):
     
     # Perform evaluation
     evaluation_result = trainer.evaluate(eval_dataset=eval_dataset)
-    predicted_labels = trainer.predict(eval_dataset=eval_dataset)
     # Assuming annotated_data is your DataFrame
-    eval_dataset['Predicted Sentiment Labels'] = pd.Series(predicted_labels)
-    save_results(evaluation_result, eval_dataset)
+    test_data['Predicted Sentiment Labels'] = my_pipeline.decode_labels(evaluation_result['predictions'])
+    save_results(evaluation_result, test_data)
 
 
 def save_results(eval_metrics, predicted_df):
     # Save the predicted labels as a CSV file
     predicted_labels_path = interim_path + "/predicted_sentiment_labels.csv"
-    predicted_df.to_csv(predicted_labels_path, index=False)
+    predicted_df.to_csv(predicted_labels_path)
     
     # Create a DataFrame from the eval_metrics dictionary
     eval_metrics_df = pd.DataFrame.from_dict(eval_metrics, orient='index').transpose()
@@ -63,7 +62,7 @@ def save_results(eval_metrics, predicted_df):
     eval_metrics_df.to_csv(results_path_csv, index=False)
     
     # Save the classification report as a text file
-    report_path = results_path + "senitment_classification_report.tex"
+    report_path = results_path + "_senitment_classification_report.tex"
     eval_metrics_df.to_latex(report_path, index=False)
 
 
@@ -72,7 +71,7 @@ if __name__ == '__main__':
     names = params['model_name_or_path'].split("/")[-1] if "/" in params['model_name_or_path'] else params['model_name_or_path']
     # Get the file paths from environment variables
     test_data_path = os.getenv('LOCAL_ENV') + 'data/interim/data_for_sentiment_prediction.csv'
-    loaded_model_path = os.getenv('LOCAL_ENV') + f'/models/sentiment_classification/transformer_models/{names}'
+    loaded_model_path = os.getenv('LOCAL_ENV') + f'/models/sentiment_classification/{names}'
     results_path = os.getenv('LOCAL_ENV') + f"/results/sentiment_classification/{names}"
     interim_path = os.getenv('LOCAL_ENV') + '/data/interim'
 
