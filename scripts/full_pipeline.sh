@@ -4,10 +4,10 @@
 #SBATCH --time=03:15:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --partition=defq
+#SBATCH --partition=proq
 #SBATCH --gres=gpu:1
 #SBATCH --mem=16G  # Increase memory allocation as needed
-#SBATCH --constraint=TitanX
+#SBATCH --constraint=RTX2080Ti
 
 
 # Load any necessary modules
