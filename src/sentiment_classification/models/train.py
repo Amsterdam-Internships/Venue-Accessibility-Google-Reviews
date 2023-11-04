@@ -70,7 +70,7 @@ def train_bert_models():
     best_parameters = best_trial.hyperparameters
     
     
-    new_training_args = my_pipeline.training_args(
+    new_training_args = TrainingArguments(
         output_dir=save_path,
         logging_dir=logs_path,
         logging_strategy='epoch',
