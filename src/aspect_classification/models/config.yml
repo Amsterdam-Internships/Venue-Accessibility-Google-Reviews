@@ -1,5 +1,5 @@
 bert_params:
-  model_name_or_path: bert-base-uncased
+  model_name_or_path: huawei-noah/TinyBERT_General_4L_312D
   num_of_labels: 5
   learning_rate: 0.001
   batch_size: 1
