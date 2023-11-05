@@ -20,7 +20,7 @@ with open(config_path, 'r') as f:
     params = params['bert_params']
         
 my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
-torch.cuda.set_per_process_memory_fraction(0.2, device="cuda")  # Adjust as needed
+torch.cuda.set_per_process_memory_fraction(0.2, device=0)  # Adjust as needed
 custom_trainer = MultiClassTrainer(model=my_pipeline.model)
 
 def encode_datasets(train_text, val_text):
