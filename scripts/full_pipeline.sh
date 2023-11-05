@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=proq
 #SBATCH --gres=gpu:1
-#SBATCH --mem=16G  # Increase memory allocation as needed
+#SBATCH --mem=64G  # Increase memory allocation as needed
 #SBATCH --constraint=RTX2080Ti
 
 
