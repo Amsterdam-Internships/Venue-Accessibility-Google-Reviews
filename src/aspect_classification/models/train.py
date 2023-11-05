@@ -15,7 +15,6 @@ import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
-torch.cuda.set_per_process_memory_fraction(0.5, device=)  # Adjust as needed
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 
 with open(config_path, 'r') as f:
@@ -24,7 +23,6 @@ my_pipeline = AspectClassificationPipeline(pipeline_type='transformer', model_ty
 processor = Preprocessor()
 custom_trainer = MultiLabelClassTrainer(model=my_pipeline.model)
 torch.cuda.set_per_process_memory_fraction(0.5, device=my_pipeline.device)  # Adjust as needed
-
 
 def encode_datasets(train_text, val_text):
     new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512, return_tensors='pt')

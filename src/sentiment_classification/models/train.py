@@ -1,5 +1,4 @@
 import torch
-torch.cuda.set_per_process_memory_fraction(0.5, device=cuda)  # Adjust as needed
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
 from transformers import TrainingArguments
@@ -21,7 +20,7 @@ with open(config_path, 'r') as f:
     params = params['bert_params']
         
 my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
-
+torch.cuda.set_per_process_memory_fraction(0.5, device=my_pipeline.device)  # Adjust as needed
 custom_trainer = MultiClassTrainer(model=my_pipeline.model)
 
 def encode_datasets(train_text, val_text):
