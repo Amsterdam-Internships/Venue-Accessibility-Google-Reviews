@@ -28,6 +28,7 @@ processor = Preprocessor()
 custom_trainer = MultiLabelClassTrainer(model=my_pipeline.model)
 torch.cuda.set_per_process_memory_fraction(0.5)  # Adjust as needed
 torch.backends.cudnn.benchmark = True
+torch.cuda.set_max_workspace_size(256 * 1024 * 1024)  # 256MB (adjust as needed)
 
 def encode_datasets(train_text, val_text):
     new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512, return_tensors='pt')
