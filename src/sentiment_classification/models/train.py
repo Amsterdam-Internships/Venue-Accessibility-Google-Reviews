@@ -1,5 +1,5 @@
 import torch
-torch.cuda.set_per_process_memory_fraction(0.5, device=0)  # Adjust as needed
+torch.cuda.set_per_process_memory_fraction(0.5, device=cuda)  # Adjust as needed
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
 from transformers import TrainingArguments
