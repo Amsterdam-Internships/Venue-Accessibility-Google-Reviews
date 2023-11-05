@@ -13,69 +13,102 @@
 module load cuda11.1/toolkit/11.1.1
 module load cuDNN/cuda11.1/8.0.5
 
-# Set your environment variables
+conda init bash
+
 export LOCAL_ENV=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/
 
-# Print the value of LOCAL_ENV
 echo "LOCAL_ENV is set to: $LOCAL_ENV"
 
-# Activate your desired Python environment
+source ~/.bashrc
+# Activate your desired Python environment, if needed
 conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
 
 # Change to your working directory
 cd /var/scratch/mbn781/Venue-Accessibility-Google-Reviews
 
 # Test that the GPU is working
+
 echo "Is the GPU being used..."
+
 python "${LOCAL_ENV}scripts/gpu_test.py"
 
-# Set some environment variables
+
+# Set some environment stuffs
 export TRAINING_MODE='simple'
+source ./.env
 
 # Create and process datasets
+
 echo "Preparing and cleaning data..."
+
 python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
 
-# Train aspect classifiers
+# train aspect classifiers
+
 python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
 
 # Check if the GPU is actually being used
+
 nvidia-smi
 
 # Evaluation step
+
 echo "Making aspect label predictions on unseen data..."
+
 python "${LOCAL_ENV}/src/aspect_classification/models/evaluate.py"
 
-# Create graphs of aspect evaluation metrics
+# Create graphs of evaluation metrics 
+
 echo "Creating graphs of aspect evaluation metrics..."
+
 python "${LOCAL_ENV}/src/aspect_classification/models/visualisations.py"
 
-# Prepare sentiment label format
+
+# Preparing sentiment label format
+
 # echo "Preparing sentiment label format..."
+
 # python "${LOCAL_ENV}/src/sentiment_classification/data/make_dataset.py"
 
-# Train sentiment classifiers
+# train sentiment classifiers
+
 echo "Training sentiment classifiers..."
+
 python "${LOCAL_ENV}/src/sentiment_classification/models/train.py"
 
+
 # Sentiment evaluation step
+
 echo "Making sentiment label predictions on unseen data..."
+
 python "${LOCAL_ENV}/src/sentiment_classification/models/evaluate.py"
 
+
 echo "Creating graphs of sentiment evaluation metrics..."
+
 python "${LOCAL_ENV}/src/sentiment_classification/models/visualisations.py"
 
-# Grouping reviews
+# # Grouping reviews
+
 # echo "Grouping review sentences by aspect..."
+
 # python "${LOCAL_ENV}/src/opinion_summarisation/data/group_test_reviews.py"
 
-# Opinion summarization training
-# echo "Training the summarization step... "
+# # Opinion summarisation training
+
+
+# echo "Training the summarisation step... "
+
 # python "${LOCAL_ENV}/src/opinion_summarisation/models/train.py"
 
-# Opinion Summarization evaluation
-# echo "Making predictions on the summarization... "
+
+# # Opinion Summarisation evaluation 
+
+# echo "Making predictions on the summarisation... "
+
 # python "${LOCAL_ENV}/src/opinion_summarisation/models/evaluate.py"
 
-# echo "Creating graphs for summarization evaluation... "
+
+# echo "Creating graphs for summarisation evaluation... "
+
 # python "${LOCAL_ENV}/src/opinion_summarisation/models/visulisations.py"
