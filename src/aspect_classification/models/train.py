@@ -17,6 +17,7 @@ sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 
+
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
 my_pipeline = AspectClassificationPipeline(pipeline_type='transformer', model_type=params['bert_params']['model_name_or_path'])
@@ -111,10 +112,9 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics
     )
-    
-    my_pipeline.trainer.train()
     torch.cuda.empty_cache()
     gc.collect()
+    my_pipeline.trainer.train()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
