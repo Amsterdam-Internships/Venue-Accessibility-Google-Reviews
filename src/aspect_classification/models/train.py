@@ -30,8 +30,8 @@ torch.cuda.set_per_process_memory_fraction(0.5)  # Adjust as needed
 torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512, return_tensors='pt')
-    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=512, return_tensors='pt')
+    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=256, return_tensors='pt')
+    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=256, return_tensors='pt')
     return new_train_encodings, new_val_encodings
 
 def create_datasets(euans_data):
