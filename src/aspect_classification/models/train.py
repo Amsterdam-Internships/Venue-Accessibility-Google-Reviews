@@ -6,6 +6,7 @@ from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLab
 # Load environment variables from .env file
 load_dotenv(override=True)
 import gc
+import torch
 torch.cuda.empty_cache()
 gc.collect()
 import pandas as pd
