@@ -2,6 +2,7 @@ import torch
 #torch.cuda.set_per_process_memory_fraction(0.5, device=0)  # Adjust as needed
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
+from transformers import TrainingArguments
 import os
 from dotenv import load_dotenv
 # Load environment variables from .env file
@@ -66,7 +67,7 @@ def train_bert_models():
         hp_space=my_pipeline.optuna_hp_space,
         n_trials=10
     )
-    
+    print(f"Optuna is using the {my_pipeline.trainer.hyperparameter_search().sampler.__class__.__name__} algorithm for optimization.")
     best_parameters = best_trial.hyperparameters
     
     
