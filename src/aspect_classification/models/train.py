@@ -6,6 +6,8 @@ from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLab
 # Load environment variables from .env file
 load_dotenv(override=True)
 import gc
+torch.cuda.empty_cache()
+gc.collect()
 import pandas as pd
 import numpy as np
 import joblib
@@ -115,6 +117,8 @@ def train_bert_models():
     torch.cuda.empty_cache()
     gc.collect()
     my_pipeline.trainer.train()
+    torch.cuda.empty_cache()
+    gc.collect()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
