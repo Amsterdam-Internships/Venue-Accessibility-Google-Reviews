@@ -2,7 +2,6 @@ import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
 from transformers import TrainingArguments
-from scripts.gpu_test import free_gpu_cache
 import os
 from dotenv import load_dotenv
 # Load environment variables from .env file
@@ -64,6 +63,7 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
+        load_best_model_at_end=True,
     )
     # optimising hyperparameters
     best_trial = my_pipeline.trainer.hyperparameter_search(

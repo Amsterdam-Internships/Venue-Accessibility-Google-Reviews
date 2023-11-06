@@ -37,31 +37,31 @@ python "${LOCAL_ENV}scripts/gpu_test.py"
 export TRAINING_MODE='simple'
 source ./.env
 
-# Create and process datasets
+# # Create and process datasets
 
-echo "Preparing and cleaning data..."
+# echo "Preparing and cleaning data..."
 
-python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
+# python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
 
-# train aspect classifiers
+# # train aspect classifiers
 
-python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
+# python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
 
-# Check if the GPU is actually being used
+# # Check if the GPU is actually being used
 
-nvidia-smi
+# nvidia-smi
 
-# Evaluation step
+# # Evaluation step
 
-echo "Making aspect label predictions on unseen data..."
+# echo "Making aspect label predictions on unseen data..."
 
-python "${LOCAL_ENV}/src/aspect_classification/models/evaluate.py"
+# python "${LOCAL_ENV}/src/aspect_classification/models/evaluate.py"
 
-# Create graphs of evaluation metrics 
+# # Create graphs of evaluation metrics 
 
-echo "Creating graphs of aspect evaluation metrics..."
+# echo "Creating graphs of aspect evaluation metrics..."
 
-python "${LOCAL_ENV}/src/aspect_classification/models/visualisations.py"
+# python "${LOCAL_ENV}/src/aspect_classification/models/visualisations.py"
 
 
 # Preparing sentiment label format
