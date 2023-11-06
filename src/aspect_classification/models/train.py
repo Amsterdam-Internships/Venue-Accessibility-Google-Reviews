@@ -2,7 +2,6 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
 from transformers import TrainingArguments
-from scripts.gpu_test import free_gpu_cache
 from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -14,6 +13,9 @@ import yaml
 import torch
 import sys
 import os
+sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
+print(sys.path)
+from gpu_test import free_gpu_cache
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
