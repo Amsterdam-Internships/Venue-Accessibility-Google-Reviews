@@ -80,6 +80,9 @@ def train_bert_models():
         logging_dir=logs_path,
         logging_strategy='epoch',
         logging_steps=10,
+        auto_find_batch_size=True,
+        gradient_checkpointing=True,
+        fp16=True,
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
@@ -95,9 +98,10 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
     )
     device = my_pipeline.trainer.args.device
+    torch.cuda.clear_memory_allocated()
     my_pipeline.trainer.train()
-    gc.collect()
     torch.cuda.empty_cache()
+    gc.collect()
     free_gpu_cache()
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
