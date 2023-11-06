@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
 import sys
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
 from gpu_test import free_gpu_cache
@@ -88,7 +89,6 @@ def train_bert_models():
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
-        load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
         model = my_pipeline.model,
@@ -103,6 +103,7 @@ def train_bert_models():
     torch.cuda.empty_cache()
     gc.collect()
     free_gpu_cache()
+    torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     save_path = saved_model_path+f"{names}"
