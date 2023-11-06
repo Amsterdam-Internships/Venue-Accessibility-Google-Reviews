@@ -26,7 +26,7 @@ with open(config_path, 'r') as f:
         
 my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
 custom_trainer = MultiClassTrainer(model=my_pipeline.model)
-torch.cuda.set_per_process_memory_fraction(0.5)  # Adjust as needed
+torch.cuda.set_per_process_memory_fraction(0.01)  # Adjust as needed
 torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
