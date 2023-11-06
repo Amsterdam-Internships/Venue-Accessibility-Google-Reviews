@@ -63,7 +63,6 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
-        load_best_model_at_end=True,
     )
     # optimising hyperparameters
     best_trial = my_pipeline.trainer.hyperparameter_search(
@@ -86,6 +85,7 @@ def train_bert_models():
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
+        load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
         model = my_pipeline.model,
