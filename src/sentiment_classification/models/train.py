@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
 import sys
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:1024"
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
 from gpu_test import free_gpu_cache
