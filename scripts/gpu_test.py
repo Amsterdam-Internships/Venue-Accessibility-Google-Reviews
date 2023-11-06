@@ -1,12 +1,17 @@
 import torch
-# from pytorch_transformers import *
-import sys,logging
-logging.root.handlers = []
-logging.basicConfig(level="INFO", format = '%(asctime)s:%(levelname)s: %(message)s' ,stream = sys.stdout)
-logger = logging.getLogger(__name__)
-logger.info('hello')
+from GPUtil import showUtilization as gpu_usage
+from numba import cuda
 print(torch.cuda.is_available(), torch.cuda.device_count())
 
+def free_gpu_cache():
+    print("Initial GPU Usage")
+    gpu_usage()                             
 
-def check_memory():
-    logger.info('GPU memory: %.1f' % (torch.cuda.memory_allocated() // 1024 ** 2))
+    torch.cuda.empty_cache()
+
+    cuda.select_device(0)
+    cuda.close()
+    cuda.select_device(0)
+
+    print("GPU Usage after emptying the cache")
+    gpu_usage()

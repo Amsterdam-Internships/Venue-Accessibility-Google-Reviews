@@ -2,6 +2,7 @@ import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
 from transformers import TrainingArguments
+from scripts.gpu_test import free_gpu_cache
 import os
 from dotenv import load_dotenv
 # Load environment variables from .env file
@@ -12,6 +13,7 @@ import numpy as np
 import joblib
 import pandas as pd
 import yaml
+import gc
 
 # Load environment variables from .env file
 config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
@@ -20,12 +22,13 @@ with open(config_path, 'r') as f:
     params = params['bert_params']
         
 my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
-torch.cuda.set_per_process_memory_fraction(0.2, device=0)  # Adjust as needed
 custom_trainer = MultiClassTrainer(model=my_pipeline.model)
+torch.cuda.set_per_process_memory_fraction(0.5)  # Adjust as needed
+torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=256)
-    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=256)
+    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512)
+    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=512)
     return new_train_encodings, new_val_encodings
 
 def create_datasets(euans_data):
@@ -90,7 +93,9 @@ def train_bert_models():
     )
     device = my_pipeline.trainer.args.device
     my_pipeline.trainer.train()
+    gc.collect()
     torch.cuda.empty_cache()
+    free_gpu_cache()
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     save_path = saved_model_path+f"{names}"

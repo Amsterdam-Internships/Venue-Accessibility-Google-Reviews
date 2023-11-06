@@ -2,13 +2,11 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
 from transformers import TrainingArguments
+from scripts.gpu_test import free_gpu_cache
 from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer
 # Load environment variables from .env file
 load_dotenv(override=True)
 import gc
-import torch
-torch.cuda.empty_cache()
-gc.collect()
 import pandas as pd
 import numpy as np
 import joblib
@@ -30,8 +28,8 @@ torch.cuda.set_per_process_memory_fraction(0.5)  # Adjust as needed
 torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=256, return_tensors='pt')
-    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=256, return_tensors='pt')
+    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=512, return_tensors='pt')
+    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=512, return_tensors='pt')
     return new_train_encodings, new_val_encodings
 
 def create_datasets(euans_data):
@@ -120,6 +118,7 @@ def train_bert_models():
     my_pipeline.trainer.train()
     torch.cuda.empty_cache()
     gc.collect()
+    free_gpu_cache()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
