@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # Define the directory path
     names = params['model_name_or_path'].split("/")[-1] if "/" in params['model_name_or_path'] else params['model_name_or_path']
     # Get the file paths from environment variables
-    test_data_path = os.getenv('LOCAL_ENV') + '/data/interim/data_for_sentiment_prediction.csv'
+    test_data_path = os.getenv('LOCAL_ENV') + '/data/interim/predicted_aspect_labels.csv'
     loaded_model_path = os.getenv('LOCAL_ENV') + f'/models/sentiment_classification/{names}'
     results_path = os.getenv('LOCAL_ENV') + f"/results/sentiment_classification/{names}"
     interim_path = os.getenv('LOCAL_ENV') + '/data/interim'
