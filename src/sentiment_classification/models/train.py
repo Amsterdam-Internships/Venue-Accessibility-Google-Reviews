@@ -1,7 +1,8 @@
 import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
-from transformers import TrainingArguments
+from transformers import TrainingArguments, DataCollatorWithPadding
+
 import os
 from dotenv import load_dotenv
 # Load environment variables from .env file
@@ -30,8 +31,8 @@ torch.cuda.set_per_process_memory_fraction(0.8)  # Adjust as needed
 torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding=True, max_length=256)
-    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding=True, max_length=256)
+    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, max_length=512)
+    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, max_length=512)
     return new_train_encodings, new_val_encodings
 
 def create_datasets(euans_data):
@@ -74,6 +75,7 @@ def train_bert_models():
     )
     print(f"Optuna is using the {my_pipeline.trainer.hyperparameter_search().sampler.__class__.__name__} algorithm for optimization.")
     best_parameters = best_trial.hyperparameters
+    data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
     
     
     new_training_args = TrainingArguments(
@@ -89,6 +91,7 @@ def train_bert_models():
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
+        data_collator=data_collator,
     )
     my_pipeline.trainer = MultiClassTrainer(
         model = my_pipeline.model,
