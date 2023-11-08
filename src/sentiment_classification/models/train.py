@@ -73,7 +73,6 @@ def train_bert_models():
         hp_space=my_pipeline.optuna_hp_space,
         n_trials=10
     )
-    print(f"Optuna is using the {my_pipeline.trainer.hyperparameter_search().sampler.__class__.__name__} algorithm for optimization.")
     best_parameters = best_trial.hyperparameters
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
     
@@ -92,6 +91,7 @@ def train_bert_models():
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
         data_collator=data_collator,
+        load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
         model = my_pipeline.model,
