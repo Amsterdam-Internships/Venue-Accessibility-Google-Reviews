@@ -56,6 +56,7 @@ def train_bert_models():
     train_dataset, val_dataset = create_datasets(euans_data)
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
+    data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
     # train the model
     my_pipeline.trainer = MultiClassTrainer(
         model=my_pipeline.model,
@@ -65,6 +66,7 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
+        data_collator=data_collator,
     )
     # optimising hyperparameters
     best_trial = my_pipeline.trainer.hyperparameter_search(
@@ -74,7 +76,6 @@ def train_bert_models():
         n_trials=10
     )
     best_parameters = best_trial.hyperparameters
-    data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
     
     
     new_training_args = TrainingArguments(
@@ -90,7 +91,6 @@ def train_bert_models():
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
-        data_collator=data_collator,
         load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
