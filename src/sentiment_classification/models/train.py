@@ -2,7 +2,6 @@ import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import GridSearchCV, train_test_split
 from transformers import TrainingArguments, DataCollatorWithPadding
-
 import os
 from dotenv import load_dotenv
 # Load environment variables from .env file
@@ -31,8 +30,8 @@ torch.cuda.set_per_process_memory_fraction(0.8)  # Adjust as needed
 torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, max_length=512)
-    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, max_length=512)
+    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding='max_length', max_length=512)
+    new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding='max_length', max_length=512)
     return new_train_encodings, new_val_encodings
 
 def create_datasets(euans_data):
@@ -53,7 +52,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data)
+    train_dataset, val_dataset = create_datasets(euans_data[:500])
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
@@ -73,7 +72,7 @@ def train_bert_models():
         direction='maximize',
         backend='optuna',
         hp_space=my_pipeline.optuna_hp_space,
-        n_trials=10
+        n_trials=1
     )
     best_parameters = best_trial.hyperparameters
     
@@ -83,7 +82,7 @@ def train_bert_models():
         logging_dir=logs_path,
         logging_strategy='epoch',
         logging_steps=10,
-        auto_find_batch_size=True,
+        auto_find_batch_size=False,
         gradient_checkpointing=True,
         fp16=True,
         save_strategy='epoch',
@@ -121,7 +120,4 @@ if __name__ == '__main__':
     loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + '/models/sentiment_classification'
     logs_path = os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/'
-    if params == 'default':
-        train_classic_models()
-    else:
-        train_bert_models()
+    train_bert_models()
