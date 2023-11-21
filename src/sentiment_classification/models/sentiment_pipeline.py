@@ -36,7 +36,7 @@ class SentimentClassificationPipeline:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.tokenizer = AutoTokenizer.from_pretrained(
                 self.model_args['model_name_or_path'],
-                padding='max_length',
+                use_fast=True,
                 max_length=512,
                 problem_type="singe_label_classification")
             self.trainer = None
