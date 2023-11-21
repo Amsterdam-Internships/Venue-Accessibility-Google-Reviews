@@ -4,8 +4,14 @@ from sklearn.model_selection import train_test_split
 from transformers import TrainingArguments, DataCollatorWithPadding, get_linear_schedule_with_warmup
 import os
 from dotenv import load_dotenv
+# Load environment variables from .env file
+load_dotenv(override=True)
 import sys
+# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:1024"
+sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
+print(sys.path)
 from gpu_test import free_gpu_cache
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 import pandas as pd
 import yaml
 import gc
