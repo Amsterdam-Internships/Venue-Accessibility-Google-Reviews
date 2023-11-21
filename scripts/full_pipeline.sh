@@ -4,7 +4,7 @@
 #SBATCH --time=05:15:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --partition=TitanX    # Use the "proq" partition for RTX2080Ti GPUs
+#SBATCH --partition=defq    # Use the "proq" partition for RTX2080Ti GPUs
 #SBATCH --gres=gpu:1
 #SBATCH --mem=64G
 #SBATCH --constraint=TitanX   # Use RTX2080Ti GPUs
