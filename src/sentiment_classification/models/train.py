@@ -1,9 +1,9 @@
+import os
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import train_test_split
 from transformers import TrainingArguments, DataCollatorWithPadding
-import os
 from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
