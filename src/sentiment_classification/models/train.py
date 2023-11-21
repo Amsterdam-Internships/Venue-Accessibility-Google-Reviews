@@ -57,7 +57,7 @@ def train_bert_models():
     train_dataset, val_dataset = create_datasets(euans_data[:500])
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
-    data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
+    data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer, padding='max_length', max_length=512)
     
     # train the model
     my_pipeline.trainer = MultiClassTrainer(
