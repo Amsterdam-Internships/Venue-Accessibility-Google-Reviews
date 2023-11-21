@@ -1,35 +1,30 @@
 import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import train_test_split
-from transformers import TrainingArguments, DataCollatorWithPadding
-
+from transformers import TrainingArguments, DataCollatorWithPadding, get_linear_schedule_with_warmup
 import os
 from dotenv import load_dotenv
-# Load environment variables from .env file
-load_dotenv(override=True)
 import sys
-# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:1024"
-sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
-print(sys.path)
 from gpu_test import free_gpu_cache
-sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 import pandas as pd
 import yaml
 import gc
+
+# Load environment variables from .env file
+load_dotenv(override=True)
 
 # Load environment variables from .env file
 config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
     params = params['bert_params']
-        
+
 my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
-custom_trainer = MultiClassTrainer(model=my_pipeline.model)
 torch.cuda.set_per_process_memory_fraction(0.8)  # Adjust as needed
 torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding='max_length',max_length=512)
+    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, padding='max_length', max_length=512)
     new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, padding='max_length', max_length=512)
     return new_train_encodings, new_val_encodings
 
@@ -55,18 +50,20 @@ def train_bert_models():
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
+    
     # train the model
     my_pipeline.trainer = MultiClassTrainer(
         model=my_pipeline.model,
-        args = my_pipeline.training_args,
-        train_dataset = train_dataset,
-        eval_dataset = val_dataset,
+        args=my_pipeline.training_args,
+        train_dataset=train_dataset,
+        eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
         data_collator=data_collator,
     )
-    # optimising hyperparameters
+
+    # Optimizing hyperparameters
     best_trial = my_pipeline.trainer.hyperparameter_search(
         direction='maximize',
         backend='optuna',
@@ -75,6 +72,15 @@ def train_bert_models():
     )
     best_parameters = best_trial.hyperparameters
     
+    num_training_steps = len(my_pipeline.trainer.get_train_dataloader()) * best_parameters['num_train_epochs']
+    num_warmup_steps = int(0.1 * num_training_steps)  # Adjust the warmup proportion as needed
+    
+    # Learning rate scheduler
+    scheduler = get_linear_schedule_with_warmup(
+        my_pipeline.trainer.optimizer,
+        num_warmup_steps=num_warmup_steps,
+        num_training_steps=num_training_steps
+    )
     
     new_training_args = TrainingArguments(
         output_dir=save_path,
@@ -84,6 +90,7 @@ def train_bert_models():
         auto_find_batch_size=True,
         gradient_checkpointing=True,
         fp16=True,
+        report_to='wandb',
         save_strategy='epoch',
         evaluation_strategy='epoch',
         learning_rate=best_parameters['learning_rate'],
@@ -93,12 +100,14 @@ def train_bert_models():
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
     )
     my_pipeline.trainer = MultiClassTrainer(
-        model = my_pipeline.model,
+        model=my_pipeline.model,
         args=new_training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
+        scheduler=scheduler  # Add the scheduler to the trainer
     )
+
     device = my_pipeline.trainer.args.device
     torch.cuda.empty_cache()
     my_pipeline.trainer.train()
@@ -108,7 +117,7 @@ def train_bert_models():
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
-    save_path = saved_model_path+f"{names}"
+    save_path = saved_model_path + f"{names}"
     my_pipeline.trainer.save_model(save_path)
     my_pipeline.tokenizer.save_pretrained(save_path)
 
