@@ -4,7 +4,10 @@
 #SBATCH --time=05:15:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --partition=longq    # Use the "proq" partition for RTX2080Ti GPUs
+#SBATCH --partition=proq    # Use the "proq" partition for RTX2080Ti GPUs
+#SBATCH --gres=gpu:1
+#SBATCH --mem=64G
+#SBATCH --constraint=RTX2080Ti   # Use RTX2080Ti GPUs
 
 # Load any necessary modules
 module load cuda11.1/toolkit/11.1.1
@@ -44,9 +47,9 @@ source ./.env
 
 # python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
 
-# # Check if the GPU is actually being used
+# Check if the GPU is actually being used
 
-# nvidia-smi
+nvidia-smi
 
 # # Evaluation step
 
