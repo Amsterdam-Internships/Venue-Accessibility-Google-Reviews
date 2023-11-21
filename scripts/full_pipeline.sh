@@ -23,6 +23,10 @@ source ~/.bashrc
 # Activate your desired Python environment, if needed
 conda activate /var/scratch/mbn781/anaconda3/envs/BachelorsProject
 
+# Explicitly set CUDA-related environment variables after activating conda environment
+export PATH=/path/to/cuda-11.1/bin:$PATH
+export LD_LIBRARY_PATH=/path/to/cuda-11.1/lib64:$LD_LIBRARY_PATH
+
 # Change to your working directory
 cd /var/scratch/mbn781/Venue-Accessibility-Google-Reviews
 
@@ -76,6 +80,7 @@ echo "Training sentiment classifiers..."
 
 python "${LOCAL_ENV}/src/sentiment_classification/models/train.py"
 
+nvidia-smi
 
 # Sentiment evaluation step
 
