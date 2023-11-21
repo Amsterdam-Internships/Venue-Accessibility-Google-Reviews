@@ -32,7 +32,7 @@ torch.cuda.set_per_process_memory_fraction(0.8)  # Adjust as needed
 torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
-    new_train_encodings = my_pipeline.tokenizer(train_text, truncation=True, max_length=512)
+    new_train_encodings = my_pipeline.tokenizer(train_text,truncation=True, max_length=512)
     new_val_encodings = my_pipeline.tokenizer(val_text, truncation=True, max_length=512)
     return new_train_encodings, new_val_encodings
 
@@ -57,7 +57,7 @@ def train_bert_models():
     train_dataset, val_dataset = create_datasets(euans_data[:500])
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
-    data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer, padding='max_length', max_length=512)
+    data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
     
     # train the model
     my_pipeline.trainer = MultiClassTrainer(
