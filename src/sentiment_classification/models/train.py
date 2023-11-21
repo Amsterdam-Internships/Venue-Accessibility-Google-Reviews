@@ -114,6 +114,7 @@ def train_bert_models():
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     save_path = saved_model_path + f"{names}"
+    torch.cuda.synchronize()
     my_pipeline.trainer.save_model(save_path)
     my_pipeline.tokenizer.save_pretrained(save_path)
 
