@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.preprocessing import LabelBinarizer
+from transformers import get_linear_schedule_with_warmup
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 import torch
 import numpy as np
@@ -48,7 +48,7 @@ class SentimentClassificationPipeline:
         Defines the hyperparameter space for Optuna.
         '''
         return {
-            'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-4, log=True),
+            'learning_rate': trial.suggest_float('learning_rate', 1e-3, 1e-5, log=True),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16, 32]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16, 32]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
