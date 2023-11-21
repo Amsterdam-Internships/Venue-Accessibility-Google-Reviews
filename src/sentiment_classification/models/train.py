@@ -1,7 +1,7 @@
 import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import train_test_split
-from transformers import TrainingArguments, DataCollatorWithPadding, get_linear_schedule_with_warmup
+from transformers import TrainingArguments, DataCollatorWithPadding
 import os
 from dotenv import load_dotenv
 # Load environment variables from .env file
@@ -77,17 +77,7 @@ def train_bert_models():
         n_trials=10
     )
     best_parameters = best_trial.hyperparameters
-    
-    num_training_steps = len(my_pipeline.trainer.get_train_dataloader()) * best_parameters['num_train_epochs']
-    num_warmup_steps = int(0.1 * num_training_steps)  # Adjust the warmup proportion as needed
-    
-    # Learning rate scheduler
-    scheduler = get_linear_schedule_with_warmup(
-        my_pipeline.trainer.optimizer,
-        num_warmup_steps=num_warmup_steps,
-        num_training_steps=num_training_steps
-    )
-    
+        
     new_training_args = TrainingArguments(
         output_dir=save_path,
         logging_dir=logs_path,
@@ -111,7 +101,6 @@ def train_bert_models():
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
-        scheduler=scheduler  # Add the scheduler to the trainer
     )
 
     device = my_pipeline.trainer.args.device
