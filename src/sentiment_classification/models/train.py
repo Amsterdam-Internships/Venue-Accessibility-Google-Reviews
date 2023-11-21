@@ -1,6 +1,6 @@
 import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
-from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.model_selection import train_test_split
 from transformers import TrainingArguments, DataCollatorWithPadding
 
 import os
@@ -13,8 +13,6 @@ sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
 from gpu_test import free_gpu_cache
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
-import numpy as np
-import joblib
 import pandas as pd
 import yaml
 import gc
@@ -93,7 +91,6 @@ def train_bert_models():
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
-        load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
         model = my_pipeline.model,
