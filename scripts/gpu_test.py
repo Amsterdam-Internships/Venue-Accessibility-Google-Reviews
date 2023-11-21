@@ -6,9 +6,7 @@ print(torch.cuda.is_available(), torch.cuda.device_count())
 def free_gpu_cache():
     print("Initial GPU Usage")
     gpu_usage()                             
-
     torch.cuda.empty_cache()
-
     cuda.select_device(0)
     cuda.close()
     cuda.select_device(0)

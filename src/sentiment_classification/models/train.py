@@ -1,3 +1,4 @@
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import train_test_split
@@ -52,7 +53,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data)
+    train_dataset, val_dataset = create_datasets(euans_data[:200])
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
@@ -104,10 +105,10 @@ def train_bert_models():
     )
 
     device = my_pipeline.trainer.args.device
-    torch.cuda.empty_cache()
+    # torch.cuda.empty_cache()
     my_pipeline.trainer.train()
-    torch.cuda.empty_cache()
-    gc.collect()
+    # torch.cuda.empty_cache()
+    # gc.collect()
     free_gpu_cache()
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
