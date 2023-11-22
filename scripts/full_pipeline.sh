@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=64G
 #SBATCH --constraint=RTX2080Ti   # Use RTX2080Ti GPUs
-#SBATCH --workdir=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/
+#SBATCH --workdir=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/scripts
 
 # Load any necessary modules
 module load cuda11.1/toolkit/11.1.1
