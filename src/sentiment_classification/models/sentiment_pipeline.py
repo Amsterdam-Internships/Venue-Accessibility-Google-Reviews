@@ -54,8 +54,7 @@ class SentimentClassificationPipeline:
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [3, 4, 5, 6, 7, 8, 9, 10]),
             'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
             'weight_decay': trial.suggest_float("weight_decay", 1e-5, 1e-3, log=True),
-            'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant']),
-            'num_warmup_steps': trial.suggest_int('num_warmup_steps', 0, 1000)
+            'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant'])
         }
         
     def model_init(self, trial):

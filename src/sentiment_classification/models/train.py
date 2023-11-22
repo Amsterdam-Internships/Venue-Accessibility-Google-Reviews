@@ -88,7 +88,6 @@ def train_bert_models():
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
         lr_scheduler_type=best_parameters['lr_scheduler_type'],
-        num_warmup_steps=best_parameters['num_warmup_steps'],
         load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
