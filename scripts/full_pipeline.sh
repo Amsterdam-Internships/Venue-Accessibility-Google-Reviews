@@ -4,9 +4,7 @@
 #SBATCH --time=05:15:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --partition=proq    # Use the "proq" partition for RTX2080Ti GPUs
-#SBATCH --gres=gpu:1
-#SBATCH --constraint=RTX2080Ti   # Use RTX2080Ti GPUs
+#SBATCH --partition=longq    # Use the "proq" partition for RTX2080Ti GPUs
 #SBATCH --workdir=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/scripts
 
 # Load any necessary modules

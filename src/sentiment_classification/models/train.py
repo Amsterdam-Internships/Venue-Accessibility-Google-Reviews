@@ -1,7 +1,5 @@
 import os
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 import torch
-print(os.umask(22))
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
 from sklearn.model_selection import train_test_split
 from transformers import TrainingArguments, DataCollatorWithPadding
@@ -9,10 +7,6 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
 import sys
-# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:1024"
-sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
-print(sys.path)
-from gpu_test import free_gpu_cache
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 import pandas as pd
 import yaml
@@ -28,8 +22,6 @@ with open(config_path, 'r') as f:
     params = params['bert_params']
 
 my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
-torch.cuda.set_per_process_memory_fraction(0.8)  # Adjust as needed
-torch.backends.cudnn.benchmark = True
 
 def encode_datasets(train_text, val_text):
     new_train_encodings = my_pipeline.tokenizer(train_text,padding='max_length',truncation=True, max_length=512)
@@ -107,11 +99,7 @@ def train_bert_models():
     )
     # Save only the best trained model
     device = my_pipeline.trainer.args.device
-    torch.cuda.empty_cache()
     my_pipeline.trainer.train()
-    torch.cuda.empty_cache()
-    gc.collect()
-    free_gpu_cache()
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
