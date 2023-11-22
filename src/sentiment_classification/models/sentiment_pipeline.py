@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from transformers import get_linear_schedule_with_warmup
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 import torch
 import numpy as np
@@ -52,8 +51,11 @@ class SentimentClassificationPipeline:
             'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16, 32]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16, 32]),
-            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
+            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [3, 4, 5, 6, 7, 8, 9, 10]),
             'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
+            'weight_decay': trial.suggest_float("weight_decay", 1e-5, 1e-3, log=True),
+            'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant']),
+            'num_warmup_steps': trial.suggest_int('num_warmup_steps', 0, 1000)
         }
         
     def model_init(self, trial):

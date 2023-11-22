@@ -84,8 +84,11 @@ def train_bert_models():
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
+        weight_decay=best_parameters['weight_decay'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
+        lr_scheduler_type=best_parameters['lr_scheduler_type'],
+        num_warmup_steps=best_parameters['num_warmup_steps'],
         load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
@@ -98,7 +101,7 @@ def train_bert_models():
     # Save only the best trained model
     device = my_pipeline.trainer.args.device
     my_pipeline.trainer.train()
-    torch.cuda.memory_summary(device=device, abbreviated=False)
+    # torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     save_path = saved_model_path + f"{names}"
