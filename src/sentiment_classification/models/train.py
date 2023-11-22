@@ -38,9 +38,9 @@ def create_datasets(euans_data):
 def split_data(euans_data):
     euans_data = euans_data.rename(columns={"Sentiment": "labels"})
     euans_labels = euans_data.labels.values.tolist()
-    euans_labels = my_pipeline.encode_labels(euans_labels)
+    encoded_labels = my_pipeline.encode_labels(euans_labels)
     euans_reviews = euans_data.Text.values.tolist()
-    return train_test_split(euans_reviews, euans_labels, test_size=.2, stratify=euans_labels)
+    return train_test_split(euans_reviews, encoded_labels, test_size=.2, stratify=encoded_labels)
 
 def train_bert_models():
     # load the data
@@ -79,8 +79,6 @@ def train_bert_models():
         logging_steps=10,
         auto_find_batch_size=True,
         gradient_checkpointing=True,
-        fp16=True,
-        report_to='wandb',
         save_strategy='epoch',
         evaluation_strategy='epoch',
         learning_rate=best_parameters['learning_rate'],
