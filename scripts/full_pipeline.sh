@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=baseline
-#SBATCH --time=05:15:00
+#SBATCH --time=10:15:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=knlq   
