@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
-from transformers import TrainingArguments, pipeline
+from transformers import TrainingArguments, pipeline, get_linear_schedule_with_warmup
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer
 from sentiment_classification.data.preprocessing import Preprocessor
 import pandas as pd
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # Define the directory path
     names = params['model_name_or_path'].split("/")[-1] if "/" in params['model_name_or_path'] else params['model_name_or_path']
     # Get the file paths from environment variables
-    test_data_path = os.getenv('LOCAL_ENV') + 'data/interim/predicted_sentiment_labels.csv'
+    test_data_path = os.getenv('LOCAL_ENV') + '/data/interim/predicted_sentiment_labels.csv'
     loaded_model_path = os.getenv('LOCAL_ENV') + f'/models/sentiment_classification/{names}'
     results_path = os.getenv('LOCAL_ENV') + f"/results/sentiment_classification/{names}"
     interim_path = os.getenv('LOCAL_ENV') + '/data/interim'
