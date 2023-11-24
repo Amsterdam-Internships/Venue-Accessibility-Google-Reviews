@@ -99,7 +99,7 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
     )
-    torch.cuda.clear_memory_allocated()
+    torch.cuda.empty_cache()
     my_pipeline.trainer.train()
     torch.cuda.empty_cache()
     gc.collect()
@@ -109,7 +109,7 @@ def train_bert_models():
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     save_path = saved_model_path + f"{names}"
-    torch.cuda.synchronize()
+    # torch.cuda.synchronize()
     my_pipeline.trainer.save_model(save_path)
     my_pipeline.tokenizer.save_pretrained(save_path)
 
