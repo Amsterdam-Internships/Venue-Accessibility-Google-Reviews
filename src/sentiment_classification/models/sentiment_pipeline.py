@@ -81,12 +81,16 @@ class SentimentClassificationPipeline:
         labels = eval_pred.label_ids
         labels_encoded = self.label_binarizer.fit_transform(labels)
         logits = torch.Tensor(eval_pred.predictions)
-        probs = F.softmax(logits, dim=1)  # Apply softmax to convert logits to probabilities
-        preds = torch.argmax(probs, dim=1)
-        f1 = f1_score(labels, preds, average='macro')
-        precision = precision_score(labels, preds, average='macro')
-        recall = recall_score(labels, preds, average='macro')
-        accuracy = accuracy_score(labels, preds)
+        probs = F.softmax(logits, dim=1)
+        preds = torch.argmax(probs, dim=1).numpy()  # Convert PyTorch tensor to NumPy array
+
+        # If labels_encoded is a 2D array, use argmax to get the predicted class for each sample
+        predicted_classes = np.argmax(labels_encoded, axis=1)
+
+        f1 = f1_score(predicted_classes, preds, average='macro')
+        precision = precision_score(predicted_classes, preds, average='macro')
+        recall = recall_score(predicted_classes, preds, average='macro')
+        accuracy = accuracy_score(predicted_classes, preds)
         
         return {"f1 score": f1,
                 "accuracy": accuracy,
