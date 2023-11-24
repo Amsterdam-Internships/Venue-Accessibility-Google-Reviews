@@ -86,7 +86,7 @@ class SentimentClassificationPipeline:
         f1 = f1_score(labels, preds, average='macro')
         precision = precision_score(labels, preds, average='macro')
         recall = recall_score(labels, preds, average='macro')
-        roc_pr = precision_recall_curve(labels_encoded, probs, multi_class='ovr')
+        roc_pr = precision_recall_curve(labels_encoded, probs)
         
         return {"f1 score": f1,
                 "accuracy": accuracy_score(labels, preds, average='macro'),
