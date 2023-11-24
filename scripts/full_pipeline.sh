@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=Sentiment Classification  Baseline
+#SBATCH --job-name=Sentiment-Classification-Baseline
 #SBATCH --time=10:15:00
 #SBATCH --nodes=1
 #SBATCH -N 1
