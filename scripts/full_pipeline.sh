@@ -3,12 +3,10 @@
 #SBATCH --job-name=Sentiment-Classification-Baseline
 #SBATCH --time=10:15:00
 #SBATCH --nodes=1
-#SBATCH -N 1
-#SBATCH --constraint=TitanX
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=proq
 #SBATCH --gres=gpu:1
-#SBATCH --workdir=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/scripts
+#SBATCH --constraint=RTX2080Ti
 
 # Load any necessary modules
 module load cuda11.1/toolkit/11.1.1
