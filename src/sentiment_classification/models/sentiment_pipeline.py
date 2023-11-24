@@ -81,7 +81,7 @@ class SentimentClassificationPipeline:
         f1 = f1_score(labels, preds, average='weighted')
         precision = precision_score(labels, preds, average='weighted')
         recall = recall_score(labels, preds, average='weighted')
-        confusion_matrix = confusion_matrix(labels, preds)
+        matrix = confusion_matrix(labels, preds)
         roc_auc = roc_auc_score(labels, preds, average='weighted', multi_class='ovr')
         
         return {"f1 score": f1,
@@ -89,7 +89,7 @@ class SentimentClassificationPipeline:
                 "precision": precision,
                 "recall": recall,
                 "roc_auc": roc_auc,
-                "confusion_matrix": confusion_matrix}
+                "confusion_matrix": matrix}
 
                 
 class EuansDataset(torch.utils.data.Dataset):

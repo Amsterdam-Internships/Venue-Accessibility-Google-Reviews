@@ -5,6 +5,7 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.stem import WordNetLemmatizer
 from sentiment_classification.models.sentiment_pipeline import EuansDataset, SentimentClassificationPipeline
 
+my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer')
 
 class Preprocessor(object):
     def __init__(self):
@@ -25,9 +26,10 @@ class Preprocessor(object):
         re.compile(r'^(?i)\bpositive\b|\bnegative\b'): "Mixed"
         }
     
-    pipeline = SentimentClassificationPipeline(pipeline_type='transformer')
+
+    
     def encode_datasets(self, text):
-        new_encodings = pipeline.tokenizer(text, truncation=True, padding=True, max_length=512)
+        new_encodings = my_pipeline.tokenizer(text, truncation=True, padding=True, max_length=512)
         return new_encodings
     
     def remove_columns(self):
@@ -68,7 +70,7 @@ class Preprocessor(object):
  
     def create_datasets(self, data):
         labels = my_pipeline.encode_labels(data['Sentiment'].values.tolist())
-        text = data['Sentences'].values.tolist()
+        texts = data['Sentences'].values.tolist()
         print(len(labels), len(texts))
         encodings = self.encode_datasets(texts)
         new_dataset = EuansDataset(encodings, labels)
