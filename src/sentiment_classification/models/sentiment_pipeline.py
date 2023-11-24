@@ -87,14 +87,13 @@ class SentimentClassificationPipeline:
         precision = precision_score(labels, preds, average='weighted')
         recall = recall_score(labels, preds, average='weighted')
         matrix = confusion_matrix(labels, preds)
-        roc_auc_values = roc_auc_score(labels_encoded, probs, average='weighted', multi_class='ovr')
-        mean_roc_auc = np.mean(roc_auc_values)
+        roc_auc = roc_auc_score(labels_encoded, probs, average='weighted', multi_class='ovr')
         
         return {"f1 score": f1,
                 "accuracy": accuracy_score(labels, preds),
                 "precision": precision,
                 "recall": recall,
-                "roc_auc": mean_roc_auc,
+                "roc_auc": roc_auc,
                 "confusion_matrix": matrix}
 
                 
