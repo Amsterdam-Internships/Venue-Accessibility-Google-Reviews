@@ -31,7 +31,7 @@ def encode_datasets(train_text, val_text):
     return new_train_encodings, new_val_encodings
 
 def create_datasets(euans_data):
-    train_texts, val_texts, train_labels, val_labels = split_data(euans_data)
+    train_texts, val_texts, train_labels, val_labels = split_data(euans_data[:500])
     train_encodings, val_encodings = encode_datasets(train_texts, val_texts)
     train_dataset = EuansDataset(train_encodings, train_labels)
     val_dataset = EuansDataset(val_encodings, val_labels)

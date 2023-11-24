@@ -3,10 +3,12 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, confusion_matrix, roc_auc_score
+from sklearn.preprocessing import LabelBinarizer
 import torch
 import numpy as np
 from transformers import Trainer
 from torch import nn
+import torch.nn.functional as F
 import optuna
 import yaml
 import os
@@ -42,6 +44,7 @@ class SentimentClassificationPipeline:
             self.label_mapping = {'negative': 0, 'neutral': 1, 'positive': 2}
             self.encoded_sent_labels = []
             self.decoded_sent_labels = []
+            self.label_binarizer = LabelBinarizer()
             
     def optuna_hp_space(self, trial):
         '''
@@ -76,13 +79,15 @@ class SentimentClassificationPipeline:
         
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
+        labels_encoded = self.label_binarizer.fit_transform(labels)
         logits = torch.Tensor(eval_pred.predictions)
-        preds = torch.argmax(logits, dim=1)
+        probs = F.softmax(logits, dim=1)  # Apply softmax to convert logits to probabilities
+        preds = torch.argmax(probs, dim=1)
         f1 = f1_score(labels, preds, average='weighted')
         precision = precision_score(labels, preds, average='weighted')
         recall = recall_score(labels, preds, average='weighted')
         matrix = confusion_matrix(labels, preds)
-        roc_auc = roc_auc_score(labels, logits, average='weighted', multi_class='ovr')
+        roc_auc = roc_auc_score(labels_encoded, probs, average='weighted', multi_class='ovr')
         
         return {"f1 score": f1,
                 "accuracy": accuracy_score(labels, preds),
