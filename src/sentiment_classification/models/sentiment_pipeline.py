@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
+from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, confusion_matrix, roc_auc_score
 import torch
 import numpy as np
 from transformers import Trainer
@@ -78,14 +78,18 @@ class SentimentClassificationPipeline:
         labels = eval_pred.label_ids
         logits = torch.Tensor(eval_pred.predictions)
         preds = torch.argmax(logits, dim=1)
-        accuracy = accuracy_score(labels, preds)
         f1 = f1_score(labels, preds, average='weighted')
         precision = precision_score(labels, preds, average='weighted')
         recall = recall_score(labels, preds, average='weighted')
+        confusion_matrix = confusion_matrix(labels, preds)
+        roc_auc = roc_auc_score(labels, preds, average='weighted', multi_class='ovr')
+        
         return {"f1 score": f1,
+                "accuracy": accuracy_score(labels, preds),
                 "precision": precision,
                 "recall": recall,
-                "accuracy": accuracy}
+                "roc_auc": roc_auc,
+                "confusion_matrix": confusion_matrix}
 
                 
 class EuansDataset(torch.utils.data.Dataset):

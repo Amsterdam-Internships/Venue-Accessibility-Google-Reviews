@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
 import sys
+sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
+from gpu_test import free_gpu_cache
 import pandas as pd
 import yaml
 import gc
@@ -46,7 +48,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:5000])
+    train_dataset, val_dataset = create_datasets(euans_data)
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
@@ -97,21 +99,24 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
     )
-    # Save only the best trained model
-    device = my_pipeline.trainer.args.device
+    torch.cuda.clear_memory_allocated()
     my_pipeline.trainer.train()
-    # torch.cuda.memory_summary(device=device, abbreviated=False)
+    torch.cuda.empty_cache()
+    gc.collect()
+    free_gpu_cache()
+    device = my_pipeline.trainer.args.device  # Getting the device
+    torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
     print('Training of BERT models has finished!')
     save_path = saved_model_path + f"{names}"
-    # torch.cuda.synchronize()
+    torch.cuda.synchronize()
     my_pipeline.trainer.save_model(save_path)
     my_pipeline.tokenizer.save_pretrained(save_path)
 
 if __name__ == '__main__':
     # Get the file paths from environment variables
     names = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
-    loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
+    loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/euans_reviews_sampled.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + '/models/sentiment_classification'
     logs_path = os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/'
     train_bert_models()

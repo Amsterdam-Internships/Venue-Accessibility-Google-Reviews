@@ -1,10 +1,13 @@
 #!/bin/bash
 
-#SBATCH --job-name=baseline
+#SBATCH --job-name=Sentiment Classification  Baseline
 #SBATCH --time=10:15:00
 #SBATCH --nodes=1
+#SBATCH -N 1
+#SBATCH --constraint=TitanX
 #SBATCH --ntasks-per-node=1
-#SBATCH --partition=knlq   
+#SBATCH --partition=proq
+#SBATCH --gres=gpu:1
 #SBATCH --workdir=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/scripts
 
 # Load any necessary modules
