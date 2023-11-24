@@ -1,13 +1,10 @@
 #!/bin/bash
 
 #SBATCH --job-name=SC-Baseline
-#SBATCH --time=10:15:00
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --partition=proq
-#SBATCH --gres=gpu:1
-#SBATCH --constraint=RTX2080Ti
-
+#SBATCH --time=72:15:00
+ #SBATCH --nodes=1
+ #SBATCH --ntasks-per-node=1
+ #SBATCH --partition=knlq   
 # Load any necessary modules
 module load cuda11.1/toolkit/11.1.1
 module load cuDNN/cuda11.1/8.0.5
