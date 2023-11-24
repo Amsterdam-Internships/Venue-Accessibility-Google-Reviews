@@ -15,10 +15,10 @@ preprocessor = Preprocessor()
     
 def make_testset():
     sample_test_df = pd.read_csv(test_file_path)
-    selected_rows = preprocessor.remove_rows(sample_test_df, 'Gold Sentiment Labels')
-    # renamed_sentiments = preprocessor.relabel(selected_rows, ['Gold Sentiment Labels', 'Sentiment'])
-    # renamed_sentiments.to_csv(processed_test_path)
-    return selected_rows
+    print(sample_test_df.columns)
+    renamed_sentiments = preprocessor.relabel(sample_test_df, 'Gold Sentiment Labels')
+    selected_rows = preprocessor.remove_rows(renamed_sentiments, 'Sentiment')
+    selected_rows.to_csv(processed_test_path)
 
 
 # Call main function

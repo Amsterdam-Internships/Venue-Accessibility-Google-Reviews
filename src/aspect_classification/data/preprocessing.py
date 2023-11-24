@@ -68,10 +68,9 @@ class Preprocessor(object):
         condition = data['Aspect'].apply(lambda x: len(x) > 1)
         data['has list'] = data['Aspect'].where(condition)
         data = data.explode('has list')
-        # data = data.rename(columns={"Aspect": "labels", "Sentences": "text"})
         labels, reviews = self.convert_to_list(data)
         # Get unique labels using set
-        unique_labels = set(tuple(label) for label in labels)
+        # unique_labels = set(tuple(label) for label in labels)
         labels = pipeline.label_binarizer.fit_transform(labels)
         labels = labels.astype(np.float32)
         return labels,reviews

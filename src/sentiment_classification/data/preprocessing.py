@@ -1,5 +1,10 @@
 import nltk
 import re
+import os
+import sys
+import numpy as np
+import ast
+sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem import WordNetLemmatizer
@@ -23,7 +28,7 @@ class Preprocessor(object):
         re.compile(r'^(?i)\bpositive\b'): "positive",
         re.compile(r'^(?i)\bnegative\b'): "negative",
         re.compile(r'^(?i)\bneutral\b|(?i)\bnetural\b'): "neutral",
-        re.compile(r'^(?i)\bpositive\b|\bnegative\b'): "mixed"
+        re.compile(r'^(?i)\bpositive, negative\b|(?i)\bnegative, positive\b'): "mixed"
         }
     
 
@@ -34,8 +39,9 @@ class Preprocessor(object):
     
     def remove_columns(self):
         pass
+    
 
-    def relabel(self, df, columns):
+    def relabel(self, df, column):
         """
         This function should take the Sentiment column and relabel the Sentiment to the needed Guide format.
 
@@ -45,32 +51,47 @@ class Preprocessor(object):
         Returns:
             pandas.DataFrame: The DataFrame with re-formatted labels.
         """
-        gold_labels = df[columns[0]].values.tolist()
+        gold_labels = df[column].values.tolist()
         for i, label in enumerate(gold_labels):
             for pattern, euans_label in self.labels_map.items():
-                labels = re.split(r'\s*,\s*', label.strip())  # Split labels on comma and whitespace
-                if len(labels) > 1:
-                    for single_label in labels:
-                        if pattern.match(single_label):
-                            gold_labels[i] = gold_labels[i].replace(single_label, euans_label)
-                else:
-                    if pattern.match(label):
-                        gold_labels[i] = euans_label
-        df[columns[1]] = gold_labels
+                if isinstance(label, str) and pattern.match(label):
+                    gold_labels[i] = euans_label
+
+        df['Sentiment'] = gold_labels
+        return df
+
+    
     
     def remove_rows(self, df, column):
-        df = df[df[column] != 'neutral']
+        df = df.dropna(subset=[column])
+        df = df[df[column].str.strip() != '']
+        df = df[df[column] != 'mixed']
         return df
+
     def remove_stopwords(self):
         pass
-    def tokenize(self):
-        pass
-    def vectorize(self):
-        pass
+    def convert_to_list(self, data):
+        labels = data.Sentiment.values.tolist()
+        reviews = data.Sentences.values.tolist()
+        return labels, reviews
+    
+    def split_data(self, data):
+        condition = data['Sentiment'].apply(lambda x: len(x) > 1)
+        data['has list'] = data['Sentiment'].where(condition)
+        data = data.explode('has list')
+        labels, reviews = self.convert_to_list(data)
+        # Get unique labels using set
+        labels = my_pipeline.label_binarizer.fit_transform(labels)
+        labels = labels.astype(np.float32)
+        return labels,reviews
+    
+    def split_sentiments(self, column, df):
+        df[column] = df[column].apply(lambda x: self.flatten_list(x))
+        df['Sentiment'] = column.explode('Split Sentiment Labels')
+        return column
  
     def create_datasets(self, data):
-        labels = my_pipeline.encode_labels(data['Sentiment'].values.tolist())
-        texts = data['Sentences'].values.tolist()
+        labels, texts = self.split_data(data)
         print(len(labels), len(texts))
         encodings = self.encode_datasets(texts)
         new_dataset = EuansDataset(encodings, labels)
