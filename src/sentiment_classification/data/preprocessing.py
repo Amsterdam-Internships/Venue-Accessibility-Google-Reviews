@@ -20,10 +20,10 @@ class Preprocessor(object):
         }
         self.lemmatizer = WordNetLemmatizer()
         self.labels_map = {
-        re.compile(r'^(?i)\bpositive\b'): "Positive",
-        re.compile(r'^(?i)\bnegative\b'): "Negative",
-        re.compile(r'^(?i)\bneutral\b|(?i)\bnetural\b'): "Neutral",
-        re.compile(r'^(?i)\bpositive\b|\bnegative\b'): "Mixed"
+        re.compile(r'^(?i)\bpositive\b'): "positive",
+        re.compile(r'^(?i)\bnegative\b'): "negative",
+        re.compile(r'^(?i)\bneutral\b|(?i)\bnetural\b'): "neutral",
+        re.compile(r'^(?i)\bpositive\b|\bnegative\b'): "mixed"
         }
     
 
