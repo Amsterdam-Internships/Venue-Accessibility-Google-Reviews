@@ -83,13 +83,13 @@ class SentimentClassificationPipeline:
         logits = torch.Tensor(eval_pred.predictions)
         probs = F.softmax(logits, dim=1)  # Apply softmax to convert logits to probabilities
         preds = torch.argmax(probs, dim=1)
-        f1 = f1_score(labels, preds)
-        precision = precision_score(labels, preds)
-        recall = recall_score(labels, preds)
+        f1 = f1_score(labels, preds, average='macro')
+        precision = precision_score(labels, preds, average='macro')
+        recall = recall_score(labels, preds, average='macro')
         roc_pr = precision_recall_curve(labels_encoded, probs, multi_class='ovr')
         
         return {"f1 score": f1,
-                "accuracy": accuracy_score(labels, preds),
+                "accuracy": accuracy_score(labels, preds, average='macro'),
                 "precision": precision,
                 "recall": recall,
                 "roc_pr": roc_pr}
