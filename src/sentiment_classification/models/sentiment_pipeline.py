@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, precision_recall_curve
+from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 from sklearn.preprocessing import LabelBinarizer
 import torch
 import numpy as np
@@ -86,9 +86,10 @@ class SentimentClassificationPipeline:
         f1 = f1_score(labels, preds, average='macro')
         precision = precision_score(labels, preds, average='macro')
         recall = recall_score(labels, preds, average='macro')
+        accuracy = accuracy_score(labels, preds)
         
         return {"f1 score": f1,
-                "accuracy": accuracy_score(labels, preds, average='macro'),
+                "accuracy": accuracy,
                 "precision": precision,
                 "recall": recall}
 
