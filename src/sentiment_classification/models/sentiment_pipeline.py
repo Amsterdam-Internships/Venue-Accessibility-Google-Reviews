@@ -4,6 +4,7 @@ load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 from sklearn.preprocessing import LabelBinarizer
+from sklearn.utils.class_weight import compute_class_weight
 import torch
 import numpy as np
 from transformers import Trainer
@@ -54,10 +55,10 @@ class SentimentClassificationPipeline:
             'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16, 32]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16, 32]),
-            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [3, 4, 5, 6, 7, 8, 9, 10])
+            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [3, 4, 5, 6, 7, 8, 9, 10]),
             # 'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
             # 'weight_decay': trial.suggest_float("weight_decay", 1e-5, 1e-3, log=True),
-            # 'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant'])
+            'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant'])
         }
         
     def model_init(self, trial):
@@ -79,23 +80,20 @@ class SentimentClassificationPipeline:
         
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
-        labels_encoded = self.label_binarizer.fit_transform(labels)
         logits = torch.Tensor(eval_pred.predictions)
         probs = F.softmax(logits, dim=1)
-        preds = torch.argmax(probs, dim=1).numpy()  # Convert PyTorch tensor to NumPy array
+        preds = torch.argmax(probs, dim=1)
 
-        # If labels_encoded is a 2D array, use argmax to get the predicted class for each sample
-        predicted_classes = np.argmax(labels_encoded, axis=1)
+        f1 = f1_score(labels, preds, average='macro')
+        precision = precision_score(labels, preds, average='macro')
+        recall = recall_score(labels, preds, average='macro')
+        accuracy = accuracy_score(labels, preds)
 
-        f1 = f1_score(predicted_classes, preds, average='macro')
-        precision = precision_score(predicted_classes, preds, average='macro')
-        recall = recall_score(predicted_classes, preds, average='macro')
-        accuracy = accuracy_score(predicted_classes, preds)
-        
         return {"f1 score": f1,
                 "accuracy": accuracy,
                 "precision": precision,
                 "recall": recall}
+
 
                 
 class EuansDataset(torch.utils.data.Dataset):
@@ -122,5 +120,9 @@ class MultiClassTrainer(Trainer):
         labels = labels.to(torch.long)
         outputs = model(**inputs)
         logits = outputs.get("logits")
-        loss = nn.CrossEntropyLoss()(logits, labels)
+        class_labels = np.unique(labels.cpu().numpy())
+        class_weights = compute_class_weight(class_weight='balanced', classes=class_labels, y = labels.cpu().numpy())
+        class_weights_tensor = torch.tensor(class_weights, dtype=torch.float)
+        loss_fct = nn.CrossEntropyLoss(weight=class_weights_tensor)
+        loss = loss_fct(logits.view(-1, model.config.num_labels), labels.view(-1))
         return (loss, outputs) if return_outputs else loss
