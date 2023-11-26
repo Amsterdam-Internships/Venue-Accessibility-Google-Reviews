@@ -10,7 +10,7 @@ load_dotenv(override=True)
 import sys
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
-from gpu_test import free_gpu_cache
+# from gpu_test import free_gpu_cache
 import pandas as pd
 import numpy as np
 import yaml
@@ -63,6 +63,7 @@ def split_data(euans_data):
     # Reshape the data back
     reviews_sampled = reviews_sampled.flatten().tolist()
 
+    # return train_test_split(euans_reviews, encoded_labels, test_size=0.2, random_state=42, stratify=encoded_labels, shuffle=True)
     return stratified_splitter(reviews_sampled, labels_sampled)
 
 
@@ -70,7 +71,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data)
+    train_dataset, val_dataset = create_datasets(euans_data[:200])
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
@@ -111,7 +112,7 @@ def train_bert_models():
         # weight_decay=best_parameters['weight_decay'],
         num_train_epochs=best_parameters['num_train_epochs'],
         # gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
-        lr_scheduler_type=best_parameters['lr_scheduler_type'],
+        # lr_scheduler_type=best_parameters['lr_scheduler_type'],
         load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
@@ -138,7 +139,7 @@ def train_bert_models():
 if __name__ == '__main__':
     # Get the file paths from environment variables
     names = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
-    loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_euans_reviews.csv'
+    loaded_data_path = os.getenv('LOCAL_ENV') + '/data/processed/sentiment_classification_data/euans_reviews_sampled.csv'
     saved_model_path = os.getenv('LOCAL_ENV') + '/models/sentiment_classification/'
     logs_path = os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/'
     train_bert_models()

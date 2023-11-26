@@ -52,13 +52,13 @@ class SentimentClassificationPipeline:
         Defines the hyperparameter space for Optuna.
         '''
         return {
-            'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True),
-            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16, 32]),
-            'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16, 32]),
-            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [3, 4, 5, 6, 7, 8, 9, 10]),
+            'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 3e-5, 2e-5, 3e-4, 1e-4]),
+            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32, 64, 128]),
+            'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [8, 16, 32, 64, 128]),
+            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [4, 5, 6, 7, 8, 9, 10])
             # 'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
             # 'weight_decay': trial.suggest_float("weight_decay", 1e-5, 1e-3, log=True),
-            'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant'])
+            # 'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant'])
         }
         
     def model_init(self, trial):
@@ -116,14 +116,14 @@ class MultiClassTrainer(Trainer):
         super().__init__(*args, **kwargs)
         
     def compute_loss(self, model, inputs, return_outputs=False):        
-
         labels = inputs.get("labels")
         labels = labels.to(torch.long)
         outputs = model(**inputs)
         logits = outputs.get("logits")
-        class_labels = np.unique(labels.cpu().numpy())
-        class_weights = compute_class_weight(class_weight='balanced', classes=class_labels, y = labels.cpu().numpy())
-        class_weights_tensor = torch.tensor(class_weights, dtype=torch.float)
-        loss_fct = nn.CrossEntropyLoss(weight=class_weights_tensor)
-        loss = loss_fct(logits.view(-1, model.config.num_labels), labels.view(-1))
+        # class_labels = np.unique(labels.cpu().numpy())
+        # class_weights = compute_class_weight(class_weight='balanced', classes=class_labels, y = labels.cpu().numpy())
+        # class_weights_tensor = torch.tensor(class_weights, dtype=torch.float)
+        # loss_fct = nn.CrossEntropyLoss(weight=class_weights_tensor)
+        # loss = loss_fct(logits.view(-1, model.config.num_labels), labels.view(-1))
+        loss = nn.CrossEntropyLoss()(logits, labels)
         return (loss, outputs) if return_outputs else loss
