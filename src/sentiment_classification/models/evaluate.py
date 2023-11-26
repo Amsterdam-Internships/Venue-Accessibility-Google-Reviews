@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
-from transformers import TrainingArguments, pipeline, get_linear_schedule_with_warmup
+from transformers import TrainingArguments, AutoModelForSequenceClassification
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer
 from sentiment_classification.data.preprocessing import Preprocessor
 import pandas as pd
@@ -25,7 +25,7 @@ my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model
 
 def generate_results(test_data):
     # Select annotated data only for the aspect classification task
-    eval_dataset = preprocessor.create_datasets(test_data[['Sentences', 'Sentiment']])    
+    eval_set = preprocessor.create_datasets(test_data[['Sentences', 'Sentiment']])    
     # Define the TrainingArguments for evaluation
     eval_args = TrainingArguments(
         output_dir="./results/sentiment_classification",
@@ -36,14 +36,14 @@ def generate_results(test_data):
     
     # Create a dummy Trainer for evaluation
     trainer = MultiClassTrainer(
-        model=pipeline('text-classification', model=loaded_model_path, tokenizer=loaded_model_path),  # Your loaded model
+        model=AutoModelForSequenceClassification(loaded_model_path),  # Your loaded model
         args=eval_args,
-        eval_dataset=eval_dataset,
+        eval_dataset=eval_set,
         compute_metrics=my_pipeline.compute_metrics,
     )
     
     # Perform evaluation
-    evaluation_result = trainer.evaluate(eval_dataset=eval_dataset)
+    evaluation_result = trainer.evaluate(eval_dataset=eval_set)
     # Assuming annotated_data is your DataFrame
     test_data['Predicted Sentiment Labels'] = my_pipeline.decode_labels(evaluation_result['predictions'])
     save_results(evaluation_result, test_data)
