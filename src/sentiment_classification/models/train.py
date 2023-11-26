@@ -58,7 +58,7 @@ def split_data(euans_data):
     encoded_labels = my_pipeline.encode_labels(euans_labels)
     euans_reviews = euans_data.Text.values.tolist()
     euans_reviews_array = np.array(euans_reviews)
-    rus = RandomUnderSampler(random_state=42, sampling_strategy='not minority', replacement=False)
+    rus = RandomUnderSampler(random_state=42, sampling_strategy='not minority', replacement=True)
     reviews_sampled, labels_sampled = rus.fit_resample(euans_reviews_array.reshape(-1, 1), encoded_labels)
     # Reshape the data back
     reviews_sampled = reviews_sampled.flatten().tolist()
