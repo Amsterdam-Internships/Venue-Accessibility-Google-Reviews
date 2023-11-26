@@ -116,6 +116,7 @@ class MultiClassTrainer(Trainer):
         super().__init__(*args, **kwargs)
         
     def compute_loss(self, model, inputs, return_outputs=False):        
+
         labels = inputs.get("labels")
         labels = labels.to(torch.long)
         outputs = model(**inputs)

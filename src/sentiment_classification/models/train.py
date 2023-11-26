@@ -1,8 +1,9 @@
 import os
 import torch
 from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
 from transformers import TrainingArguments, DataCollatorWithPadding
+from imblearn.under_sampling import RandomUnderSampler
 from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -11,6 +12,7 @@ sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from gpu_test import free_gpu_cache
 import pandas as pd
+import numpy as np
 import yaml
 import gc
 
@@ -37,18 +39,38 @@ def create_datasets(euans_data):
     val_dataset = EuansDataset(val_encodings, val_labels)
     return train_dataset, val_dataset
 
+def stratified_splitter(euans_reviews, encoded_labels):
+    splitter = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+    
+    train_texts, val_texts, train_labels, val_labels = [], [], [], []
+
+    for train_idx, val_idx in splitter.split(euans_reviews, encoded_labels):
+        train_texts.extend([euans_reviews[i] for i in train_idx])
+        val_texts.extend([euans_reviews[i] for i in val_idx])
+        train_labels.extend([encoded_labels[i] for i in train_idx])
+        val_labels.extend([encoded_labels[i] for i in val_idx])
+
+    return train_texts, val_texts, train_labels, val_labels
+
 def split_data(euans_data):
     euans_data = euans_data.rename(columns={"Sentiment": "labels"})
     euans_labels = euans_data.labels.values.tolist()
     encoded_labels = my_pipeline.encode_labels(euans_labels)
     euans_reviews = euans_data.Text.values.tolist()
-    return train_test_split(euans_reviews, encoded_labels, test_size=.2, stratify=encoded_labels)
+    euans_reviews_array = np.array(euans_reviews)
+    rus = RandomUnderSampler(random_state=42, sampling_strategy='not minority', replacement=False)
+    reviews_sampled, labels_sampled = rus.fit_resample(euans_reviews_array.reshape(-1, 1), encoded_labels)
+    # Reshape the data back
+    reviews_sampled = reviews_sampled.flatten().tolist()
+
+    return stratified_splitter(reviews_sampled, labels_sampled)
+
 
 def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:1000])
+    train_dataset, val_dataset = create_datasets(euans_data[:500])
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
