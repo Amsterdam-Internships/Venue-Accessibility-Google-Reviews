@@ -48,7 +48,7 @@ class AspectClassificationPipeline:
         Defines the hyperparameter space for Optuna.
         '''
         return {
-            'learning_rate': trial.suggest_categorial('learning_rate', [5e-5, 4e-5, 3e-5, 2e-5]),
+            'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 4e-5, 3e-5, 2e-5]),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16, 32]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16, 32]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
