@@ -71,7 +71,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data)
+    train_dataset, val_dataset = create_datasets(euans_data[:400])
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
@@ -106,11 +106,14 @@ def train_bert_models():
         gradient_checkpointing=True,
         save_strategy='epoch',
         evaluation_strategy='epoch',
+        L2_reg=best_parameters['L2_reg'],
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         # weight_decay=best_parameters['weight_decay'],
         num_train_epochs=best_parameters['num_train_epochs'],
+        warmup_steps=500,
+        # hidden_dropout_prob=best_parameters['hidden_dropout_prob'],
         # gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
         # lr_scheduler_type=best_parameters['lr_scheduler_type'],
         load_best_model_at_end=True,

@@ -2,9 +2,8 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
+from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, classification_report
 from sklearn.preprocessing import LabelBinarizer
-from sklearn.utils.class_weight import compute_class_weight
 import torch
 import numpy as np
 from transformers import Trainer
@@ -52,12 +51,13 @@ class SentimentClassificationPipeline:
         Defines the hyperparameter space for Optuna.
         '''
         return {
-            'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 3e-5, 2e-5, 3e-4, 1e-4]),
+            'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 4e-5, 3e-5, 2e-5]),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32, 64, 128]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [8, 16, 32, 64, 128]),
-            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [4, 5, 6, 7, 8, 9, 10])
-            # 'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
-            # 'weight_decay': trial.suggest_float("weight_decay", 1e-5, 1e-3, log=True),
+            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [4, 5, 6, 7, 8, 9, 10]),
+            # 'L2_reg': trial.suggest_float("L2_reg", 1e-3, 1e-2, log=True)
+            # 'hidden_dropout_prob': trial.suggest_categorical('hidden_dropout_prob', [0.1, 0.2, 0.3, 0.4, 0.5])
+            # 'weight_decay': trial.suggest_float("weight_decay", 1e-3, 1e-2, log=True)
             # 'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant'])
         }
         

@@ -48,7 +48,7 @@ class AspectClassificationPipeline:
         Defines the hyperparameter space for Optuna.
         '''
         return {
-            'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True),
+            'learning_rate': trial.suggest_categorial('learning_rate', [5e-5, 4e-5, 3e-5, 2e-5]),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16, 32]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16, 32]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
@@ -75,15 +75,15 @@ class AspectClassificationPipeline:
         
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
-        #correct threshold to use when using the sigmoid activation function
+        # correct threshold to use when using the sigmoid activation function
         logits = eval_pred.predictions
         preds = torch.sigmoid(torch.Tensor(logits))
         threshold = 0.5
         pred_labels = (preds > threshold).float()
         self.encoded_pred_lables = pred_labels
-        f1 = f1_score(labels, pred_labels, average='samples')
-        precision = precision_score(labels, pred_labels, average='samples')
-        recall = recall_score(labels, pred_labels, average='samples')
+        f1 = f1_score(labels, pred_labels, average='weighted')
+        precision = precision_score(labels, pred_labels, average='weighted')
+        recall = recall_score(labels, pred_labels, average='weighted')
         return {"f1 score": f1,
                 "precision": precision,
                 "recall": recall}

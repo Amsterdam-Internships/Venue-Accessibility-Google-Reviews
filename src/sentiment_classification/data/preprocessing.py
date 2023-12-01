@@ -82,7 +82,7 @@ class Preprocessor(object):
         labels, reviews = self.convert_to_list(data)
         # Get unique labels using set
         labels = my_pipeline.label_binarizer.fit_transform(labels)
-        labels = labels.astype(np.float32)
+        # labels = labels.astype(np.float32)
         return labels,reviews
     
     def split_sentiments(self, column, df):
@@ -92,7 +92,6 @@ class Preprocessor(object):
  
     def create_datasets(self, data):
         labels, texts = self.split_data(data)
-        print(len(labels), len(texts))
         encodings = self.encode_datasets(texts)
         new_dataset = EuansDataset(encodings, labels)
         return new_dataset

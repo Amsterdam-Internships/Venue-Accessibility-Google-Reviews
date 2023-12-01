@@ -36,7 +36,7 @@ def generate_results(test_data):
     
     # Create a dummy Trainer for evaluation
     trainer = MultiClassTrainer(
-        model=AutoModelForSequenceClassification(loaded_model_path),  # Your loaded model
+        model=AutoModelForSequenceClassification.from_pretrained(loaded_model_path),  # Your loaded model
         args=eval_args,
         eval_dataset=eval_set,
         compute_metrics=my_pipeline.compute_metrics,
