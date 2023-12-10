@@ -81,7 +81,7 @@ class Preprocessor(object):
         data = data.explode('has list')
         labels, reviews = self.convert_to_list(data)
         # Get unique labels using set
-        labels = my_pipeline.label_binarizer.fit_transform(labels)
+        labels = my_pipeline.label_encoder.fit_transform(labels)
         # labels = labels.astype(np.float32)
         return labels,reviews
     

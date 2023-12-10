@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, classification_report
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 import torch
 import numpy as np
 from transformers import Trainer
@@ -45,6 +45,7 @@ class SentimentClassificationPipeline:
             self.encoded_sent_labels = []
             self.decoded_sent_labels = []
             self.label_binarizer = LabelBinarizer()
+            self.label_encoder = LabelEncoder()
             
     def optuna_hp_space(self, trial):
         '''
