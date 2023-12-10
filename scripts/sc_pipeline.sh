@@ -27,7 +27,7 @@ source ./.env
 # train sentiment classifiers
 
 echo "Training sentiment classifiers..."
-
+# test
 #python "${LOCAL_ENV}/src/sentiment_classification/models/train.py"
 
 # Sentiment evaluation step

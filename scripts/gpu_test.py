@@ -13,3 +13,4 @@ def free_gpu_cache():
 
     print("GPU Usage after emptying the cache")
     gpu_usage()
+# test

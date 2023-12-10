@@ -12,8 +12,9 @@
 module load cuda11.1/toolkit/11.1.1
 module load cuDNN/cuda11.1/8.0.5
 
-conda init bash
 
+conda init bash
+# test
 export LOCAL_ENV=/var/scratch/mbn781/Venue-Accessibility-Google-Reviews/
 
 echo "LOCAL_ENV is set to: $LOCAL_ENV"

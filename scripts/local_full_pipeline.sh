@@ -15,7 +15,7 @@ python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
 python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
 
 # Evaluation step
-
+# test
 echo "Making aspect label predictions on unseen data..."
 
 python "${LOCAL_ENV}/src/aspect_classification/models/evaluate.py"
