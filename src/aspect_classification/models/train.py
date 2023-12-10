@@ -116,10 +116,11 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics
     )
-    torch.cuda.clear_memory_allocated()
+    # torch.cuda.clear_memory_allocated()
+    free_gpu_cache()
     my_pipeline.trainer.train()
-    torch.cuda.empty_cache()
-    gc.collect()
+    # torch.cuda.empty_cache()
+    # gc.collect()
     free_gpu_cache()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
