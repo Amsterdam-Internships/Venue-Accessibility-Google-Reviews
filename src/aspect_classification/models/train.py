@@ -87,7 +87,7 @@ def train_bert_models():
         logging_strategy='epoch',
         logging_steps=10, 
         learning_rate=best_parameters['learning_rate'],
-        auto_find_batch_size=True,
+        auto_find_batch_size=False,
         gradient_checkpointing=True,
         fp16=True,
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
@@ -122,8 +122,5 @@ if __name__ == '__main__':
     saved_model_path = os.getenv('LOCAL_ENV') + '/models/aspect_classification/transformer_models/'
     params_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification/transformer_models/'
     logs_path = os.getenv('LOCAL_ENV') + '/logs/aspect_classification/'
-    if params['bert_params']['model_name_or_path'] == 'default':
-        train_classic_models()
-    else:
-        train_bert_models()
+    train_bert_models()
 

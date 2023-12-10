@@ -122,10 +122,5 @@ class MultiClassTrainer(Trainer):
         labels = labels.to(torch.long)
         outputs = model(**inputs)
         logits = outputs.get("logits")
-        # class_labels = np.unique(labels.cpu().numpy())
-        # class_weights = compute_class_weight(class_weight='balanced', classes=class_labels, y = labels.cpu().numpy())
-        # class_weights_tensor = torch.tensor(class_weights, dtype=torch.float)
-        # loss_fct = nn.CrossEntropyLoss(weight=class_weights_tensor)
-        # loss = loss_fct(logits.view(-1, model.config.num_labels), labels.view(-1))
         loss = nn.CrossEntropyLoss()(logits, labels)
         return (loss, outputs) if return_outputs else loss
