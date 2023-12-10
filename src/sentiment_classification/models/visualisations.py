@@ -9,11 +9,12 @@ load_dotenv(override=True)
 
 def extract_metrics():
     eval_metrics = pd.read_csv(load_path)
+    print(eval_metrics.columns)
     # Get the metric scores for the single row
-    accuracy_score = eval_metrics['Accuracy'].values[0]
-    precision_score = eval_metrics['Precision'].values[0]
-    recall_score = eval_metrics['Recall'].values[0]
-    f1_score = eval_metrics['F1-Score'].values[0]
+    accuracy_score = eval_metrics['eval_accuracy'].values[0]
+    precision_score = eval_metrics['eval_precision'].values[0]
+    recall_score = eval_metrics['eval_recall'].values[0]
+    f1_score = eval_metrics['eval_f1 score'].values[0]
     plot_metrics(accuracy_score, precision_score, recall_score, f1_score)
 
 def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
