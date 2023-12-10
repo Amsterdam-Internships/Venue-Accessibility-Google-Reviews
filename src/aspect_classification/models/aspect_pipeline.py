@@ -5,10 +5,15 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trai
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import f1_score, precision_score, recall_score
 import torch
-from transformers import Trainer
+from transformers import Trainer, TrainerCallback
 from torch import nn
 import yaml
 import os
+import sys
+sys.path.append(os.getenv('LOCAL_ENV') + 'scripts')
+print(sys.path)
+from scripts.gpu_test import free_gpu_cache
+memory_clear_interval = 1
 
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 
@@ -115,4 +120,8 @@ class MultiLabelClassTrainer(Trainer):
         return (loss, outputs) if return_outputs else loss
     
        
-
+class MyTrainerCallback(TrainerCallback):
+    def on_epoch_end(self, args, state, control, **kwargs):
+        if state.epoch % memory_clear_interval == 0:
+            torch.cuda.clear_memory_allocated()
+            free_gpu_cache()

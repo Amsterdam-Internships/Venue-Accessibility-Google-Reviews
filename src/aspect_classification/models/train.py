@@ -2,7 +2,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
 from transformers import TrainingArguments
-from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer
+from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer, MyTrainerCallback
 # Load environment variables from .env file
 load_dotenv(override=True)
 import gc
@@ -13,13 +13,13 @@ import yaml
 import torch
 import sys
 import os
-sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
+sys.path.append(os.getenv('LOCAL_ENV') + 'scripts')
 print(sys.path)
-from gpu_test import free_gpu_cache
+from scripts.gpu_test import free_gpu_cache
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
-
+my_trainer_callback = MyTrainerCallback()
 
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
@@ -117,11 +117,11 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics
     )
     # torch.cuda.clear_memory_allocated()
-    free_gpu_cache()
-    my_pipeline.trainer.train()
+    # free_gpu_cache()
+    my_pipeline.trainer.train(callbacks=[my_trainer_callback])
     # torch.cuda.empty_cache()
     # gc.collect()
-    free_gpu_cache()
+    # free_gpu_cache()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
