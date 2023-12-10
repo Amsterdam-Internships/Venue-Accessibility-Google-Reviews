@@ -10,7 +10,7 @@ from torch import nn
 import yaml
 import os
 import sys
-sys.path.append(os.getenv('LOCAL_ENV') + 'scripts')
+sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
 from scripts.gpu_test import free_gpu_cache
 memory_clear_interval = 1
