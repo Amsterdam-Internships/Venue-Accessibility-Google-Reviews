@@ -49,20 +49,6 @@ def split_data(euans_data):
     euans_reviews = euans_data.Text.values.tolist()
     return train_test_split(euans_reviews, euans_labels, test_size=.2)
 
-
-def train_classic_models():
-    grid_search = GridSearchCV(
-        estimator=my_pipeline.get_sk_pipeline(),
-        param_grid=my_pipeline.get_params(),
-        cv=5, n_jobs=3, verbose=3, scoring='accuracy'
-    )
-    euans_data = pd.read_csv(loaded_data_path)
-    X_train, y_train = split_data(euans_data)
-    trained_model = grid_search.fit(X_train, y_train)
-    print('Training of classic models has finished!')
-    save_path = saved_model_path + f'/{my_pipeline.model_name}.joblib'
-    joblib.dump(trained_model, save_path)
-
 def train_bert_models():
     name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     save_path = saved_model_path+f"{name}"
@@ -116,12 +102,12 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics
     )
-    # torch.cuda.clear_memory_allocated()
-    # free_gpu_cache()
+    torch.cuda.clear_memory_allocated()
+    free_gpu_cache()
     my_pipeline.trainer.train(callbacks=[my_trainer_callback])
-    # torch.cuda.empty_cache()
-    # gc.collect()
-    # free_gpu_cache()
+    torch.cuda.empty_cache()
+    gc.collect()
+    free_gpu_cache()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print(f"Here Training device: {device}")
