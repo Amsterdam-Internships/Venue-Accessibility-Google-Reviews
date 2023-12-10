@@ -45,7 +45,7 @@ def generate_results(test_data):
     # Perform evaluation
     evaluation_result = trainer.evaluate(eval_dataset=eval_set)
     # Assuming annotated_data is your DataFrame
-    test_data['Predicted Sentiment Labels'] = my_pipeline.decode_labels(evaluation_result['predictions'])
+    test_data['Predicted Sentiment Labels'] = my_pipeline.extract_labels()
     save_results(evaluation_result, test_data)
 
 

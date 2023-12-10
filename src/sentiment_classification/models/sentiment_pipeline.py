@@ -41,10 +41,9 @@ class SentimentClassificationPipeline:
                 max_length=512,
                 problem_type="singe_label_classification")
             self.trainer = None
-            self.label_mapping = {'negative': 0, 'neutral': 1, 'positive': 2}
-            self.encoded_sent_labels = []
-            self.decoded_sent_labels = []
-            self.label_binarizer = LabelBinarizer()
+            self.label_mapping = {0:'negative', 1:'neutral', 2:'positive'}
+            self.encoded_pred_labels = []
+            self.decoded_pred_labels = []
             self.label_encoder = LabelEncoder()
             
     def optuna_hp_space(self, trial):
@@ -70,21 +69,23 @@ class SentimentClassificationPipeline:
             problem_type="single_label_classification"
         )
         
-    def encode_labels(self, labels):
-        self.encoded_sent_labels = [self.label_mapping[label] for label in labels]
-        return np.array(self.encoded_sent_labels, dtype=np.int64)
-    
-    def decode_labels(self, class_probabilities):
-        encoded_labels = class_probabilities.argmax(dim=1)
-        self.decoded_sent_labels = [list(self.label_mapping.keys())[list(self.label_mapping.values()).index(encoded_label in encoded_labels)]]
-        return self.decoded_sent_labels
+    def extract_labels(self):
+        for guess in self.encoded_pred_labels:
+            for key, label in self.label_mapping.items():
+                if guess == key:
+                    self.decoded_pred_labels.append(label)
+        return self.decoded_pred_labels
         
+    def encode_labels(self, labels):
+        self.encoded_pred_labels = [self.label_mapping[label] for label in labels]
+        return np.array(self.encoded_pred_labels, dtype=np.int64)
+    
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
         logits = torch.Tensor(eval_pred.predictions)
         probs = F.softmax(logits, dim=1)
         preds = torch.argmax(probs, dim=1)
-
+        self.encoded_pred_labels = preds.tolist()
         f1 = f1_score(labels, preds, average='macro')
         precision = precision_score(labels, preds, average='macro')
         recall = recall_score(labels, preds, average='macro')
