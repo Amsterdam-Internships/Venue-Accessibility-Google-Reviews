@@ -12,7 +12,7 @@ import os
 import sys
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
-from scripts.gpu_test import free_gpu_cache
+from gpu_test import free_gpu_cache
 memory_clear_interval = 1
 
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'

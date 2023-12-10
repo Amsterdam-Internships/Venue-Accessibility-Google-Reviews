@@ -15,7 +15,7 @@ import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
-from scripts.gpu_test import free_gpu_cache
+from gpu_test import free_gpu_cache
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
