@@ -124,7 +124,6 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         callbacks=[my_trainer_callback],
     )
-    # my_pipeline.trainer.train()
     free_gpu_cache()
     my_pipeline.trainer.train()
     torch.cuda.empty_cache()

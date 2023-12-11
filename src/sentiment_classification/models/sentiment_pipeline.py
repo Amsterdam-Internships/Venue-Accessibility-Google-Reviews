@@ -57,8 +57,8 @@ class SentimentClassificationPipeline:
         '''
         return {
             'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 4e-5, 3e-5, 2e-5]),
-            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32, 64, 128]),
-            'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [8, 16, 32, 64, 128]),
+            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 4, 4, 4, 4]),
+            'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 4, 4, 4, 4]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [4, 5, 6, 7, 8, 9, 10]),
             'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4])
         }
@@ -103,27 +103,7 @@ class SentimentClassificationPipeline:
             "precision": report_dict["macro avg"]["precision"],
             "recall": report_dict["macro avg"]["recall"]
         }
-    
-    # def compute_metrics(self, eval_pred):
-    #     labels = eval_pred.label_ids
-    #     logits = torch.Tensor(eval_pred.predictions)
-    #     probs = F.softmax(logits, dim=1)
-    #     preds = torch.argmax(probs, dim=1)
-    #     self.encoded_pred_labels = preds.tolist()
-    #     f1 = f1_score(labels, preds, average='macro')
-    #     precision = precision_score(labels, preds, average='macro')
-    #     recall = recall_score(labels, preds, average='macro')
-    #     accuracy = accuracy_score(labels, preds)
-    #     report = pd.DataFrame(classification_report(labels, preds, target_names=self.label_mapping.values()))
-    #     report.to_csv(os.getenv('LOCAL_ENV')+'/logs/sentiment_classification/classification_report.csv')
-    #     return {"f1 score": f1,
-    #             "accuracy": accuracy,
-    #             "precision": precision,
-    #             "recall": recall
-    #             }
-
-
-                
+                    
 class EuansDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
         self.encodings = encodings
@@ -153,7 +133,7 @@ class MultiClassTrainer(Trainer):
 
 
 class MyTrainerCallback(TrainerCallback):
-    memory_clear_interval = 1  
+    memory_clear_interval = 5  
 
     @staticmethod
     def adjust_memory_clear_fraction():
