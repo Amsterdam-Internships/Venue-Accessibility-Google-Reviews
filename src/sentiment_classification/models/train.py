@@ -122,6 +122,7 @@ def train_bert_models():
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
+        MyTrainerCallback=my_trainer_callback,
     )
     # my_pipeline.trainer.train()
     free_gpu_cache()
