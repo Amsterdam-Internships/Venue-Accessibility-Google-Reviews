@@ -55,7 +55,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:10000])
+    train_dataset, val_dataset = create_datasets(euans_data[:1000])
     my_pipeline.training_args.output_dir = save_path
     print(f"my device {my_pipeline.device}")
     print(f"my model {my_pipeline.model_name}")
@@ -103,11 +103,12 @@ def train_bert_models():
         args=new_training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
-        compute_metrics=my_pipeline.compute_metrics
+        compute_metrics=my_pipeline.compute_metrics,
+        callbacks=[my_trainer_callback],
     )
     torch.cuda.empty_cache()
     free_gpu_cache()
-    my_pipeline.trainer.train(callbacks=[my_trainer_callback])
+    my_pipeline.trainer.train()
     torch.cuda.empty_cache()
     gc.collect()
     free_gpu_cache()

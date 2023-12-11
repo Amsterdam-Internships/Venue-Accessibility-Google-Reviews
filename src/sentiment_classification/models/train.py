@@ -114,7 +114,7 @@ def train_bert_models():
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
-        load_best_model_at_end=True,
+        load_best_model_at_end=True
     )
     my_pipeline.trainer = MultiClassTrainer(
         model=my_pipeline.model,
@@ -122,11 +122,11 @@ def train_bert_models():
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
-        MyTrainerCallback=my_trainer_callback,
+        callbacks=[my_trainer_callback],
     )
     # my_pipeline.trainer.train()
     free_gpu_cache()
-    my_pipeline.trainer.train(callbacks=[my_trainer_callback])
+    my_pipeline.trainer.train()
     torch.cuda.empty_cache()
     gc.collect()
     free_gpu_cache()
