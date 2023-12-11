@@ -1,7 +1,7 @@
 import os
 import torch
-from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset
-from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
+from sentiment_pipeline import SentimentClassificationPipeline, MultiClassTrainer, EuansDataset, MyTrainerCallback
+from sklearn.model_selection import StratifiedShuffleSplit
 from transformers import TrainingArguments, DataCollatorWithPadding
 from imblearn.under_sampling import RandomUnderSampler
 from dotenv import load_dotenv
@@ -15,10 +15,12 @@ import pandas as pd
 import numpy as np
 import yaml
 import gc
+print(sys.path)
+from gpu_test import free_gpu_cache
 
 # Load environment variables from .env file
 load_dotenv(override=True)
-
+my_trainer_callback = MyTrainerCallback()
 # Load environment variables from .env file
 config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
 with open(config_path, 'r') as f:
@@ -71,7 +73,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:400])
+    train_dataset, val_dataset = create_datasets(euans_data[:4000])
     save_path = saved_model_path + f'/{names}'
     my_pipeline.training_args.output_dir = save_path
     data_collator = DataCollatorWithPadding(tokenizer=my_pipeline.tokenizer)
@@ -102,20 +104,14 @@ def train_bert_models():
         logging_dir=logs_path,
         logging_strategy='epoch',
         logging_steps=10,
-        # auto_find_batch_size=False,
         gradient_checkpointing=True,
         save_strategy='epoch',
         evaluation_strategy='epoch',
-        L2_reg=best_parameters['L2_reg'],
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
-        # weight_decay=best_parameters['weight_decay'],
         num_train_epochs=best_parameters['num_train_epochs'],
-        warmup_steps=500,
-        # hidden_dropout_prob=best_parameters['hidden_dropout_prob'],
-        # gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
-        # lr_scheduler_type=best_parameters['lr_scheduler_type'],
+        gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
         load_best_model_at_end=True,
     )
     my_pipeline.trainer = MultiClassTrainer(
@@ -125,14 +121,14 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics,
     )
-    # free_gpu_cache()
-    # gc.collect()
-    my_pipeline.trainer.train()
-    # free_gpu_cache()
-    # gc.collect()
-    # device = my_pipeline.trainer.args.device  # Getting the device
-    # torch.cuda.memory_summary(device=device, abbreviated=False)
-    # print(f"Here Training device: {device}")
+    # my_pipeline.trainer.train()
+    free_gpu_cache()
+    my_pipeline.trainer.train(callbacks=[my_trainer_callback])
+    torch.cuda.empty_cache()
+    gc.collect()
+    free_gpu_cache()
+    device = my_pipeline.trainer.args.device  # Getting the device
+    torch.cuda.memory_summary(device=device, abbreviated=False)
     print('Training of BERT models has finished!')
     save_path = saved_model_path + f"{names}"
     print(f'Saving model to {save_path}')

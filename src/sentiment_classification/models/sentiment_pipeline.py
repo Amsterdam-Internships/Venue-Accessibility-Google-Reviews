@@ -3,15 +3,21 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, classification_report
-from sklearn.preprocessing import LabelBinarizer, LabelEncoder
+from sklearn.preprocessing import LabelEncoder
 import torch
 import numpy as np
-from transformers import Trainer
+from transformers import Trainer, TrainerCallback
 from torch import nn
 import torch.nn.functional as F
 import optuna
+import pandas as pd
 import yaml
 import os
+import sys
+sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
+print(sys.path)
+from gpu_test import free_gpu_cache
+memory_clear_interval = 5
 
 
 config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
@@ -55,11 +61,9 @@ class SentimentClassificationPipeline:
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32, 64, 128]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [8, 16, 32, 64, 128]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [4, 5, 6, 7, 8, 9, 10]),
-            # 'L2_reg': trial.suggest_float("L2_reg", 1e-3, 1e-2, log=True)
-            # 'hidden_dropout_prob': trial.suggest_categorical('hidden_dropout_prob', [0.1, 0.2, 0.3, 0.4, 0.5])
-            # 'weight_decay': trial.suggest_float("weight_decay", 1e-3, 1e-2, log=True)
-            # 'lr_scheduler_type': trial.suggest_categorical('lr_scheduler_type', ['linear', 'cosine', 'constant'])
+            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4])
         }
+    
         
     def model_init(self, trial):
         return AutoModelForSequenceClassification.from_pretrained(
@@ -77,7 +81,7 @@ class SentimentClassificationPipeline:
         return self.decoded_pred_labels
         
     def encode_labels(self, labels):
-        self.encoded_pred_labels = [self.label_mapping[label] for label in labels]
+        self.encoded_pred_labels = [key for label in labels for key, value in self.label_mapping.items() if value == label]
         return np.array(self.encoded_pred_labels, dtype=np.int64)
     
     def compute_metrics(self, eval_pred):
@@ -86,15 +90,38 @@ class SentimentClassificationPipeline:
         probs = F.softmax(logits, dim=1)
         preds = torch.argmax(probs, dim=1)
         self.encoded_pred_labels = preds.tolist()
-        f1 = f1_score(labels, preds, average='macro')
-        precision = precision_score(labels, preds, average='macro')
-        recall = recall_score(labels, preds, average='macro')
-        accuracy = accuracy_score(labels, preds)
+        
+        # Generate the classification report
+        report_dict = classification_report(labels, preds, target_names=self.label_mapping.values(), output_dict=True)
+        
+        # Save the classification report to a CSV file
+        report_df = pd.DataFrame(report_dict).transpose()
+        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/classification_report.csv')
 
-        return {"f1 score": f1,
-                "accuracy": accuracy,
-                "precision": precision,
-                "recall": recall}
+        return {
+            "f1 score": report_dict["macro avg"]["f1-score"],
+            "accuracy": report_dict["accuracy"],
+            "precision": report_dict["macro avg"]["precision"],
+            "recall": report_dict["macro avg"]["recall"]
+        }
+    
+    # def compute_metrics(self, eval_pred):
+    #     labels = eval_pred.label_ids
+    #     logits = torch.Tensor(eval_pred.predictions)
+    #     probs = F.softmax(logits, dim=1)
+    #     preds = torch.argmax(probs, dim=1)
+    #     self.encoded_pred_labels = preds.tolist()
+    #     f1 = f1_score(labels, preds, average='macro')
+    #     precision = precision_score(labels, preds, average='macro')
+    #     recall = recall_score(labels, preds, average='macro')
+    #     accuracy = accuracy_score(labels, preds)
+    #     report = pd.DataFrame(classification_report(labels, preds, target_names=self.label_mapping.values()))
+    #     report.to_csv(os.getenv('LOCAL_ENV')+'/logs/sentiment_classification/classification_report.csv')
+    #     return {"f1 score": f1,
+    #             "accuracy": accuracy,
+    #             "precision": precision,
+    #             "recall": recall
+    #             }
 
 
                 
@@ -124,3 +151,10 @@ class MultiClassTrainer(Trainer):
         logits = outputs.get("logits")
         loss = nn.CrossEntropyLoss()(logits, labels)
         return (loss, outputs) if return_outputs else loss
+
+
+class MyTrainerCallback(TrainerCallback):
+    def on_epoch_end(self, args, state, control, **kwargs):
+        if state.epoch % memory_clear_interval == 0:
+            torch.cuda.empty_cache()
+            free_gpu_cache()
