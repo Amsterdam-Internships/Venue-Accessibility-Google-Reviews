@@ -60,7 +60,7 @@ class SentimentClassificationPipeline:
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 4, 4, 4, 4]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 4, 4, 4, 4]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [4, 5, 6, 7, 8, 9, 10]),
-            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4])
+            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [4, 5, 6, 7])
         }
     
         

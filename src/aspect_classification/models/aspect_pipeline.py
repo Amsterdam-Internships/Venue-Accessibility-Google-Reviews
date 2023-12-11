@@ -13,7 +13,7 @@ import sys
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
 from gpu_test import free_gpu_cache
-memory_clear_interval = 5
+
 
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 
@@ -121,7 +121,8 @@ class MultiLabelClassTrainer(Trainer):
     
        
 class MyTrainerCallback(TrainerCallback):
+    memory_clear_interval = 1
     def on_epoch_end(self, args, state, control, **kwargs):
-        if state.epoch % memory_clear_interval == 0:
+        if state.epoch % self.memory_clear_interval == 0:
             torch.cuda.empty_cache()
             free_gpu_cache()
