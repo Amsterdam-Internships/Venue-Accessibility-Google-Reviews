@@ -102,7 +102,7 @@ def train_bert_models():
         eval_dataset=val_dataset,
         compute_metrics=my_pipeline.compute_metrics
     )
-    torch.cuda.clear_memory_allocated()
+    torch.cuda.empty_cache()
     free_gpu_cache()
     my_pipeline.trainer.train(callbacks=[my_trainer_callback])
     torch.cuda.empty_cache()
