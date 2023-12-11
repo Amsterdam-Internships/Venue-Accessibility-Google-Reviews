@@ -55,7 +55,7 @@ def train_bert_models():
     # load the data
     euans_data = pd.read_csv(loaded_data_path)
     # split the data 
-    train_dataset, val_dataset = create_datasets(euans_data[:4000])
+    train_dataset, val_dataset = create_datasets(euans_data)
     my_pipeline.training_args.output_dir = save_path
     print(f"my device {my_pipeline.device}")
     print(f"my model {my_pipeline.model_name}")
