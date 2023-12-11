@@ -90,6 +90,7 @@ def train_bert_models():
         auto_find_batch_size=False,
         gradient_checkpointing=True,
         fp16=True,
+        load_best_model_at_end=True,
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
