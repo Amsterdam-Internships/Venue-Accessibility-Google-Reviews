@@ -17,7 +17,6 @@ import sys
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
 from gpu_test import free_gpu_cache
-memory_clear_interval = 1
 
 
 config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/config.yml'
@@ -154,7 +153,18 @@ class MultiClassTrainer(Trainer):
 
 
 class MyTrainerCallback(TrainerCallback):
+    memory_clear_interval = 1  
+
+    @staticmethod
+    def adjust_memory_clear_fraction():
+        total_gpu_memory = torch.cuda.get_device_properties(0).total_memory
+        free_gpu_memory = torch.cuda.memory_reserved(0) - torch.cuda.memory_allocated(0)
+        fraction = free_gpu_memory / total_gpu_memory
+        return fraction
+
     def on_epoch_end(self, args, state, control, **kwargs):
-        if state.epoch % memory_clear_interval == 0:
-            torch.cuda.empty_cache()
-            free_gpu_cache()
+        if state.epoch % self.memory_clear_interval == 0:
+            fraction = self.adjust_memory_clear_fraction()
+            if fraction < 0.9:  
+                torch.cuda.empty_cache()
+                free_gpu_cache()
