@@ -98,6 +98,7 @@ def train_bert_models():
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
     )
+    print(torch.cuda.get_device_properties(0))
     my_pipeline.trainer = MultiLabelClassTrainer(
         model = my_pipeline.model,
         args=new_training_args,

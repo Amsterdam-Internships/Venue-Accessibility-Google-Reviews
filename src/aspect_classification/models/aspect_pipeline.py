@@ -121,7 +121,7 @@ class MultiLabelClassTrainer(Trainer):
     
        
 class MyTrainerCallback(TrainerCallback):
-    memory_clear_interval = 1
+    memory_clear_interval = 5
     def on_epoch_end(self, args, state, control, **kwargs):
         if state.epoch % self.memory_clear_interval == 0:
             torch.cuda.empty_cache()
