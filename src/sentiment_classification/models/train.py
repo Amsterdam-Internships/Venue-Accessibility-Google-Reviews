@@ -108,6 +108,7 @@ def train_bert_models():
         gradient_checkpointing=True,
         save_strategy='epoch',
         evaluation_strategy='epoch',
+        fp16=True,
         learning_rate=best_parameters['learning_rate'],
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
