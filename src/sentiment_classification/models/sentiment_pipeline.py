@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, classification_report
+from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 import torch
 import numpy as np
@@ -90,19 +90,23 @@ class SentimentClassificationPipeline:
         preds = torch.argmax(probs, dim=1)
         self.encoded_pred_labels = preds.tolist()
         
-        # Generate the classification report
-        report_dict = classification_report(labels, preds, target_names=self.label_mapping.values(), output_dict=True)
-        
-        # Save the classification report to a CSV file
-        report_df = pd.DataFrame(report_dict).transpose()
+        precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
+        balanced_acc = balanced_accuracy_score(labels, preds)
+        c_matrix = confusion_matrix(labels, preds)
+
+        report_dict = {
+            "precision": precision,
+            "recall": recall,
+            "f1 score": f1,
+            "balanced accuracy": balanced_acc
+        }
+
+        report_df = pd.DataFrame(report_dict, index=self.label_mapping.values())
+        c_matrix_df = pd.DataFrame(c_matrix, index=self.label_mapping.values(), columns=self.label_mapping.values())
+        c_matrix_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/confusion_matrix.csv')
         report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/classification_report.csv')
 
-        return {
-            "f1 score": report_dict["macro avg"]["f1-score"],
-            "accuracy": report_dict["accuracy"],
-            "precision": report_dict["macro avg"]["precision"],
-            "recall": report_dict["macro avg"]["recall"]
-        }
+        return report_dict
                     
 class EuansDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
@@ -133,7 +137,7 @@ class MultiClassTrainer(Trainer):
 
 
 class MyTrainerCallback(TrainerCallback):
-    memory_clear_interval = 2  
+    memory_clear_interval = 1  
 
     @staticmethod
     def adjust_memory_clear_fraction():
