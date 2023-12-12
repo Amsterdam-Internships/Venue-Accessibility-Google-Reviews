@@ -3,13 +3,14 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, multilabel_confusion_matrix
 import torch
 from transformers import Trainer, TrainerCallback
 from torch import nn
 import yaml
 import os
 import sys
+import pandas as pd 
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
 from gpu_test import free_gpu_cache
@@ -57,7 +58,8 @@ class AspectClassificationPipeline:
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
-            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4])
+            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
+            'dropout': trial.suggest_categorical('dropout', [0.1, 0.2, 0.3, 0.4, 0.5])
         }
         
     def model_init(self, trial):
@@ -86,12 +88,23 @@ class AspectClassificationPipeline:
         threshold = 0.5
         pred_labels = (preds > threshold).float()
         self.encoded_pred_lables = pred_labels
-        f1 = f1_score(labels, pred_labels, average='weighted')
-        precision = precision_score(labels, pred_labels, average='weighted')
-        recall = recall_score(labels, pred_labels, average='weighted')
-        return {"f1 score": f1,
-                "precision": precision,
-                "recall": recall}
+        precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted')
+        balanced_acc = balanced_accuracy_score(labels, pred_labels)
+        c_matrix = multilabel_confusion_matrix(labels, pred_labels)
+
+        report_dict = {
+            "precision": precision,
+            "recall": recall,
+            "f1 score": f1,
+            "balanced accuracy": balanced_acc
+        }
+
+        report_df = pd.DataFrame(report_dict, index=self.label_mapping.values())
+        c_matrix_df = pd.DataFrame(c_matrix, index=self.label_mapping.values(), columns=self.label_mapping.values())
+        c_matrix_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/confusion_matrix.csv')
+        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/classification_report.csv')
+
+        return report_dict
                         
 class EuansDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):

@@ -96,7 +96,8 @@ def train_bert_models():
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
-        gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
+        gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
+        hidden_dropout_prob=best_parameters['dropout']
     )
     print(torch.cuda.get_device_properties(0))
     my_pipeline.trainer = MultiLabelClassTrainer(
