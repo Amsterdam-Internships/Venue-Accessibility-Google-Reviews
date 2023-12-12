@@ -97,7 +97,7 @@ class AspectClassificationPipeline:
             "f1 score": f1,
         }
 
-        report_df = pd.DataFrame(report_dict, index=self.label_mapping.values(), index=['weighted'])
+        report_df = pd.DataFrame(report_dict, index=['weighted'])
         c_matrix_df = pd.DataFrame(c_matrix[0], index=self.label_mapping.values(), columns=self.label_mapping.values())
         c_matrix_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/confusion_matrix.csv')
         report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/classification_report.csv')
