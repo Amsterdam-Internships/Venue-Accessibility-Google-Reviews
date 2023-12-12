@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, multilabel_confusion_matrix
+from sklearn.metrics import precision_recall_fscore_support, multilabel_confusion_matrix
 import torch
 from transformers import Trainer, TrainerCallback
 from torch import nn
@@ -89,14 +89,12 @@ class AspectClassificationPipeline:
         pred_labels = (preds > threshold).float()
         self.encoded_pred_lables = pred_labels
         precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted')
-        balanced_acc = balanced_accuracy_score(labels, pred_labels)
         c_matrix = multilabel_confusion_matrix(labels, pred_labels)
 
         report_dict = {
             "precision": precision,
             "recall": recall,
             "f1 score": f1,
-            "balanced accuracy": balanced_acc
         }
 
         report_df = pd.DataFrame(report_dict, index=self.label_mapping.values())
