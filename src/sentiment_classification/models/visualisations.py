@@ -11,7 +11,7 @@ def extract_metrics():
     eval_metrics = pd.read_csv(load_path)
     print(eval_metrics.columns)
     # Get the metric scores for the single row
-    accuracy_score = eval_metrics['eval_accuracy'].values[0]
+    accuracy_score = eval_metrics['eval_balanced accuracy'].values[0]
     precision_score = eval_metrics['eval_precision'].values[0]
     recall_score = eval_metrics['eval_recall'].values[0]
     f1_score = eval_metrics['eval_f1 score'].values[0]

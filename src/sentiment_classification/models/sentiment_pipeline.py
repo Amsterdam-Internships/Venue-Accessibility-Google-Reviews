@@ -5,6 +5,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trai
 from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 import torch
+import gc
 import numpy as np
 from transformers import Trainer, TrainerCallback
 from torch import nn
@@ -137,7 +138,7 @@ class MultiClassTrainer(Trainer):
 
 
 class MyTrainerCallback(TrainerCallback):
-    memory_clear_interval = 1  
+    memory_clear_interval = 5  
 
     @staticmethod
     def adjust_memory_clear_fraction():
@@ -152,3 +153,4 @@ class MyTrainerCallback(TrainerCallback):
             if fraction < 0.9:  
                 torch.cuda.empty_cache()
                 free_gpu_cache()
+                gc.collect()
