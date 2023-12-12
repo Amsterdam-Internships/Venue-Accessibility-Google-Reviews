@@ -114,6 +114,8 @@ def train_bert_models():
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
         gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
+        hidden_dropout_prob=best_parameters['hidden_dropout_prob'],
+        weight_decay=best_parameters['weight_decay'],
         load_best_model_at_end=True
     )
     my_pipeline.trainer = MultiClassTrainer(
@@ -124,11 +126,7 @@ def train_bert_models():
         compute_metrics=my_pipeline.compute_metrics,
         callbacks=[my_trainer_callback],
     )
-    # free_gpu_cache()
     my_pipeline.trainer.train()
-    # torch.cuda.empty_cache()
-    # gc.collect()
-    # free_gpu_cache()
     device = my_pipeline.trainer.args.device  # Getting the device
     torch.cuda.memory_summary(device=device, abbreviated=False)
     print('Training of BERT models has finished!')
