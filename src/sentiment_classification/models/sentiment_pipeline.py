@@ -141,7 +141,7 @@ class MultiClassTrainer(Trainer):
 
 
 class MyTrainerCallback(TrainerCallback):
-    memory_clear_interval = 3  
+    memory_clear_interval = 1 
 
     @staticmethod
     def adjust_memory_clear_fraction():
