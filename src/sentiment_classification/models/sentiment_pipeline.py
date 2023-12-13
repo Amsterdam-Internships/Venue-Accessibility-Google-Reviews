@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, confusion_matrix
-from imblearn.metrics import classification_report_imbalanced, confusion_matrix
+from imblearn.metrics import classification_report_imbalanced
 from sklearn.preprocessing import LabelEncoder
 import torch
 import gc
