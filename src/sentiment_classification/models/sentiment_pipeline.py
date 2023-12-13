@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, confusion_matrix
+from imblearn.metrics import classification_report_imbalanced, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 import torch
 import gc
@@ -92,16 +93,17 @@ class SentimentClassificationPipeline:
         preds = torch.argmax(probs, dim=1)
         self.encoded_pred_labels = preds.tolist()
         
-        precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
-        balanced_acc = balanced_accuracy_score(labels, preds)
+        # precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
+        report_dict = classification_report_imbalanced(labels, preds, target_names=list(self.label_mapping.values()), output_dict=True)
+        # balanced_acc = balanced_accuracy_score(labels, preds)
         c_matrix = confusion_matrix(labels, preds)
 
-        report_dict = {
-            "precision": precision,
-            "recall": recall,
-            "f1 score": f1,
-            "balanced accuracy": balanced_acc
-        }
+        # report_dict = {
+        #     "precision": precision,
+        #     "recall": recall,
+        #     "f1 score": f1,
+        #     "balanced accuracy": balanced_acc
+        # }
 
         report_df = pd.DataFrame(report_dict, index=self.label_mapping.values())
         c_matrix_df = pd.DataFrame(c_matrix, index=self.label_mapping.values(), columns=self.label_mapping.values())
@@ -139,7 +141,7 @@ class MultiClassTrainer(Trainer):
 
 
 class MyTrainerCallback(TrainerCallback):
-    memory_clear_interval = 5  
+    memory_clear_interval = 3  
 
     @staticmethod
     def adjust_memory_clear_fraction():
