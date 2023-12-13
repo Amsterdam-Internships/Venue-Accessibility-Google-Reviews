@@ -10,7 +10,8 @@ from torch import nn
 import yaml
 import os
 import sys
-import pandas as pd 
+import pandas as pd
+import numpy as np
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
 from gpu_test import free_gpu_cache
@@ -102,12 +103,26 @@ class AspectClassificationPipeline:
                 best_threshold = threshold
 
         return best_threshold
+    
+    def calculate_metrics_per_label(self, labels, pred_labels):
+        # Calculate precision, recall, and F1 score for each class
+        precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average=None)
+
+        # Create a dictionary for each label's metrics
+        label_metrics = {}
+        for i, label in enumerate(np.unique(labels)):
+            label_metrics[label] = {
+                "precision": precision[i],
+                "recall": recall[i],
+                "f1 score": f1[i],
+            }
+
+        return label_metrics
         
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
         logits = eval_pred.predictions
         preds = torch.sigmoid(torch.Tensor(logits))
-
         # Threshold tuning
         thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]  # You can adjust the range
         best_threshold = self.find_best_threshold(labels, preds, thresholds, metric='precision')
@@ -116,17 +131,27 @@ class AspectClassificationPipeline:
         pred_labels = (preds > best_threshold).float()
         self.encoded_pred_lables = pred_labels
         precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted')
-        c_matrix = multilabel_confusion_matrix(labels, pred_labels, labels = list(self.label_mapping.values()))
-
+        
         report_dict = {
             "precision": precision,
             "recall": recall,
             "f1 score": f1,
         }
+        
+        # Calculate and save per-label metrics
+        label_metrics = self.calculate_metrics_per_label(labels, pred_labels)
+
+        # Convert keys to strings
+        label_metrics_str_keys = {str(key): value for key, value in label_metrics.items()}
+
+        # Create a DataFrame for the per-label metrics
+        metrics_df = pd.DataFrame(label_metrics_str_keys).T
+
+        # Save the per-label metrics to CSV
+        metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
+
 
         report_df = pd.DataFrame(report_dict, index=list(self.label_mapping.values()))
-        c_matrix_df = pd.DataFrame(c_matrix.reshape(-1, 4))
-        c_matrix_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/confusion_matrix.csv', index=False)
         report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/classification_report.csv')
 
         return report_dict
