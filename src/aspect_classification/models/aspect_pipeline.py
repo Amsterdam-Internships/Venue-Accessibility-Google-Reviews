@@ -124,7 +124,7 @@ class AspectClassificationPipeline:
             f1: 'f1 score'
         }
         # Create a DataFrame for the per-label metrics
-        metrics_df = classification_report(labels, pred_labels, output_dict=True)   
+        metrics_df = pd.DataFrame(classification_report(labels, pred_labels, output_dict=True))   
 
         # Save the per-label metrics to CSV
         metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
