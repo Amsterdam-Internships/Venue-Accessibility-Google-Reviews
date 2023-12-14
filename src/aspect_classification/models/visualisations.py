@@ -33,22 +33,9 @@ def plot_metrics(total_loss, precision_score, recall_score, f1_score):
     plt.bar(metrics, scores)
     plt.xlabel('Metric')
     plt.ylabel('Score')
-    plt.title(f'Evaluation Metrics of {names}')
+    plt.title(f'Aspect Classification Evaluation Metrics of {names}')
     plt.savefig(save_path +f'{names}_evaluation_metrics.png')
     
-    confusion_matrix_df = pd.read_csv(confusion_matrix_path)  # Assuming 'Class' is the index column
-
-    # Plot a heatmap
-    plt.figure(figsize=(8, 6))
-    heatmap = sns.heatmap(confusion_matrix_df, annot=True, fmt="d", cmap="Blues", cbar=False)
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.title("Multi-Label Confusion Matrix")
-
-    # Save the heatmap data to a new CSV file
-    heatmap_data = pd.DataFrame(heatmap.get_array(), index=confusion_matrix_df.index, columns=confusion_matrix_df.columns)
-    heatmap_data.to_csv('heatmap_data.csv')
-
     plt.close()
 
 
