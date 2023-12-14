@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, confusion_matrix
+from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, confusion_matrix, classification_report
 from sklearn.preprocessing import LabelEncoder
 import torch
 import gc
@@ -85,25 +85,6 @@ class SentimentClassificationPipeline:
         self.encoded_pred_labels = [key for label in labels for key, value in self.label_mapping.items() if value == label]
         return np.array(self.encoded_pred_labels, dtype=np.int64)
     
-    def calculate_metrics_per_label(self, labels, preds):
-        # Calculate precision, recall, and F1 score for each class
-        precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average=None)
-
-        # Calculate accuracy for each class
-        accuracies = [balanced_accuracy_score(labels == i, preds == i) for i in np.unique(labels)]
-
-        # Create a dictionary for each label's metrics
-        label_metrics = {}
-        for i, label in enumerate(np.unique(labels)):
-            label_metrics[label] = {
-                "precision": precision[i],
-                "recall": recall[i],
-                "f1 score": f1[i],
-                "accuracy": accuracies[i]
-            }
-
-        return label_metrics
-
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
         logits = torch.Tensor(eval_pred.predictions)
@@ -113,57 +94,21 @@ class SentimentClassificationPipeline:
         
         precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
         balanced_acc = balanced_accuracy_score(labels, preds)
-            
+        c_matrix = confusion_matrix(labels, preds)
 
-        overall_metrics = {
+        report_dict = {
             "precision": precision,
             "recall": recall,
             "f1 score": f1,
             "balanced accuracy": balanced_acc
-            }
-        # Calculate per-label metrics
-        label_metrics = self.calculate_metrics_per_label(labels, preds)
+        }
 
-        # Convert keys to strings
-        label_metrics_str_keys = {str(key): value for key, value in label_metrics.items()}
+        report_df = pd.DataFrame(report_dict, index=self.label_mapping.values())
+        c_matrix_df = pd.DataFrame(c_matrix, index=self.label_mapping.values(), columns=self.label_mapping.values())
+        c_matrix_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/confusion_matrix.csv')
+        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/classification_report.csv')
 
-        # Create a DataFrame for the per-label metrics
-        metrics_df = pd.DataFrame(label_metrics_str_keys, index=list(self.label_mapping.values())).T
-
-        # Save the per-label metrics to CSV
-        metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/metrics_per_label.csv')
-
-        # Save the confusion matrix
-        pd.DataFrame(confusion_matrix(labels, preds), index=self.label_mapping.values(), columns=self.label_mapping.values())\
-            .to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/confusion_matrix.csv')
-
-        return overall_metrics
-
-    
-    # def compute_metrics(self, eval_pred):
-    #     labels = eval_pred.label_ids
-    #     logits = torch.Tensor(eval_pred.predictions)
-    #     probs = F.softmax(logits, dim=1)
-    #     preds = torch.argmax(probs, dim=1)
-    #     self.encoded_pred_labels = preds.tolist()
-        
-    #     precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
-    #     balanced_acc = balanced_accuracy_score(labels, preds)
-    #     c_matrix = confusion_matrix(labels, preds)
-
-    #     report_dict = {
-    #         "precision": precision,
-    #         "recall": recall,
-    #         "f1 score": f1,
-    #         "balanced accuracy": balanced_acc
-    #     }
-
-    #     report_df = pd.DataFrame(report_dict, index=self.label_mapping.values())
-    #     c_matrix_df = pd.DataFrame(c_matrix, index=self.label_mapping.values(), columns=self.label_mapping.values())
-    #     c_matrix_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/confusion_matrix.csv')
-    #     report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/classification_report.csv')
-
-    #     return report_dict
+        return report_dict
                     
 class EuansDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import precision_recall_fscore_support,  multilabel_confusion_matrix
+from sklearn.metrics import precision_recall_fscore_support, classification_report, balanced_accuracy_score
 import torch
 from transformers import Trainer, TrainerCallback
 from torch import nn
@@ -104,21 +104,7 @@ class AspectClassificationPipeline:
 
         return best_threshold
     
-    def calculate_metrics_per_label(self, labels, pred_labels):
-        # Calculate precision, recall, and F1 score for each class
-        precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average=None)
-
-        # Create a dictionary for each label's metrics
-        label_metrics = {}
-        for i, label in enumerate(np.unique(labels)):
-            label_metrics[label] = {
-                "precision": precision[i],
-                "recall": recall[i],
-                "f1 score": f1[i],
-            }
-
-        return label_metrics
-        
+       
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
         logits = eval_pred.predictions
@@ -133,19 +119,12 @@ class AspectClassificationPipeline:
         precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted')
         
         report_dict = {
-            "precision": precision,
-            "recall": recall,
-            "f1 score": f1,
+            'precision': precision,
+            'recall': recall,
+            f1: 'f1 score'
         }
-        
-        # Calculate and save per-label metrics
-        label_metrics = self.calculate_metrics_per_label(labels, pred_labels)
-
-        # Convert keys to strings
-        label_metrics_str_keys = {str(key): value for key, value in label_metrics.items()}
-
         # Create a DataFrame for the per-label metrics
-        metrics_df = pd.DataFrame(label_metrics_str_keys).T
+        metrics_df = classification_report(labels, pred_labels, output_dict=True)   
 
         # Save the per-label metrics to CSV
         metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
