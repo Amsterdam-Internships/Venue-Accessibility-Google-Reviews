@@ -59,8 +59,7 @@ class AspectClassificationPipeline:
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
-            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
-            'dropout': trial.suggest_categorical('dropout', [0.1, 0.2, 0.3, 0.4, 0.5])
+            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4])
         }
         
     def model_init(self, trial):
@@ -116,19 +115,17 @@ class AspectClassificationPipeline:
         # Apply the best threshold to get final predicted labels
         pred_labels = (preds > best_threshold).float()
         self.encoded_pred_lables = pred_labels
-        precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted')
+        precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted', labels=list(self.label_mapping.keys()))
         
         report_dict = {
             'precision': precision,
             'recall': recall,
             f1: 'f1 score'
         }
-        # Create a DataFrame for the per-label metrics
+        
         metrics_df = pd.DataFrame(classification_report(labels, pred_labels, output_dict=True))   
 
-        # Save the per-label metrics to CSV
         metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
-
 
         report_df = pd.DataFrame(report_dict, index=list(self.label_mapping.values()))
         report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/classification_report.csv')
