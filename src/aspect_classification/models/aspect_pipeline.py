@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import precision_recall_fscore_support, classification_report, balanced_accuracy_score
+from sklearn.metrics import precision_recall_fscore_support, classification_report
 import torch
 from transformers import Trainer, TrainerCallback
 from torch import nn
@@ -123,9 +123,9 @@ class AspectClassificationPipeline:
             f1: 'f1 score'
         }
         
-        metrics_df = pd.DataFrame(classification_report(labels, pred_labels, output_dict=True))   
+        # metrics_df = pd.DataFrame(classification_report(labels, pred_labels, output_dict=True))   
 
-        metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
+        # metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
 
         report_df = pd.DataFrame(report_dict, index=list(self.label_mapping.values()))
         report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/classification_report.csv')
