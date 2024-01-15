@@ -5,8 +5,10 @@ from transformers import TrainingArguments
 from aspect_pipeline import AspectClassificationPipeline, EuansDataset, MultiLabelClassTrainer, MyTrainerCallback
 # Load environment variables from .env file
 load_dotenv(override=True)
+import gc
 import pandas as pd
 import numpy as np
+import joblib
 import yaml
 import torch
 import sys
@@ -51,19 +53,9 @@ def train_bert_models():
     name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     save_path = saved_model_path+f"{name}"
     # load the data
-    # Load the data
-    try:
-        euans_data = pd.read_csv(loaded_data_path)
-    except Exception as e:
-        print("Error loading data:", e)
-        return
-
-    # Split the data
-    try:
-        train_dataset, val_dataset = create_datasets(euans_data)
-    except Exception as e:
-        print("Error creating datasets:", e)
-        return
+    euans_data = pd.read_csv(loaded_data_path)
+    # split the data 
+    train_dataset, val_dataset = create_datasets(euans_data)
     my_pipeline.training_args.output_dir = save_path
     print(f"my device {my_pipeline.device}")
     print(f"my model {my_pipeline.model_name}")
@@ -78,20 +70,15 @@ def train_bert_models():
         tokenizer=my_pipeline.tokenizer,
         model_init=my_pipeline.model_init,
     )
-    # Optimize hyperparameters
-    try:
-        best_trial = my_pipeline.trainer.hyperparameter_search(
-            direction='maximize',
-            backend='optuna',
-            hp_space=my_pipeline.optuna_hp_space,
-            n_trials=10
-        )
+    # optimising hyperparameters
+    best_trial = my_pipeline.trainer.hyperparameter_search(
+        direction='maximize',
+        backend='optuna',
+        hp_space=my_pipeline.optuna_hp_space,
+        n_trials=10
+    )
 
-        best_parameters = best_trial.hyperparameters
-    except Exception as e:
-        print("Error in hyperparameter search:", e)
-        return
-
+    
     best_parameters = best_trial.hyperparameters
     
     new_training_args = TrainingArguments(
@@ -109,8 +96,7 @@ def train_bert_models():
         per_device_train_batch_size=best_parameters['per_device_train_batch_size'],
         per_device_eval_batch_size=best_parameters['per_device_eval_batch_size'],
         num_train_epochs=best_parameters['num_train_epochs'],
-        gradient_accumulation_steps=best_parameters['gradient_accumulation_steps'],
-        hidden_dropout_prob=best_parameters['dropout']
+        gradient_accumulation_steps=best_parameters['gradient_accumulation_steps']
     )
     print(torch.cuda.get_device_properties(0))
     my_pipeline.trainer = MultiLabelClassTrainer(
@@ -140,4 +126,3 @@ if __name__ == '__main__':
     params_path = os.getenv('LOCAL_ENV') + 'models/aspect_classification/transformer_models/'
     logs_path = os.getenv('LOCAL_ENV') + '/logs/aspect_classification/'
     train_bert_models()
-
