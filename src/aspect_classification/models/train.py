@@ -53,7 +53,10 @@ def train_bert_models():
     name = my_pipeline.model_name.split('/')[-1] if '/' in my_pipeline.model_name else my_pipeline.model_name
     save_path = saved_model_path+f"{name}"
     # load the data
-    euans_data = pd.read_csv(loaded_data_path)
+    try:
+        euans_data = pd.read_csv(loaded_data_path)
+    except AttributeError as e:
+        print(f"{e.name=}") 
     # split the data 
     train_dataset, val_dataset = create_datasets(euans_data)
     my_pipeline.training_args.output_dir = save_path

@@ -12,9 +12,6 @@ from aspect_pipeline import AspectClassificationPipeline, MultiLabelClassTrainer
 import pandas as pd
 import yaml
 
-
-
-
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
@@ -43,10 +40,14 @@ def generate_results(test_data):
     )
     
     # Perform evaluation
-    evaluation_result = trainer.evaluate(eval_dataset=eval_set)
-    # Assuming annotated_data is your DataFrame
-    test_data['Predicted Aspect Labels'] = my_pipeline.extract_labels()
-    save_results(evaluation_result, test_data)
+    try:
+        evaluation_result = trainer.evaluate(eval_dataset=eval_set)
+        # Assuming annotated_data is your DataFrame
+        test_data['Predicted Aspect Labels'] = my_pipeline.extract_labels()
+        save_results(evaluation_result, test_data)
+    except AttributeError as e:
+        print(f"{e.name=}") 
+    
     
 def save_results(eval_metrics, predicted_df):
     # Save the predicted labels as a CSV file
@@ -70,7 +71,6 @@ if __name__ == '__main__':
     # Get the file paths from environment variables
     test_data_path = os.getenv('LOCAL_ENV') + '/data/processed/aspect_classification_data/processed_google_sample_reviews.csv'
     loaded_model_path = os.getenv('LOCAL_ENV') + f'/models/aspect_classification/transformer_models/{names}'
-    print(loaded_model_path)
     results_path = os.getenv('LOCAL_ENV') + f"/results/aspect_classification/{names}"
     interim_path = os.getenv('LOCAL_ENV') + '/data/interim'
 
