@@ -120,7 +120,7 @@ class AspectClassificationPipeline:
         report_dict = {
             'precision': precision,
             'recall': recall,
-            f1: 'f1 score'
+            'f1 score': f1
         }
         
         # metrics_df = pd.DataFrame(classification_report(labels, pred_labels, output_dict=True))   
