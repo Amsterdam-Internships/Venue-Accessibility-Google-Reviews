@@ -97,7 +97,7 @@ class AspectClassificationPipeline:
             else:
                 raise ValueError(f"Unsupported metric: {metric}")
 
-            if metric_value > best_metric_value:
+            if np.all(metric_value > best_metric_value):
                 best_metric_value = metric_value
                 best_threshold = threshold
 
@@ -110,7 +110,7 @@ class AspectClassificationPipeline:
         preds = torch.sigmoid(torch.Tensor(logits))
         # Threshold tuning
         thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]  # You can adjust the range
-        best_threshold = self.find_best_threshold(labels, preds, thresholds, metric='f1')
+        best_threshold = self.find_best_threshold(labels, preds, thresholds, metric='precision')
 
         # Apply the best threshold to get final predicted labels
         pred_labels = (preds > best_threshold).float()
