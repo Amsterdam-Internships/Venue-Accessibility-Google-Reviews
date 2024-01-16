@@ -85,7 +85,7 @@ class AspectClassificationPipeline:
 
         for threshold in thresholds:
             pred_labels = (preds > threshold).float()
-            precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted')
+            precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels)
 
             # Choose the metric to optimize
             if metric == 'precision':
