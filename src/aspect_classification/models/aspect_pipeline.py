@@ -85,7 +85,7 @@ class AspectClassificationPipeline:
 
         for threshold in thresholds:
             pred_labels = (preds > threshold).float()
-            precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average=None, labels=list(self.label_mapping.keys()))
+            precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted', labels=list(self.label_mapping.keys()))
 
             # Choose the metric to optimize
             if metric == 'precision':
@@ -97,7 +97,7 @@ class AspectClassificationPipeline:
             else:
                 raise ValueError(f"Unsupported metric: {metric}")
 
-            if np.all(metric_value > best_metric_value):
+            if  metric_value > best_metric_value:
                 best_metric_value = metric_value
                 best_threshold = threshold
 
@@ -110,25 +110,30 @@ class AspectClassificationPipeline:
         preds = torch.sigmoid(torch.Tensor(logits))
         # Threshold tuning
         thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]  # You can adjust the range
-        best_threshold = self.find_best_threshold(labels, preds, thresholds, metric='precision')
+        best_threshold = self.find_best_threshold(labels, preds, thresholds, metric='f1')
 
         # Apply the best threshold to get final predicted labels
         pred_labels = (preds > best_threshold).float()
         self.encoded_pred_lables = pred_labels
         precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average=None, labels=list(self.label_mapping.keys()))
-        
+        temp_precision, temp_recall, temp_f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted', labels=list(self.label_mapping.keys()))
         report_dict = {
-            'precision': precision,
-            'recall': recall,
-            'f1 score': f1
+            'precision': temp_precision,
+            'recall': temp_recall,
+            'f1 score': temp_f1,
+        }
+        final_report_dict = {
+            'precision': {'Access': precision[0], 'Overview': precision[1],'Staff': precision[2],'Toilets': precision[3],'Transport & Parking': precision[4]},
+            'recall': {'Access': recall[0], 'Overview': recall[1],'Staff': recall[2],'Toilets': recall[3],'Transport & Parking': recall[4]},
+            'f1 score': {'Access': f1[0], 'Overview': f1[1],'Staff': f1[2],'Toilets': f1[3],'Transport & Parking': f1[4]},
         }
         
         # metrics_df = pd.DataFrame(classification_report(labels, pred_labels, output_dict=True))   
 
         # metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
 
-        report_df = pd.DataFrame(report_dict, index=list(self.label_mapping.values()))
-        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/classification_report.csv')
+        report_df = pd.DataFrame(final_report_dict, index=list(self.label_mapping.values()))
+        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
 
         return report_dict
 
