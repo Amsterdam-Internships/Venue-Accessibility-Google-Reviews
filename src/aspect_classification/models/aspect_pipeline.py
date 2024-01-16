@@ -110,12 +110,12 @@ class AspectClassificationPipeline:
         preds = torch.sigmoid(torch.Tensor(logits))
         # Threshold tuning
         thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]  # You can adjust the range
-        best_threshold = self.find_best_threshold(labels, preds, thresholds, metric='precision')
+        best_threshold = self.find_best_threshold(labels, preds, thresholds)
 
         # Apply the best threshold to get final predicted labels
         pred_labels = (preds > best_threshold).float()
         self.encoded_pred_lables = pred_labels
-        precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average='weighted', labels=list(self.label_mapping.keys()))
+        precision, recall, f1, _ = precision_recall_fscore_support(labels, pred_labels, average=None, labels=list(self.label_mapping.keys()))
         
         report_dict = {
             'precision': precision,
