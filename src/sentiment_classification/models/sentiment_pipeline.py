@@ -57,12 +57,10 @@ class SentimentClassificationPipeline:
         Defines the hyperparameter space for Optuna.
         '''
         return {
-            'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 4e-5, 3e-5, 2e-5]),
-            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16]),
-            'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16]),
-            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5]),
-            'gradient_accumulation_steps': trial.suggest_categorical('gradient_accumulation_steps', [1, 2, 3, 4]),
-            'weight_decay': trial.suggest_categorical('weight_decay', [0.0, 0.01, 0.1]),
+            'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 3e-5, 2e-5, 3e-4, 1e-4]),
+            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32, 64, 128]),
+            'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [8, 16, 32, 64, 128]),
+            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [4, 5, 6, 7, 8, 9, 10])
         }
     
         
@@ -91,22 +89,24 @@ class SentimentClassificationPipeline:
         probs = F.softmax(logits, dim=1)
         preds = torch.argmax(probs, dim=1)
         self.encoded_pred_labels = preds.tolist()
-        
-        precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
-        balanced_acc = balanced_accuracy_score(labels, preds)
-        c_matrix = confusion_matrix(labels, preds)
-
+        precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average=None, labels=list(self.label_mapping.keys()))
+        temp_precision, temp_recall, temp_f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
         report_dict = {
-            "precision": precision,
-            "recall": recall,
-            "f1 score": f1,
-            "balanced accuracy": balanced_acc
+            'precision': temp_precision,
+            'recall': temp_recall,
+            'f1 score': temp_f1,
         }
+        final_report_dict = {
+            'precision': {'Negative': precision[0], 'Neutral': precision[1],'Positive': precision[2]},
+            'recall': {'Negative': recall[0], 'Neutral': recall[1],'Positive': recall[2]},
+            'f1 score': {'Negative': f1[0], 'Neutral': f1[1],'Positive': f1[2]},
+        }
+        c_matrix = confusion_matrix(labels, preds, labels=list(self.label_mapping.keys()))
 
-        report_df = pd.DataFrame(report_dict, index=self.label_mapping.values())
-        c_matrix_df = pd.DataFrame(c_matrix, index=self.label_mapping.values(), columns=self.label_mapping.values())
+        report_df = pd.DataFrame(final_report_dict)
+        c_matrix_df = pd.DataFrame(c_matrix, columns=list(self.label_mapping.values()), index=list(self.label_mapping.values()))
         c_matrix_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/confusion_matrix.csv')
-        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/classification_report.csv')
+        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/sentiment_classification/metrics_per_label.csv')
 
         return report_dict
                     
