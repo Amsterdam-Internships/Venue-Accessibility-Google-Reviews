@@ -11,17 +11,17 @@ def extract_metrics():
     eval_metrics = pd.read_csv(load_path)
     print(eval_metrics.columns)
     # Get the metric scores for the single row
-    accuracy_score = eval_metrics['eval_balanced accuracy'].values[0]
+    loss_score = eval_metrics['eval_loss'].values[0]
     precision_score = eval_metrics['eval_precision'].values[0]
     recall_score = eval_metrics['eval_recall'].values[0]
     f1_score = eval_metrics['eval_f1 score'].values[0]
-    plot_metrics(accuracy_score, precision_score, recall_score, f1_score)
+    plot_metrics(loss_score, precision_score, recall_score, f1_score)
 
 def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
     # Create a bar plot for all four metrics
     plt.figure(figsize=(8, 6))
-    metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
-    scores = [accuracy_score, precision_score, recall_score, f1_score]
+    metrics = ['loss', 'Precision', 'Recall', 'F1-Score']
+    scores = [loss_score, precision_score, recall_score, f1_score]
     plt.bar(metrics, scores)
     plt.xlabel('Metric')
     plt.ylabel('Score')
