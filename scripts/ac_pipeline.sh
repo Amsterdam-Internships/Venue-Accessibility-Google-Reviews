@@ -47,11 +47,11 @@ nvidia-smi
 
 echo "Preparing and cleaning data..."
 
-python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
+# python "${LOCAL_ENV}/src/aspect_classification/data/make_dataset.py"
 
 # train aspect classifiers
 
-python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
+# python "${LOCAL_ENV}/src/aspect_classification/models/train.py"
 
 # Check if the GPU is actually being used
 
