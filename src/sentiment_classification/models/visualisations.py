@@ -17,7 +17,7 @@ def extract_metrics():
     f1_score = eval_metrics['eval_f1 score'].values[0]
     plot_metrics(loss_score, precision_score, recall_score, f1_score)
 
-def plot_metrics(accuracy_score, precision_score, recall_score, f1_score):
+def plot_metrics(loss_score, precision_score, recall_score, f1_score):
     # Create a bar plot for all four metrics
     plt.figure(figsize=(8, 6))
     metrics = ['loss', 'Precision', 'Recall', 'F1-Score']
