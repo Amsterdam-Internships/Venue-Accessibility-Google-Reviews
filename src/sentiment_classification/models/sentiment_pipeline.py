@@ -58,9 +58,9 @@ class SentimentClassificationPipeline:
         '''
         return {
             'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 3e-5, 2e-5, 3e-4, 1e-4]),
-            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 16, 64]),
-            'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 16, 64]),
-            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [2, 3, 4, 5, 10]),
+            'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [4, 8, 64]),
+            'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [4, 8, 64]),
+            'num_train_epochs': trial.suggest_categorical('num_train_epochs', [10]),
         }
     
         
