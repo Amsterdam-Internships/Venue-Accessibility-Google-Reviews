@@ -128,7 +128,7 @@ class AspectClassificationPipeline:
             'f1 score': {'Access': f1[0], 'Overview': f1[1],'Staff': f1[2],'Toilets': f1[3],'Transport & Parking': f1[4]},
         }
         
-        cm_df = pd.DataFrame(multilabel_confusion_matrix(labels, pred_labels, output_dict=True))   
+        cm_df = pd.DataFrame(multilabel_confusion_matrix(labels, pred_labels))   
 
         cm_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/confmatrix.csv')
 
