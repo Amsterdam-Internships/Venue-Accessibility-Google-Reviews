@@ -57,7 +57,7 @@ class SentimentClassificationPipeline:
         Defines the hyperparameter space for Optuna.
         '''
         return {
-            'learning_rate': trial.suggest_categorical('learning_rate', [5e-5, 3e-5, 2e-5, 3e-4, 1e-4]),
+            'learning_rate': trial.suggest_categorical('learning_rate', [3e-4]),
             'per_device_train_batch_size': trial.suggest_categorical('per_device_train_batch_size', [8]),
             'per_device_eval_batch_size': trial.suggest_categorical('per_device_eval_batch_size', [64]),
             'num_train_epochs': trial.suggest_categorical('num_train_epochs', [10]),
