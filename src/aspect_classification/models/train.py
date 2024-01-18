@@ -1,4 +1,3 @@
-from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
 from transformers import TrainingArguments
@@ -15,7 +14,6 @@ import sys
 import os
 sys.path.append(os.getenv('LOCAL_ENV') + '/scripts')
 print(sys.path)
-from gpu_test import free_gpu_cache
 sys.path.append(os.getenv('LOCAL_ENV') + '/src')
 from aspect_classification.data.preprocessing import Preprocessor
 config_path = os.getenv('LOCAL_ENV') + '/src/aspect_classification/models/config.yml'
@@ -81,7 +79,6 @@ def train_bert_models():
         n_trials=10
     )
 
-    
     best_parameters = best_trial.hyperparameters
     
     new_training_args = TrainingArguments(
