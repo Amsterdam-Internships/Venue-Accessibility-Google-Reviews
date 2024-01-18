@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import precision_recall_fscore_support, classification_report
+from sklearn.metrics import precision_recall_fscore_support, multilabel_confusion_matrix
 import torch
 from transformers import Trainer, TrainerCallback
 from torch import nn
@@ -128,9 +128,9 @@ class AspectClassificationPipeline:
             'f1 score': {'Access': f1[0], 'Overview': f1[1],'Staff': f1[2],'Toilets': f1[3],'Transport & Parking': f1[4]},
         }
         
-        # metrics_df = pd.DataFrame(classification_report(labels, pred_labels, output_dict=True))   
+        cm_df = pd.DataFrame(multilabel_confusion_matrix(labels, pred_labels, output_dict=True))   
 
-        # metrics_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
+        cm_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/confmatrix.csv')
 
         report_df = pd.DataFrame(final_report_dict, index=list(self.label_mapping.values()))
         report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
@@ -161,7 +161,7 @@ class MultiLabelClassTrainer(Trainer):
         labels = inputs.get("labels")
         outputs = model(**inputs)
         logits = outputs.logits
-        loss = nn.BCEWithLogitsLoss()(logits, labels.float())
+        loss = nn.MultiLabelSoftMarginLoss()(logits, labels.float())
         return (loss, outputs) if return_outputs else loss
     
        
