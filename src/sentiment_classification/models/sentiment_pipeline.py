@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
-from sklearn.metrics import precision_recall_fscore_support, balanced_accuracy_score, confusion_matrix, classification_report
+from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 import torch
 import gc
