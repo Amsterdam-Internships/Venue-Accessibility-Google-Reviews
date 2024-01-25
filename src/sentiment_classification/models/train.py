@@ -26,8 +26,8 @@ config_path = os.getenv('LOCAL_ENV') + '/src/sentiment_classification/models/con
 with open(config_path, 'r') as f:
     params = yaml.load(f, Loader=yaml.FullLoader)
     params = params['bert_params']
-torch.cuda.set_per_process_memory_fraction(0.5)  # Adjust as needed
-torch.backends.cudnn.benchmark = True
+# torch.cuda.set_per_process_memory_fraction(0.5)  # Adjust as needed
+# torch.backends.cudnn.benchmark = True
 my_pipeline = SentimentClassificationPipeline(pipeline_type='transformer', model_type=params['model_name_or_path'])
 
 def encode_datasets(train_text, val_text):
