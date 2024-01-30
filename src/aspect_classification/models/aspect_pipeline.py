@@ -126,9 +126,11 @@ class AspectClassificationPipeline:
             'precision': {'Access': precision[0], 'Overview': precision[1],'Staff': precision[2],'Toilets': precision[3],'Transport & Parking': precision[4]},
             'recall': {'Access': recall[0], 'Overview': recall[1],'Staff': recall[2],'Toilets': recall[3],'Transport & Parking': recall[4]},
             'f1 score': {'Access': f1[0], 'Overview': f1[1],'Staff': f1[2],'Toilets': f1[3],'Transport & Parking': f1[4]},
-        }
+        }  
         
-        cm_df = pd.DataFrame(multilabel_confusion_matrix(labels, pred_labels))   
+        cm = multilabel_confusion_matrix(labels, pred_labels, labels=list(self.label_mapping.keys()))
+        
+        cm_df = pd.DataFrame(cm)   
 
         cm_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/confmatrix.csv')
 
