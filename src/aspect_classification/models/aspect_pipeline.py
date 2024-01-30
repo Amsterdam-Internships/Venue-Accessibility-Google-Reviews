@@ -4,6 +4,7 @@ load_dotenv()
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import precision_recall_fscore_support, multilabel_confusion_matrix
+from sklearn.utils.class_weight import compute_sample_weight
 import torch
 from transformers import Trainer, TrainerCallback
 from torch import nn
@@ -116,7 +117,7 @@ class AspectClassificationPipeline:
                             index=[f'{class_name} Actual', f'Not {class_name} Actual'])
 
             # Save to CSV
-            df.to_csv(os.getenv('LOCAL_ENV') + f'/logs/aspect_classification/confusion_matrix_{class_name}.csv')
+            df.to_csv(os.getenv('LOCAL_ENV') + f'/logs/aspect_classification/weighted_confusion_matrix_{class_name}.csv')
             
        
     def compute_metrics(self, eval_pred):
@@ -124,7 +125,7 @@ class AspectClassificationPipeline:
         logits = eval_pred.predictions
         preds = torch.sigmoid(torch.Tensor(logits))
         # Threshold tuning
-        thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]  # You can adjust the range
+        thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
         best_threshold = self.find_best_threshold(labels, preds, thresholds, metric='f1')
 
         # Apply the best threshold to get final predicted labels
@@ -143,12 +144,16 @@ class AspectClassificationPipeline:
             'f1 score': {'Access': f1[0], 'Overview': f1[1],'Staff': f1[2],'Toilets': f1[3],'Transport & Parking': f1[4]},
         }  
         
-        cm = multilabel_confusion_matrix(labels, pred_labels, labels=list(self.label_mapping.keys()))
+        # Calculate label frequency weights
+        label_frequencies = np.sum(labels, axis=0)
+        sample_weights = compute_sample_weight(class_weight='balanced', y=labels)
+        
+        cm = multilabel_confusion_matrix(labels, pred_labels, labels=list(self.label_mapping.keys()), sample_weight=sample_weights, samplewise=True)
         
         self.create_cm(cm)
 
         report_df = pd.DataFrame(final_report_dict, index=list(self.label_mapping.values()))
-        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
+        report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/weighted_metrics_per_label.csv')
 
         return report_dict
 
