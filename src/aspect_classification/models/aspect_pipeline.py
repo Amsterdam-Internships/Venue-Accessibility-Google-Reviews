@@ -103,6 +103,21 @@ class AspectClassificationPipeline:
 
         return best_threshold
     
+    def create_cm(self,cm):
+        
+        # Iterate over each class in the dictionary
+        for class_index, class_name in self.label_mapping.items():
+            # Extract the confusion matrix for the current class
+            class_cm = cm[class_index]
+
+            # Create a DataFrame with more appropriate terminology
+            df = pd.DataFrame(class_cm, 
+                            columns=[f'{class_name} Predicted', f'Not {class_name} Predicted'], 
+                            index=[f'{class_name} Actual', f'Not {class_name} Actual'])
+
+            # Save to CSV
+            df.to_csv(os.getenv('LOCAL_ENV') + f'/logs/aspect_classification/confusion_matrix_{class_name}.csv')
+            
        
     def compute_metrics(self, eval_pred):
         labels = eval_pred.label_ids
@@ -130,9 +145,7 @@ class AspectClassificationPipeline:
         
         cm = multilabel_confusion_matrix(labels, pred_labels, labels=list(self.label_mapping.keys()))
         
-        cm_df = pd.DataFrame(cm)   
-
-        cm_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/confmatrix.csv')
+        self.create_cm(cm)
 
         report_df = pd.DataFrame(final_report_dict, index=list(self.label_mapping.values()))
         report_df.to_csv(os.getenv('LOCAL_ENV') + '/logs/aspect_classification/metrics_per_label.csv')
